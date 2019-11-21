@@ -5,9 +5,9 @@ services:
     image: python:3.6
     container_name: pc-enriched-data
     volumes:
-      - .:/opt/enriched_data
+      - .:/opt/pass-culture-metabase
     command: >
-      bash -c "cd /opt/enriched_data;
+      bash -c "cd /opt/pass-culture-metabase;
                pip install -r ./requirements.txt;
                while true
                do
@@ -34,10 +34,6 @@ services:
                python -m nltk.downloader punkt stopwords;
                cp /opt/enriched_data/install_models.py /opt/pass-culture-api/install_models.py;
                PYTHONPATH=. python install_models.py;
-               while true
-               do
-               sleep 1000
-               done;
                "
     env_file:
       - env_file
