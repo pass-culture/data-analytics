@@ -1,0 +1,97 @@
+version: "3.7"
+
+services:
+  enriched-data:
+    image: python:3.6
+    container_name: pc-enriched-data
+    volumes:
+      - .:/opt/enriched_data
+    command: >
+      bash -c "cd /opt/enriched_data;
+               pip install -r ./requirements.txt;
+               while true
+               do
+               sleep 100
+               done;
+               "
+    env_file:
+      - env_file
+    networks:
+      - db_nw
+    depends_on:
+      - postgres-product
+
+  install-models:
+    image: python:3.6
+    container_name: pc-install-models
+    volumes:
+      - .:/opt/enriched_data
+    command: >
+      bash -c "cd /opt;
+               git clone https://github.com/betagouv/pass-culture-api.git;
+               cd pass-culture-api;
+               pip install -r requirements.txt;
+               python -m nltk.downloader punkt stopwords;
+               cp /opt/enriched_data/install_models.py /opt/pass-culture-api/install_models.py;
+               PYTHONPATH=. python install_models.py;
+               while true
+               do
+               sleep 1000
+               done;
+               "
+    env_file:
+      - env_file
+    networks:
+      - db_nw
+    depends_on:
+      - postgres-product
+
+  postgres-product:
+    image: postgres:10.10-alpine
+    container_name: pc-postgres-product
+
+    env_file:
+      - env_file
+    networks:
+      - db_nw
+    ports:
+      - 5435:5432
+    command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
+
+  postgres-metabase:
+    image: postgres:10.10-alpine
+    container_name: pc-postgres-metabase
+    environment:
+      - POSTGRES_DB=pass_culture
+      - POSTGRES_USER=metabase
+      - POSTGRES_PASSWORD=metabase
+    networks:
+      - db_nw
+    ports:
+      - 5436:5432
+    command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
+
+
+  metabase-app:
+    container_name: pc-metabase-app
+    image: metabase/metabase
+    ports:
+      - 3002:3000
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: pass_culture
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: metabase
+      MB_DB_HOST: postgres-metabase
+    depends_on:
+      - postgres-metabase
+    links:
+      - postgres-metabase
+    networks:
+      - db_nw
+
+networks:
+  db_nw:
+    driver: bridge
+
