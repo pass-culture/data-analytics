@@ -1,0 +1,6 @@
+flask_sqlalchemy
+pandas
+postgresql_audit
+psycopg2
+pytest
+sqlalchemy
