@@ -3,20 +3,19 @@ from datetime import datetime
 import pandas
 import pytest
 
-from db import CONNECTION
+from db import CONNECTION, ENGINE
 from offerer_queries import get_first_stock_creation_dates, \
     get_first_booking_creation_dates, get_creation_dates, get_number_of_offers, \
     get_number_of_bookings_not_cancelled, get_offerers_details
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product, engine
+    create_booking, create_product
 
-connection = CONNECTION
 
 
 class OffererQueriesTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
-        engine.execute('''
+        ENGINE.execute('''
                         DELETE FROM "recommendation";
                         DELETE FROM "booking";
                         DELETE FROM "stock";
@@ -36,7 +35,7 @@ class OffererQueriesTest:
             create_offerer(date_created=creation_date)
 
             # When
-            creation_dates = get_creation_dates(connection)
+            creation_dates = get_creation_dates(CONNECTION)
 
             # Then
             assert creation_dates.loc[1, "Date de création"] == creation_date
@@ -54,7 +53,7 @@ class OffererQueriesTest:
             create_stock(offer_id=1, id=2)
 
             # When
-            first_stock_dates = get_first_stock_creation_dates(connection)
+            first_stock_dates = get_first_stock_creation_dates(CONNECTION)
 
             # Then
             assert date_before_first_save < first_stock_dates.loc[
@@ -65,7 +64,7 @@ class OffererQueriesTest:
             create_offerer()
 
             # When
-            first_stock_dates = get_first_stock_creation_dates(connection)
+            first_stock_dates = get_first_stock_creation_dates(CONNECTION)
 
             # Then
             assert first_stock_dates.loc[1, "Date de création du premier stock"] is None
@@ -85,7 +84,7 @@ class OffererQueriesTest:
             create_booking(user_id=1, stock_id=1, date_created=second_booking_date, id=2, token='AZERTY')
 
             # When
-            first_booking_dates = get_first_booking_creation_dates(connection)
+            first_booking_dates = get_first_booking_creation_dates(CONNECTION)
 
             # Then
             assert first_booking_dates.loc[1, "Date de première réservation"] == first_booking_date
@@ -95,7 +94,7 @@ class OffererQueriesTest:
             create_offerer()
 
             # When
-            first_booking_dates = get_first_booking_creation_dates(connection)
+            first_booking_dates = get_first_booking_creation_dates(CONNECTION)
 
             # Then
             assert first_booking_dates.loc[1, "Date de première réservation"] is None
@@ -110,7 +109,7 @@ class OffererQueriesTest:
             create_offer(venue_id=1, product_id=1, id=1)
             create_offer(venue_id=1, product_id=2, id=2)
             # When
-            number_of_offers = get_number_of_offers(connection)
+            number_of_offers = get_number_of_offers(CONNECTION)
             # Then
             assert number_of_offers.loc[1, "Nombre d’offres"] == 2
 
@@ -119,7 +118,7 @@ class OffererQueriesTest:
             create_offerer()
 
             # When
-            number_of_offers = get_number_of_offers(connection)
+            number_of_offers = get_number_of_offers(CONNECTION)
 
             # Then
             assert number_of_offers.loc[1, "Nombre d’offres"] == 0
@@ -139,7 +138,7 @@ class OffererQueriesTest:
             create_booking(user_id=2, stock_id=1, is_cancelled=True, id=3, token='6YHA08')
 
             # When
-            number_of_bookings_not_cancelled = get_number_of_bookings_not_cancelled(connection)
+            number_of_bookings_not_cancelled = get_number_of_bookings_not_cancelled(CONNECTION)
 
             # Then
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 2
@@ -149,7 +148,7 @@ class OffererQueriesTest:
             create_offerer()
 
             # When
-            number_of_bookings_not_cancelled = get_number_of_bookings_not_cancelled(connection)
+            number_of_bookings_not_cancelled = get_number_of_bookings_not_cancelled(CONNECTION)
 
             # Then
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 0
@@ -182,7 +181,7 @@ class OffererQueriesTest:
                            token='9ZKZ0A')
 
             # When
-            offerers_details = get_offerers_details(connection)
+            offerers_details = get_offerers_details(CONNECTION)
             # Then
             assert offerers_details.shape == (2, 5)
             assert offerers_details.loc[1, "Date de création"] == date_creation_offerer_1

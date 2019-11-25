@@ -13,7 +13,7 @@ L'url pour aller sur Metabase en local est : http://localhost:3002/
 
 Pour configurer Metabase, il suffit de créer un compte admin, puis de se connecter à la base produit. Pour cela, il faut renseigner les informations suivantes :
 - Choisir Postgresql comme type de base de données
-- Host : pc-postgres-product
+- Host : pcm-postgres-product
 - Port : 5432
 - Database name : pass_culture
 - Database username : pass_culture
@@ -22,7 +22,7 @@ Pour configurer Metabase, il suffit de créer un compte admin, puis de se connec
 ## Créer les tables de données enrichies
 Après avoir lancé les conteneurs, taper :
 
-`docker exec -it pc-enriched-data bash -c "cd /opt/pass-culture-metabase; python create_enriched_data_tables.py"`
+`docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase; python create_enriched_data_tables.py"`
 
 ## Lancer les tests
-`docker exec -it pc-enriched-data bash -c "cd /opt/pass-culture-metabase; pytest"`
+`docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase; pytest"`

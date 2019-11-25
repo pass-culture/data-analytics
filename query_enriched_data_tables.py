@@ -12,8 +12,7 @@ def create_enriched_offerer_data(connection: Connection):
 
 
 def create_enriched_user_data(connection: Connection):
-    enriched_user_data = get_beneficiary_users_details(connection)
-    enriched_user_data = enriched_user_data.sample(frac=1).reset_index(drop=True)
-    enriched_user_data.to_sql(name='enriched_user_data',
-                                 con=connection,
-                                 if_exists='replace')
+    get_beneficiary_users_details(connection)\
+        .sample(frac=1)\
+        .reset_index(drop=True)\
+        .to_sql(name='enriched_user_data', con=connection, if_exists='replace')

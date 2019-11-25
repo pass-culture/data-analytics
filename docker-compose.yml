@@ -2,8 +2,8 @@ version: "3.7"
 
 services:
   enriched-data:
-    image: python:3.6
-    container_name: pc-enriched-data
+    image: python:3.6-stretch
+    container_name: pcm-enriched-data
     volumes:
       - .:/opt/pass-culture-metabase
     command: >
@@ -16,14 +16,12 @@ services:
                "
     env_file:
       - env_file
-    networks:
-      - db_nw
     depends_on:
       - postgres-product
 
   install-models:
-    image: python:3.6
-    container_name: pc-install-models
+    image: python:3.6-stretch
+    container_name: pcm-install-models
     volumes:
       - .:/opt/enriched_data
     command: >
@@ -37,39 +35,33 @@ services:
                "
     env_file:
       - env_file
-    networks:
-      - db_nw
     depends_on:
       - postgres-product
 
   postgres-product:
     image: postgres:10.10-alpine
-    container_name: pc-postgres-product
+    container_name: pcm-postgres-product
 
     env_file:
       - env_file
-    networks:
-      - db_nw
     ports:
       - 5435:5432
     command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
 
   postgres-metabase:
     image: postgres:10.10-alpine
-    container_name: pc-postgres-metabase
+    container_name: pcm-postgres-metabase
     environment:
       - POSTGRES_DB=pass_culture
       - POSTGRES_USER=metabase
       - POSTGRES_PASSWORD=metabase
-    networks:
-      - db_nw
     ports:
       - 5436:5432
     command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
 
 
   metabase-app:
-    container_name: pc-metabase-app
+    container_name: pcm-metabase-app
     image: metabase/metabase
     ports:
       - 3002:3000
@@ -84,10 +76,3 @@ services:
       - postgres-metabase
     links:
       - postgres-metabase
-    networks:
-      - db_nw
-
-networks:
-  db_nw:
-    driver: bridge
-

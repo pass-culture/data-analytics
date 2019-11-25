@@ -5,17 +5,16 @@ import pytest
 
 from create_enriched_data_tables import create_enriched_offerer_data, \
     create_enriched_user_data
+from db import CONNECTION, ENGINE
 from tests.utils import create_offerer, create_user
 
-from db import CONNECTION, ENGINE
-
 connection = CONNECTION
-engine = ENGINE
+
 
 class EnrichedDataTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
-        engine.execute('''
+        ENGINE.execute('''
                         DELETE FROM "recommendation";
                         DELETE FROM "booking";
                         DELETE FROM "stock";
@@ -29,6 +28,7 @@ class EnrichedDataTest:
                         DROP TABLE IF EXISTS enriched_offerer_data;
                         DROP TABLE IF EXISTS enriched_user_data;
                         ''')
+
     class CreateEnrichedOffererDataTest:
 
         def test_creates_enriched_offerer_data_table(self):
@@ -39,8 +39,7 @@ class EnrichedDataTest:
             create_enriched_offerer_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [(0,)]
-
+            assert ENGINE.execute(query).fetchall() == [(0,)]
 
         def test_populates_table_when_existing_offerer(self):
             # Given
@@ -52,8 +51,7 @@ class EnrichedDataTest:
             create_enriched_offerer_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [(1,)]
-
+            assert ENGINE.execute(query).fetchall() == [(1,)]
 
         @patch('query_enriched_data_tables.get_offerers_details')
         def test_saves_offerers_details(self, get_offerers_details):
@@ -65,7 +63,6 @@ class EnrichedDataTest:
 
             # Then
             get_offerers_details.assert_called_once_with(connection)
-
 
         def test_creates_index_on_offerer_id(self):
             # Given
@@ -83,10 +80,9 @@ class EnrichedDataTest:
             create_enriched_offerer_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [('ix_enriched_offerer_data_offerer_id',
-                                                            'CREATE INDEX ix_enriched_offerer_data_offerer_id '
-                                                            'ON public.enriched_offerer_data USING btree (offerer_id)')]
-
+            assert ENGINE.execute(query).fetchall() == [('ix_enriched_offerer_data_offerer_id',
+                                                         'CREATE INDEX ix_enriched_offerer_data_offerer_id '
+                                                         'ON public.enriched_offerer_data USING btree (offerer_id)')]
 
         def test_replaces_table_if_exists(self):
             # Given
@@ -102,8 +98,7 @@ class EnrichedDataTest:
             create_enriched_offerer_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [(0,)]
-
+            assert ENGINE.execute(query).fetchall() == [(0,)]
 
     class CreateEnrichedUserDataTest:
 
@@ -115,8 +110,7 @@ class EnrichedDataTest:
             create_enriched_user_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [(0,)]
-
+            assert ENGINE.execute(query).fetchall() == [(0,)]
 
         def test_populates_table_when_existing_user(self):
             # Given
@@ -128,8 +122,7 @@ class EnrichedDataTest:
             create_enriched_user_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [(1,)]
-
+            assert ENGINE.execute(query).fetchall() == [(1,)]
 
         @patch('query_enriched_data_tables.get_beneficiary_users_details')
         def test_saves_users_details(self, get_beneficiary_users_details):
@@ -141,7 +134,6 @@ class EnrichedDataTest:
 
             # Then
             get_beneficiary_users_details.assert_called_once_with(connection)
-
 
         def test_creates_index(self):
             # Given
@@ -159,10 +151,9 @@ class EnrichedDataTest:
             create_enriched_user_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [('ix_enriched_user_data_index',
-                                                            'CREATE INDEX ix_enriched_user_data_index '
-                                                            'ON public.enriched_user_data USING btree (index)')]
-
+            assert ENGINE.execute(query).fetchall() == [('ix_enriched_user_data_index',
+                                                         'CREATE INDEX ix_enriched_user_data_index '
+                                                         'ON public.enriched_user_data USING btree (index)')]
 
         @patch('query_enriched_data_tables.get_beneficiary_users_details')
         def test_shuffles_index(self, get_beneficiary_users_details):
@@ -175,8 +166,6 @@ class EnrichedDataTest:
 
             # Then
             enriched_user_data.sample.assert_called_once_with(frac=1)
-
-
 
         def test_replaces_table_if_exists(self):
             # Given
@@ -195,4 +184,4 @@ class EnrichedDataTest:
             create_enriched_user_data(connection)
 
             # Then
-            assert engine.execute(query).fetchall() == [(0,)]
+            assert ENGINE.execute(query).fetchall() == [(0,)]

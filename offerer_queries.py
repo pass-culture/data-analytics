@@ -3,7 +3,7 @@ from sqlalchemy.engine import Connection
 
 
 def get_offerers_details(connection: Connection) -> pandas.DataFrame:
-    offerers_details = pandas.concat(
+    return pandas.concat(
         [get_creation_dates(connection),
          get_first_stock_creation_dates(connection),
          get_first_booking_creation_dates(connection),
@@ -12,7 +12,6 @@ def get_offerers_details(connection: Connection) -> pandas.DataFrame:
         axis=1
     )
 
-    return offerers_details
 
 
 def get_creation_dates(connection: Connection) -> pandas.DataFrame:
