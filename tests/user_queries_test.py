@@ -102,7 +102,6 @@ class UserQueriesTest:
             beneficiary_users_details = get_beneficiary_users_details(CONNECTION)
 
             # Then
-            pandas.set_option('display.max_columns', None)
             assert beneficiary_users_details.shape == (2, 11)
             actual = beneficiary_users_details.loc[0]
             assert actual.equals(expected_first_row)
