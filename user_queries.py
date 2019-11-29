@@ -1,4 +1,5 @@
 import pandas
+from sqlalchemy.engine import Connection
 
 recommendation_dates_query = '''
     WITH recommendation_dates AS (
@@ -14,7 +15,7 @@ recommendation_dates_query = '''
     '''
 
 
-def get_beneficiary_users_details(connection):
+def get_beneficiary_users_details(connection: Connection):
     user_details = [
         get_experimentation_sessions(connection),
         get_departments(connection),
@@ -35,7 +36,7 @@ def get_beneficiary_users_details(connection):
     return beneficiary_users_details.reset_index(drop=True)
 
 
-def get_experimentation_sessions(connection):
+def get_experimentation_sessions(connection: Connection):
     query = '''
     WITH experimentation_session AS (
         SELECT
@@ -62,7 +63,7 @@ def get_experimentation_sessions(connection):
     return pandas.read_sql_query(query, connection, index_col="user_id")
 
 
-def get_departments(connection):
+def get_departments(connection: Connection):
     query = '''
     SELECT
      "user"."departementCode" AS "Département",
@@ -73,7 +74,7 @@ def get_departments(connection):
     return pandas.read_sql(query, connection, index_col="user_id")
 
 
-def get_activation_dates(connection):
+def get_activation_dates(connection: Connection):
     query = '''
     WITH validated_activation_booking AS (
      SELECT activity.issued_at, booking."userId", booking."isUsed" AS is_used
@@ -106,7 +107,7 @@ def get_activation_dates(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_typeform_filling_dates(connection):
+def get_typeform_filling_dates(connection: Connection):
     query = '''
     WITH typeform_filled AS (
      SELECT activity.issued_at, "user".id AS user_id, "user"."canBookFreeOffers"
@@ -127,7 +128,7 @@ def get_typeform_filling_dates(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_first_connection_dates(connection):
+def get_first_connection_dates(connection: Connection):
     query = recommendation_dates_query + \
         '''
             SELECT
@@ -140,7 +141,7 @@ def get_first_connection_dates(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_date_of_first_bookings(connection):
+def get_date_of_first_bookings(connection: Connection):
     query = '''
     WITH bookings_grouped_by_user AS (
     SELECT
@@ -163,7 +164,7 @@ def get_date_of_first_bookings(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_date_of_second_bookings(connection):
+def get_date_of_second_bookings(connection: Connection):
     query = '''
      WITH second_booking_dates AS (
      SELECT
@@ -194,7 +195,7 @@ def get_date_of_second_bookings(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_date_of_bookings_on_third_product_type(connection):
+def get_date_of_bookings_on_third_product_type(connection: Connection):
     query = '''
     WITH
      bookings_on_distinct_types AS (
@@ -232,7 +233,7 @@ def get_date_of_bookings_on_third_product_type(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_last_recommendation_dates(connection):
+def get_last_recommendation_dates(connection: Connection):
     query = recommendation_dates_query + \
         '''
             SELECT
@@ -244,7 +245,7 @@ def get_last_recommendation_dates(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_number_of_bookings(connection):
+def get_number_of_bookings(connection: Connection):
     query = '''
     WITH bookings_grouped_by_user AS (
      SELECT
@@ -271,7 +272,7 @@ def get_number_of_bookings(connection):
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_number_of_non_cancelled_bookings(connection):
+def get_number_of_non_cancelled_bookings(connection: Connection):
     query = '''
     WITH non_cancelled_bookings_grouped_by_user AS(
     SELECT

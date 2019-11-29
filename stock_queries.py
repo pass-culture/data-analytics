@@ -1,7 +1,8 @@
 import pandas
+from sqlalchemy.engine import Connection
 
 
-def get_stocks_details(connection):
+def get_stocks_details(connection: Connection):
     stocks_details = [
         get_stocks_information(connection),
         get_stocks_offer_information(connection),
@@ -17,7 +18,7 @@ def get_stocks_details(connection):
                                                   "Nombre de réservations ayant un paiement"]]
 
 
-def get_stocks_information(connection):
+def get_stocks_information(connection: Connection):
     query = '''
     SELECT
      id AS stock_id,
@@ -32,7 +33,7 @@ def get_stocks_information(connection):
         .astype({"Date limite de réservation": 'datetime64', "Date de début de l'évènement": 'datetime64'})
 
 
-def get_stocks_offer_information(connection):
+def get_stocks_offer_information(connection: Connection):
     query = '''
     SELECT
      stock.id AS stock_id,
@@ -45,7 +46,7 @@ def get_stocks_offer_information(connection):
         .read_sql(query, connection, index_col="stock_id")
 
 
-def get_stocks_venue_information(connection):
+def get_stocks_venue_information(connection: Connection):
     query = '''
     SELECT
      stock.id AS stock_id,
@@ -59,7 +60,7 @@ def get_stocks_venue_information(connection):
         .read_sql(query, connection, index_col="stock_id")
 
 
-def get_stocks_booking_information(connection):
+def get_stocks_booking_information(connection: Connection):
     query = '''
     WITH
     last_status AS (
@@ -95,7 +96,7 @@ def get_stocks_booking_information(connection):
         .read_sql(query, connection, index_col="stock_id")
 
 
-def get_stock_creation_date(connection):
+def get_stock_creation_date(connection: Connection):
     query = '''
     SELECT
      issued_at AS "Date de création du stock",
