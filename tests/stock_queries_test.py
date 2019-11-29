@@ -5,7 +5,7 @@ import pytest
 
 from db import ENGINE, CONNECTION
 from stock_queries import get_stocks_information, get_stocks_offer_information, get_stocks_venue_information, \
-    get_stocks_booking_information, get_stock_creation_date, get_all_stocks_details
+    get_stocks_booking_information, get_stock_creation_date, get_stocks_details
 from tests.utils import create_stock, create_offer, create_venue, create_offerer, create_product, create_booking, \
     create_user, create_payment, create_payment_status
 
@@ -28,7 +28,7 @@ class StockQueriesTest:
                         DELETE FROM activity;
                         ''')
 
-    class GetAllStocksDetailsTest:
+    class GetStocksDetailsTest:
         def test_should_return_all_values(self):
             # Given
             datetime_before_first_stock_creation = datetime.utcnow()
@@ -66,17 +66,17 @@ class StockQueriesTest:
             )
 
             # When
-            all_stocks_details = get_all_stocks_details(CONNECTION)
+            stocks_details = get_stocks_details(CONNECTION)
 
             # Then
             datetime_after_second_stock_creation = datetime.utcnow()
 
-            assert datetime_before_first_stock_creation < all_stocks_details.loc[1, "Date de création du stock"] \
+            assert datetime_before_first_stock_creation < stocks_details.loc[1, "Date de création du stock"] \
                    < datetime_between_stocks_creation
-            assert datetime_between_stocks_creation < all_stocks_details.loc[2, "Date de création du stock"] \
+            assert datetime_between_stocks_creation < stocks_details.loc[2, "Date de création du stock"] \
                    < datetime_after_second_stock_creation
-            assert all_stocks_details.drop("Date de création du stock", axis=1).equals(expected_stocks_details)
-            assert list(all_stocks_details.columns) == [
+            assert stocks_details.drop("Date de création du stock", axis=1).equals(expected_stocks_details)
+            assert list(stocks_details.columns) == [
                 "Identifiant de l'offre", "Nom de l'offre", "offerer_id", "Type d'offre", "Département",
                 "Date de création du stock", "Date limite de réservation", "Date de début de l'évènement",
                 "Stock disponible brut de réservations", "Nombre total de réservations",

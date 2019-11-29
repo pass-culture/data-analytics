@@ -1,7 +1,7 @@
 import pandas
 
 
-def get_all_stocks_details(connection):
+def get_stocks_details(connection):
     stocks_details = [
         get_stocks_information(connection),
         get_stocks_offer_information(connection),
