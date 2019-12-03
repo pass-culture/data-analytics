@@ -75,7 +75,7 @@ class StockQueriesTest:
                    < datetime_between_stocks_creation
             assert datetime_between_stocks_creation < stocks_details.loc[2, "Date de création du stock"] \
                    < datetime_after_second_stock_creation
-            assert stocks_details.drop("Date de création du stock", axis=1).equals(expected_stocks_details)
+            pandas.testing.assert_frame_equal(stocks_details.drop("Date de création du stock", axis=1), expected_stocks_details)
             assert list(stocks_details.columns) == [
                 "Identifiant de l'offre", "Nom de l'offre", "offerer_id", "Type d'offre", "Département",
                 "Date de création du stock", "Date limite de réservation", "Date de début de l'évènement",
@@ -103,7 +103,7 @@ class StockQueriesTest:
             stocks_information = get_stocks_information(CONNECTION)
 
             # Then
-            assert stocks_information.equals(expected_stocks_information)
+            pandas.testing.assert_frame_equal(stocks_information, expected_stocks_information)
 
     class GetStocksOfferInformationTest:
         def test_should_return_all_information_directly_linked_to_offer(self):
@@ -122,7 +122,7 @@ class StockQueriesTest:
             stocks_offer_information = get_stocks_offer_information(CONNECTION)
 
             # Then
-            assert stocks_offer_information.equals(expected_stocks_information)
+            pandas.testing.assert_frame_equal(stocks_offer_information, expected_stocks_information)
 
     class GetStocksVenueInformationTest:
         def test_should_return_all_information_directly_linked_to_venue_with_departement_code_when_physical_venue(self):
@@ -141,7 +141,7 @@ class StockQueriesTest:
             stocks_venue_information = get_stocks_venue_information(CONNECTION)
 
             # Then
-            assert stocks_venue_information.equals(expected_stocks_information)
+            pandas.testing.assert_frame_equal(stocks_venue_information, expected_stocks_information)
 
         def test_should_return_all_information_directly_linked_to_venue_without_departement_code_when_virtual_venue(self):
             # Given
@@ -159,7 +159,7 @@ class StockQueriesTest:
             stocks_venue_information = get_stocks_venue_information(CONNECTION)
 
             # Then
-            assert stocks_venue_information.equals(expected_stocks_information)
+            pandas.testing.assert_frame_equal(stocks_venue_information, expected_stocks_information)
 
     class GetStocksBookingInformationTest:
         def test_should_return_column_with_total_number_of_bookings_cancelled_and_not(self):
@@ -179,13 +179,14 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
-                data=[2, 1])
+                data=[2, 1],
+                name="Nombre total de réservations")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre total de réservations"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre total de réservations"], expected_stocks_booking_information)
 
         def test_should_return_column_with_total_number_of_bookings_at_0_when_no_booking(self):
             # Given
@@ -203,13 +204,14 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
-                data=[2, 0])
+                data=[2, 0],
+                name="Nombre total de réservations")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre total de réservations"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre total de réservations"], expected_stocks_booking_information)
 
         def test_should_return_column_with_number_of_cancelled_bookings(self):
             # Given
@@ -228,13 +230,14 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
-                data=[2, 0])
+                data=[2, 0],
+                name="Nombre de réservations annulées")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre de réservations annulées"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations annulées"], expected_stocks_booking_information)
 
         def test_should_return_column_with_0_cancelled_bookings_if_no_booking(self):
             # Given
@@ -249,13 +252,14 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1], name='stock_id'),
-                data=[0])
+                data=[0],
+                name="Nombre de réservations annulées")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre de réservations annulées"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations annulées"], expected_stocks_booking_information)
 
         def test_should_return_column_with_number_of_bookings_appearing_on_payment(self):
             # Given
@@ -276,13 +280,14 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
-                data=[2, 0])
+                data=[2, 0],
+                name="Nombre de réservations ayant un paiement")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre de réservations ayant un paiement"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"], expected_stocks_booking_information)
 
         def test_should_not_count_bookings_appearing_on_payment_if_payment_s_current_status_is_banned(self):
             # Given
@@ -303,16 +308,17 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
-                data=[0, 0])
+                data=[0, 0],
+                name="Nombre de réservations ayant un paiement")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre de réservations ayant un paiement"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"], expected_stocks_booking_information)
 
             # Then
-            assert stocks_booking_information["Nombre de réservations ayant un paiement"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"], expected_stocks_booking_information)
 
         def test_should_count_bookings_appearing_on_payment_if_payment_is_no_longer_banned(self):
             # Given
@@ -333,13 +339,14 @@ class StockQueriesTest:
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
-                data=[2, 0])
+                data=[2, 0],
+                name="Nombre de réservations ayant un paiement")
 
             # When
             stocks_booking_information = get_stocks_booking_information(CONNECTION)
 
             # Then
-            assert stocks_booking_information["Nombre de réservations ayant un paiement"].equals(expected_stocks_booking_information)
+            pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"], expected_stocks_booking_information)
 
 
     class GetStockCreationDateTest:

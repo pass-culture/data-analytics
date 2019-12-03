@@ -16,6 +16,7 @@ class EnrichedDataTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
         ENGINE.execute('''
+                        DELETE FROM "booking";
                         DELETE FROM "stock";
                         DELETE FROM "offer";
                         DELETE FROM "product";
@@ -188,7 +189,7 @@ class EnrichedDataTest:
 
     class CreateEnrichedStockDataTest:
 
-        def test_creates_enriched_stock_data_table(self):
+        def test_initializes_empty_table_when_no_existing_offerer(self):
             # Given
             query = 'SELECT COUNT(*) FROM enriched_stock_data'
 
@@ -217,13 +218,18 @@ class EnrichedDataTest:
         @patch('query_enriched_data_tables.get_stocks_details')
         def test_saves_stocks_details(self, get_stocks_details):
             # Given
-            get_stocks_details.return_value = pandas.DataFrame()
+            mocked_dataframe = MagicMock()
+            mocked_dataframe.to_sql.return_value = MagicMock()
+            get_stocks_details.return_value = mocked_dataframe
 
             # When
             create_enriched_stock_data(connection)
 
             # Then
             get_stocks_details.assert_called_once_with(connection)
+            mocked_dataframe.to_sql.assert_called_once_with(name='enriched_stock_data',
+                                 con=connection,
+                                 if_exists='replace')
 
         def test_creates_index_on_stock_id(self):
             # Given
@@ -248,9 +254,12 @@ class EnrichedDataTest:
         def test_replaces_table_if_exists(self):
             # Given
             enriched_stock_data = pandas.DataFrame(
-                {'Date de création': '2019-11-18', 'Date de création du premier stock': '2019-11-18',
-                 'Date de première réservation': '2019-11-18', 'Nombre d’offres': 0,
-                 'Nombre de réservations non annulées': 0}, index={'offerer_id': 1})
+                {'Date de création': '2019-11-18',
+                 'Date de création du premier stock': '2019-11-18',
+                 'Date de première réservation': '2019-11-18',
+                 'Nombre d’offres': 0,
+                 'Nombre de réservations non annulées': 0},
+                index={'offerer_id': 1})
             enriched_stock_data.to_sql(name='enriched_stock_data',
                                          con=connection)
             query = 'SELECT COUNT(*) FROM enriched_stock_data'
