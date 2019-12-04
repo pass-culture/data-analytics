@@ -6,7 +6,8 @@ import pytest
 from create_enriched_data_tables import create_enriched_offerer_data, \
     create_enriched_user_data
 from db import CONNECTION, ENGINE
-from tests.utils import create_offerer, create_user
+from query_enriched_data_tables import create_enriched_stock_data
+from tests.utils import create_offerer, create_user, create_venue, create_offer, create_product, create_stock
 
 connection = CONNECTION
 
@@ -15,18 +16,18 @@ class EnrichedDataTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
         ENGINE.execute('''
-                        DELETE FROM "recommendation";
                         DELETE FROM "booking";
                         DELETE FROM "stock";
                         DELETE FROM "offer";
                         DELETE FROM "product";
                         DELETE FROM "venue";
-                        DELETE FROM "mediation";
                         DELETE FROM "offerer";
                         DELETE FROM "user";
                         DELETE FROM activity;
                         DROP TABLE IF EXISTS enriched_offerer_data;
                         DROP TABLE IF EXISTS enriched_user_data;
+                        DROP TABLE IF EXISTS enriched_stock_data;
+
                         ''')
 
     class CreateEnrichedOffererDataTest:
@@ -182,6 +183,89 @@ class EnrichedDataTest:
 
             # When
             create_enriched_user_data(connection)
+
+            # Then
+            assert ENGINE.execute(query).fetchall() == [(0,)]
+
+    class CreateEnrichedStockDataTest:
+
+        def test_initializes_empty_table_when_no_existing_offerer(self):
+            # Given
+            query = 'SELECT COUNT(*) FROM enriched_stock_data'
+
+            # When
+            create_enriched_stock_data(connection)
+
+            # Then
+            assert ENGINE.execute(query).fetchall() == [(0,)]
+
+        def test_populates_table_when_existing_offerer(self):
+            # Given
+            create_offerer(id=1)
+            create_venue(offerer_id=1, id=1)
+            create_product(id=1)
+            create_offer(venue_id=1, product_id=1, id=1)
+            create_stock(offer_id=1, id=1)
+
+            query = 'SELECT COUNT(*) FROM enriched_stock_data'
+
+            # When
+            create_enriched_stock_data(connection)
+
+            # Then
+            assert ENGINE.execute(query).fetchall() == [(1,)]
+
+        @patch('query_enriched_data_tables.get_stocks_details')
+        def test_saves_stocks_details(self, get_stocks_details):
+            # Given
+            mocked_dataframe = MagicMock()
+            mocked_dataframe.to_sql.return_value = MagicMock()
+            get_stocks_details.return_value = mocked_dataframe
+
+            # When
+            create_enriched_stock_data(connection)
+
+            # Then
+            get_stocks_details.assert_called_once_with(connection)
+            mocked_dataframe.to_sql.assert_called_once_with(name='enriched_stock_data',
+                                 con=connection,
+                                 if_exists='replace')
+
+        def test_creates_index_on_stock_id(self):
+            # Given
+            query = """
+            SELECT
+                indexname,
+                indexdef
+            FROM
+                pg_indexes
+            WHERE
+                tablename = 'enriched_stock_data';
+            """
+
+            # When
+            create_enriched_stock_data(connection)
+
+            # Then
+            assert ENGINE.execute(query).fetchall() == [('ix_enriched_stock_data_stock_id',
+                                                         'CREATE INDEX ix_enriched_stock_data_stock_id '
+                                                         'ON public.enriched_stock_data USING btree (stock_id)')]
+
+        def test_replaces_table_if_exists(self):
+            # Given
+            enriched_stock_data = pandas.DataFrame(
+                {'Date de création': '2019-11-18',
+                 'Date de création du premier stock': '2019-11-18',
+                 'Date de première réservation': '2019-11-18',
+                 'Nombre d’offres': 0,
+                 'Nombre de réservations non annulées': 0},
+                index={'offerer_id': 1})
+            enriched_stock_data.to_sql(name='enriched_stock_data',
+                                         con=connection)
+            query = 'SELECT COUNT(*) FROM enriched_stock_data'
+
+            # When
+            create_enriched_stock_data(connection)
 
             # Then
             assert ENGINE.execute(query).fetchall() == [(0,)]
