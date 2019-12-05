@@ -4,7 +4,7 @@ from logger import logger
 from query_enriched_data_tables import create_enriched_offerer_data, create_enriched_user_data, \
     create_enriched_stock_data
 
-if __name__ == '__main__':
+def create_enriched_data_tables():
     logger.info('[ENRICHED DATA] Start enriched data creation')
 
     create_enriched_offerer_data(CONNECTION)
