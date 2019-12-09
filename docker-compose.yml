@@ -9,7 +9,7 @@ services:
     command: >
       bash -c "cd /opt/pass-culture-metabase;
                pip install -r ./requirements.txt;
-               while true; do python /opt/pass-culture-metabase/run_server.py; done;
+               python /opt/pass-culture-metabase/run_server.py;
                "
     ports:
       - 5000:5000
