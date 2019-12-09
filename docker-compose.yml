@@ -9,11 +9,10 @@ services:
     command: >
       bash -c "cd /opt/pass-culture-metabase;
                pip install -r ./requirements.txt;
-               while true
-               do
-               sleep 100
-               done;
+               python /opt/pass-culture-metabase/run_server.py;
                "
+    ports:
+      - 5000:5000
     env_file:
       - env_file
     depends_on:
