@@ -28,16 +28,11 @@ def get_first_stock_creation_dates(connection: Connection) -> pandas.DataFrame:
     query = '''
     SELECT 
      offerer.id AS offerer_id, 
-     MIN(activity.issued_at) AS "Date de création du premier stock"
+     MIN(stock."dateCreated") AS "Date de création du premier stock"
     FROM offerer 
     LEFT JOIN venue ON venue."managingOffererId" = offerer.id 
     LEFT JOIN offer ON offer."venueId" = venue.id 
     LEFT JOIN stock ON stock."offerId" = offer.id 
-    LEFT JOIN activity ON (
-     activity.changed_data->>'id'=stock.id::text
-     AND activity.table_name='stock' 
-     AND verb='insert'
-    ) 
     GROUP BY offerer_id
     '''
 

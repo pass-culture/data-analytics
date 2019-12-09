@@ -77,25 +77,19 @@ def get_departments(connection: Connection):
 def get_activation_dates(connection: Connection):
     query = '''
     WITH validated_activation_booking AS (
-     SELECT activity.issued_at, booking."userId", booking."isUsed" AS is_used
-     FROM activity
-     JOIN booking
-      ON (activity.old_data ->> 'id')::int = booking.id
-      AND booking."isUsed"
+     SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
+     FROM booking
      JOIN stock
       ON stock.id = booking."stockId"
      JOIN offer
       ON stock."offerId" = offer.id
       AND offer.type = 'ThingType.ACTIVATION'
-     WHERE
-      activity.table_name='booking'
-      AND activity.verb='update'
-      AND activity.changed_data ->> 'isUsed'='true'
+     WHERE booking."isUsed"
     )
 
     SELECT
      CASE
-      WHEN validated_activation_booking.is_used THEN validated_activation_booking.issued_at
+      WHEN validated_activation_booking.is_used THEN validated_activation_booking.date_used
       ELSE "user"."dateCreated"
      END AS "Date d'activation",
      "user".id as user_id
@@ -109,21 +103,11 @@ def get_activation_dates(connection: Connection):
 
 def get_typeform_filling_dates(connection: Connection):
     query = '''
-    WITH typeform_filled AS (
-     SELECT activity.issued_at, "user".id AS user_id, "user"."canBookFreeOffers"
-     FROM "user"
-     LEFT JOIN "activity"
-      ON (activity.old_data ->> 'id')::int = "user".id
-      AND activity.table_name='user'
-      AND activity.verb='update'
-      AND activity.changed_data ->> 'needsToFillCulturalSurvey'='false'
-      )
-
     SELECT
-     typeform_filled.issued_at AS "Date de remplissage du typeform",
-     typeform_filled.user_id AS user_id
-    FROM typeform_filled
-    WHERE typeform_filled."canBookFreeOffers"
+     "culturalSurveyFilledDate" AS "Date de remplissage du typeform",
+     id AS user_id
+    FROM "user"
+    WHERE "user"."canBookFreeOffers"
     '''
     return pandas.read_sql(query, connection, index_col='user_id')
 

@@ -5,7 +5,7 @@ import pytest
 
 from db import CONNECTION, ENGINE
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_recommendation, create_product, update_table_column
+    create_booking, create_recommendation, create_product, update_table_column, clean_database
 from user_queries import get_beneficiary_users_details, get_experimentation_sessions, \
     get_departments, get_activation_dates, get_typeform_filling_dates, get_first_connection_dates, \
     get_date_of_first_bookings, get_date_of_second_bookings, get_date_of_bookings_on_third_product_type, \
@@ -15,18 +15,7 @@ from user_queries import get_beneficiary_users_details, get_experimentation_sess
 class UserQueriesTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
-        ENGINE.execute('''
-                        DELETE FROM "recommendation";
-                        DELETE FROM "booking";
-                        DELETE FROM "stock";
-                        DELETE FROM "offer";
-                        DELETE FROM "product";
-                        DELETE FROM "venue";
-                        DELETE FROM "mediation";
-                        DELETE FROM "offerer";
-                        DELETE FROM "user";
-                        DELETE FROM activity;
-                        ''')
+        clean_database()
 
     class GetAllExperimentationUsersDetailsTest:
         def test_should_not_return_details_when_user_cannot_book_free_offers(self):
@@ -41,19 +30,18 @@ class UserQueriesTest:
 
         def test_should_return_values_for_users_who_can_book_free_offers(self):
             # Given
-            date_before_changes = datetime.now()
             activation_id = 1
             active_user_id = 2
             create_user(can_book_free_offers=True, departement_code="93",
                         date_created=datetime(2019, 1, 1, 12, 0, 0), needs_to_fill_cultural_survey=True, id=1)
             create_user(can_book_free_offers=True, departement_code="08", email="em@a.il",
-                        needs_to_fill_cultural_survey=True, id=active_user_id)
+                        needs_to_fill_cultural_survey=False, cultural_survey_filled_date='2019-12-08', id=active_user_id)
             create_offerer(id=1)
             create_venue(offerer_id=1, id=1)
             create_product(id=activation_id, product_type='ThingType.ACTIVATION')
             create_offer(venue_id=1, product_id=activation_id, id=1, product_type='ThingType.ACTIVATION')
             create_stock(offer_id=activation_id, id=1)
-            create_booking(user_id=active_user_id, stock_id=activation_id, is_used=False, id=1)
+            create_booking(user_id=active_user_id, stock_id=activation_id, is_used=True, date_used='2019-12-09', id=1)
             create_product(id=2, product_type='ThingType.JEUX_VIDEO')
             create_product(id=3, product_type='ThingType.AUDIOVISUEL')
             create_product(id=4, product_type='ThingType.CINEMA_ABO')
@@ -71,47 +59,31 @@ class UserQueriesTest:
             create_booking(user_id=active_user_id, stock_id=4, date_created=datetime(2019, 5, 7), token='J91U21',
                            is_cancelled=True, id=4)
             update_table_column(table_name='booking', id=activation_id, column='"isUsed"', value='True')
-            update_table_column(table_name='"user"', id=active_user_id, column='"needsToFillCulturalSurvey"',
-                                value='False')
             recommendation_creation_date = datetime.utcnow()
             create_recommendation(offer_id=3, user_id=active_user_id, date_created=recommendation_creation_date, id=2)
-            date_after_changes = datetime.utcnow()
 
-            expected_first_row = pandas.Series(
-                data=[active_user_id, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
-                      pandas.NaT, pandas.NaT, pandas.NaT, 0,
-                      0],
-                index=["Vague d'expérimentation", "Département", "Date d'activation", "Date de remplissage du typeform",
-                       "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
-                       "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
-                       "Nombre de réservations totales", "Nombre de réservations non annulées"])
-            columns_to_check_for_exact_values_in_second_row = ["Vague d'expérimentation",
-                                                               "Département",
-                                                               "Date de première connexion",
-                                                               "Date de première réservation",
-                                                               "Date de deuxième réservation",
-                                                               "Date de première réservation dans 3 catégories différentes",
-                                                               "Date de dernière recommandation",
-                                                               "Nombre de réservations totales",
-                                                               "Nombre de réservations non annulées"]
-            expected_second_row = pandas.Series(
-                data=[1, "08", datetime(2019, 2, 3), datetime(2019, 3, 7), datetime(2019, 4, 7), datetime(2019, 5, 7),
-                      recommendation_creation_date, 3, 2], index=columns_to_check_for_exact_values_in_second_row)
+            columns = ["Vague d'expérimentation", "Département", "Date d'activation", "Date de remplissage du typeform",
+                   "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
+                   "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
+                   "Nombre de réservations totales", "Nombre de réservations non annulées"]
+
+
+            expected_beneficiary_users_details = pandas.DataFrame(
+                index=pandas.RangeIndex(start=0, stop=2, step=1),
+                data=[
+                    [active_user_id, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
+                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0],
+                    [1, "08", datetime(2019, 12, 9), datetime(2019, 12, 8), datetime(2019, 2, 3), datetime(2019, 3, 7),
+                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2]
+                ],
+                columns=columns
+            )
 
             # When
             beneficiary_users_details = get_beneficiary_users_details(CONNECTION)
 
             # Then
-            assert beneficiary_users_details.shape == (2, 11)
-            actual = beneficiary_users_details.loc[0]
-            assert actual.equals(expected_first_row)
-            actual = beneficiary_users_details.loc[1, columns_to_check_for_exact_values_in_second_row]
-            assert actual.equals(
-                expected_second_row
-            )
-            assert date_before_changes < beneficiary_users_details.loc[1, "Date d'activation"] < date_after_changes
-            assert date_before_changes < beneficiary_users_details.loc[
-                1, "Date de remplissage du typeform"] < date_after_changes
+            pandas.testing.assert_frame_equal(beneficiary_users_details, expected_beneficiary_users_details)
 
     class GetExperimentationSessionsTest:
         def test_should_return_1_when_user_has_used_activation_booking(self):
@@ -194,22 +166,20 @@ class UserQueriesTest:
         class GetActivationDateTest:
             def test_should_return_the_date_at_which_the_activation_booking_was_used(self):
                 # Given
-                date_before_changes = datetime.utcnow()
                 create_user(date_created=datetime(2019, 8, 31), id=1)
                 create_offerer(id=1)
                 create_venue(offerer_id=1)
                 create_product(id=1, product_type='ThingType.ACTIVATION')
                 create_offer(id=1, product_type='ThingType.ACTIVATION', product_id=1, venue_id=1)
                 create_stock(offer_id=1, id=1)
-                create_booking(user_id=1, stock_id=1, id=1)
+                create_booking(user_id=1, stock_id=1, id=1, date_used='2019-11-29')
                 update_table_column(id=1, table_name='booking', column='"isUsed"', value=True)
-                date_after_used = datetime.utcnow()
 
                 # When
                 activation_dates = get_activation_dates(CONNECTION)
 
                 # Then
-                assert date_before_changes < activation_dates.loc[1, "Date d'activation"] < date_after_used
+                assert activation_dates.loc[1, "Date d'activation"] == datetime(2019, 11, 29)
 
             def test_should_return_the_date_at_which_the_user_was_created_when_no_activation_booking(self):
                 # Given
@@ -259,21 +229,17 @@ class UserQueriesTest:
 
             def test_should_return_the_date_at_which_needs_to_fill_cultural_survey_was_updated_to_false(self):
                 # Given
-                date_before_changes = datetime.utcnow()
-                create_user(needs_to_fill_cultural_survey=True, id=1)
-                update_table_column(id=1, table_name='"user"', column='"needsToFillCulturalSurvey"', value=False)
-                date_after_used = datetime.utcnow()
+                create_user(needs_to_fill_cultural_survey=False, id=1, cultural_survey_filled_date='2019-12-09')
 
                 # When
                 typeform_filling_dates = get_typeform_filling_dates(CONNECTION)
 
                 # Then
-                assert date_before_changes < typeform_filling_dates.loc[
-                    1, "Date de remplissage du typeform"] < date_after_used
+                assert typeform_filling_dates.loc[1, "Date de remplissage du typeform"] == datetime(2019, 12, 9)
 
             def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
                 # Given
-                create_user(needs_to_fill_cultural_survey=True, id=1)
+                create_user(needs_to_fill_cultural_survey=True, cultural_survey_filled_date=None, id=1)
 
                 # When
                 typeform_filling_dates = get_typeform_filling_dates(CONNECTION)

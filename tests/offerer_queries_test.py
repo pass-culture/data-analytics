@@ -8,25 +8,13 @@ from offerer_queries import get_first_stock_creation_dates, \
     get_first_booking_creation_dates, get_creation_dates, get_number_of_offers, \
     get_number_of_bookings_not_cancelled, get_offerers_details
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product
-
+    create_booking, create_product, clean_database
 
 
 class OffererQueriesTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
-        ENGINE.execute('''
-                        DELETE FROM "recommendation";
-                        DELETE FROM "booking";
-                        DELETE FROM "stock";
-                        DELETE FROM "offer";
-                        DELETE FROM "product";
-                        DELETE FROM "venue";
-                        DELETE FROM "mediation";
-                        DELETE FROM "offerer";
-                        DELETE FROM "user";
-                        DELETE FROM activity;
-                        ''')
+        clean_database()
 
     class GetOffererCreationDatesTest:
         def test_should_return_offerer_s_creation_date(self):
@@ -47,17 +35,15 @@ class OffererQueriesTest:
             create_venue(offerer_id=1, id=1)
             create_product(id=1)
             create_offer(venue_id=1, product_id=1, id=1)
-            date_before_first_save = datetime.utcnow()
-            create_stock(offer_id=1)
-            date_before_second_save = datetime.utcnow()
-            create_stock(offer_id=1, id=2)
+            create_stock(offer_id=1, date_created='2019-12-01')
+            create_stock(offer_id=1, id=2, date_created='2019-12-09')
 
             # When
             first_stock_dates = get_first_stock_creation_dates(CONNECTION)
 
             # Then
-            assert date_before_first_save < first_stock_dates.loc[
-                1, "Date de création du premier stock"] < date_before_second_save
+            assert first_stock_dates.loc[
+                1, "Date de création du premier stock"] == datetime(2019, 12, 1)
 
         def test_should_return_None_if_the_offerer_has_no_stock(self):
             # Given
@@ -169,11 +155,9 @@ class OffererQueriesTest:
             create_offer(venue_id=1, product_id=1, id=1, product_type='ThingType.JEUX_VIDEO')
             create_offer(venue_id=1, product_id=2, id=2, product_type='ThingType.AUDIOVISUEL')
             create_offer(venue_id=1, product_id=3, id=3, product_type='ThingType.CINEMA_ABO')
-            date_before_first_save = datetime.utcnow()
-            create_stock(offer_id=1, id=1)
-            date_before_second_save = datetime.utcnow()
-            create_stock(offer_id=2, id=2)
-            create_stock(offer_id=3, id=3)
+            create_stock(offer_id=1, id=1, date_created='2019-12-01')
+            create_stock(offer_id=2, id=2, date_created='2019-12-02')
+            create_stock(offer_id=3, id=3, date_created='2019-12-03')
             date_creation_booking_1 = datetime(2019, 3, 7)
             create_booking(user_id=1, stock_id=1, id=1, date_created=date_creation_booking_1, token='92IZKA')
             create_booking(user_id=1, stock_id=2, id=2, date_created=datetime(2019, 4, 7), token='ZIZ93K')
@@ -186,8 +170,8 @@ class OffererQueriesTest:
             assert offerers_details.shape == (2, 5)
             assert offerers_details.loc[1, "Date de création"] == date_creation_offerer_1
             assert offerers_details.loc[2, "Date de création"] == date_creation_offerer_2
-            assert date_before_first_save < offerers_details.loc[
-                1, "Date de création du premier stock"] < date_before_second_save
+            assert offerers_details.loc[
+                1, "Date de création du premier stock"] == datetime(2019, 12, 1)
             assert pandas.isnull(offerers_details.loc[2, "Date de création du premier stock"])
             assert offerers_details.loc[1, "Date de première réservation"] == date_creation_booking_1
             assert pandas.isnull(offerers_details.loc[2, "Date de première réservation"])
