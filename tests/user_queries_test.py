@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas
 import pytest
 
-from db import CONNECTION, ENGINE
+from db import CONNECTION
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
     create_booking, create_recommendation, create_product, update_table_column, clean_database
 from user_queries import get_beneficiary_users_details, get_experimentation_sessions, \
@@ -35,7 +35,8 @@ class UserQueriesTest:
             create_user(can_book_free_offers=True, departement_code="93",
                         date_created=datetime(2019, 1, 1, 12, 0, 0), needs_to_fill_cultural_survey=True, id=1)
             create_user(can_book_free_offers=True, departement_code="08", email="em@a.il",
-                        needs_to_fill_cultural_survey=False, cultural_survey_filled_date='2019-12-08', id=active_user_id)
+                        needs_to_fill_cultural_survey=False, cultural_survey_filled_date='2019-12-08',
+                        id=active_user_id)
             create_offerer(id=1)
             create_venue(offerer_id=1, id=1)
             create_product(id=activation_id, product_type='ThingType.ACTIVATION')
@@ -63,10 +64,9 @@ class UserQueriesTest:
             create_recommendation(offer_id=3, user_id=active_user_id, date_created=recommendation_creation_date, id=2)
 
             columns = ["Vague d'expérimentation", "Département", "Date d'activation", "Date de remplissage du typeform",
-                   "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
-                   "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
-                   "Nombre de réservations totales", "Nombre de réservations non annulées"]
-
+                       "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
+                       "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
+                       "Nombre de réservations totales", "Nombre de réservations non annulées"]
 
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
@@ -226,7 +226,6 @@ class UserQueriesTest:
                 assert activation_dates["Date d'activation"].empty
 
         class GetTypeformFillingDatesTest:
-
             def test_should_return_the_date_at_which_needs_to_fill_cultural_survey_was_updated_to_false(self):
                 # Given
                 create_user(needs_to_fill_cultural_survey=False, id=1, cultural_survey_filled_date='2019-12-09')
@@ -236,6 +235,16 @@ class UserQueriesTest:
 
                 # Then
                 assert typeform_filling_dates.loc[1, "Date de remplissage du typeform"] == datetime(2019, 12, 9)
+
+            def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
+                # Given
+                create_user(needs_to_fill_cultural_survey=True, id=1)
+
+                # When
+                typeform_filling_dates = get_typeform_filling_dates(CONNECTION)
+
+                # Then
+                assert typeform_filling_dates.loc[1, "Date de remplissage du typeform"] is None
 
             def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
                 # Given
@@ -258,7 +267,6 @@ class UserQueriesTest:
                 assert typeform_filling_dates.empty
 
         class GetFirstConnectionDatesTest:
-
             def test_should_return_the_creation_date_of_the_first_recommendation_of_the_user(self):
                 # Given
                 create_user(date_created=datetime(2019, 8, 31), can_book_free_offers=True, id=1)

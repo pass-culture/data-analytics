@@ -10,7 +10,7 @@ recommendation_dates_query = '''
       "user"."canBookFreeOffers"
      FROM "user"
      LEFT JOIN recommendation ON recommendation."userId" = "user".id
-     GROUP BY "user".id
+     GROUP BY "user".id, "user"."canBookFreeOffers"
     )
     '''
 
