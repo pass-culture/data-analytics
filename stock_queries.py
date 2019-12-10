@@ -21,7 +21,6 @@ def get_stocks_details(connection: Connection):
         get_stocks_offer_information(connection),
         get_stocks_venue_information(connection),
         get_stocks_booking_information(connection),
-        get_stock_creation_date(connection)
     ]
 
     return pandas.concat(stocks_details, axis=1)[STOCK_COLUMNS.values()]
@@ -32,6 +31,7 @@ def get_stocks_information(connection: Connection):
     SELECT
      id AS stock_id,
      "offerId" AS "{STOCK_COLUMNS["offer_id"]}",
+     "dateCreated" AS "{STOCK_COLUMNS["stock_issued_at"]}",
      "bookingLimitDatetime" AS "{STOCK_COLUMNS["booking_limit_datetime"]}",
      "beginningDatetime" AS "{STOCK_COLUMNS["beginning_datetime"]}",
      available AS "{STOCK_COLUMNS["available"]}"
@@ -101,19 +101,6 @@ def get_stocks_booking_information(connection: Connection):
     LEFT JOIN booking_with_payment ON booking_with_payment.booking_id=booking.id
     GROUP BY stock.id
     ORDER BY stock.id
-    '''
-    return pandas \
-        .read_sql(query, connection, index_col="stock_id")
-
-
-def get_stock_creation_date(connection: Connection):
-    query = f'''
-    SELECT
-     issued_at AS "{STOCK_COLUMNS["stock_issued_at"]}",
-     (changed_data ->>'id')::int AS stock_id
-    FROM activity
-    WHERE table_name='stock'
-    AND verb='insert'
     '''
     return pandas \
         .read_sql(query, connection, index_col="stock_id")

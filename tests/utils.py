@@ -3,14 +3,18 @@ from db import ENGINE
 
 def create_user(id=1, email='test@email.com', can_book_free_offers=True, is_admin=False, postal_code='93100',
                 departement_code='93', public_name='Test', date_created='2018-11-20',
-                needs_to_fill_cultural_survey=True):
+                needs_to_fill_cultural_survey=True, cultural_survey_filled_date=None):
+    if not cultural_survey_filled_date:
+        cultural_survey_filled_date = 'NULL'
+    else:
+        cultural_survey_filled_date = f"'{cultural_survey_filled_date}'"
     password = '\x2432622431322445425a572e6d484754383242375558366e31576f43655044647671467875634b4173327873' \
                '666c6b69675061793347397968527561'
     ENGINE.execute(f'''
     INSERT INTO "user" (id, email, "publicName", "canBookFreeOffers", "isAdmin", password, "postalCode", 
-    "departementCode", "dateCreated", "needsToFillCulturalSurvey")
+    "departementCode", "dateCreated", "needsToFillCulturalSurvey", "culturalSurveyFilledDate")
     VALUES ({id}, '{email}', '{public_name}', {can_book_free_offers}, {is_admin}, '{password}', '{postal_code}', 
-    '{departement_code}', '{date_created}', {needs_to_fill_cultural_survey})
+    '{departement_code}', '{date_created}', {needs_to_fill_cultural_survey}, {cultural_survey_filled_date})
     ''')
 
 
@@ -71,7 +75,7 @@ def create_offer(venue_id, product_id, id=1, is_active=True, product_type='Thing
                 ''')
 
 
-def create_stock(offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-20', price=0, available=10,
+def create_stock(offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-20', date_created='2019-11-20', price=0, available=10,
                  groupe_size=1, booking_limit_datetime=None, beginning_datetime=None):
     if not booking_limit_datetime:
         booking_limit_datetime = 'NULL'
@@ -84,16 +88,16 @@ def create_stock(offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-2
         beginning_datetime = f"'{beginning_datetime}'"
 
     ENGINE.execute(f'''
-        INSERT INTO stock (id, "isSoftDeleted", "dateModified", "offerId", price, available, "groupSize", "beginningDatetime", "bookingLimitDatetime")
-        VALUES ({id}, {is_soft_deleted}, '{date_modified}', {offer_id}, {price}, {available}, {groupe_size}, {beginning_datetime}, {booking_limit_datetime})
+        INSERT INTO stock (id, "isSoftDeleted", "dateModified", "dateCreated", "offerId", price, available, "groupSize", "beginningDatetime", "bookingLimitDatetime")
+        VALUES ({id}, {is_soft_deleted}, '{date_modified}', '{date_created}', {offer_id}, {price}, {available}, {groupe_size}, {beginning_datetime}, {booking_limit_datetime})
         ''')
 
 
 def create_booking(user_id, stock_id, id=1, date_created='2019-11-20', quantity=1, token='ABC123', amount=0,
-                   is_cancelled=False, is_used=False):
+                   is_cancelled=False, is_used=False, date_used='2019-11-22'):
     ENGINE.execute(f'''
-            INSERT INTO booking (id, "dateCreated", "stockId", quantity, token, "userId", amount, "isCancelled", "isUsed")
-            VALUES ({id}, '{date_created}', {stock_id}, {quantity}, '{token}', {user_id}, {amount}, {is_cancelled}, {is_used})
+            INSERT INTO booking (id, "dateCreated", "stockId", quantity, token, "userId", amount, "isCancelled", "isUsed", "dateUsed")
+            VALUES ({id}, '{date_created}', {stock_id}, {quantity}, '{token}', {user_id}, {amount}, {is_cancelled}, {is_used}, '{date_used}')
             ''')
 
 
@@ -132,3 +136,21 @@ def update_table_column(id, table_name, column, value):
             SET {column} = ({value})
             WHERE id={id}
             ''')
+
+def clean_database():
+    ENGINE.execute('''
+    DELETE FROM "recommendation";
+    DELETE FROM payment_status;
+    DELETE FROM payment;
+    DELETE FROM "booking";
+    DELETE FROM "stock";
+    DELETE FROM "offer";
+    DELETE FROM "product";
+    DELETE FROM "venue";
+    DELETE FROM "mediation";
+    DELETE FROM "offerer";
+    DELETE FROM "user";
+    DROP TABLE IF EXISTS enriched_offerer_data;
+    DROP TABLE IF EXISTS enriched_user_data;
+    DROP TABLE IF EXISTS enriched_stock_data;
+    ''')

@@ -7,7 +7,8 @@ from create_enriched_data_tables import create_enriched_offerer_data, \
     create_enriched_user_data
 from db import CONNECTION, ENGINE
 from query_enriched_data_tables import create_enriched_stock_data
-from tests.utils import create_offerer, create_user, create_venue, create_offer, create_product, create_stock
+from tests.utils import create_offerer, create_user, create_venue, create_offer, create_product, create_stock, \
+    clean_database
 
 connection = CONNECTION
 
@@ -15,20 +16,7 @@ connection = CONNECTION
 class EnrichedDataTest:
     @pytest.fixture(autouse=True)
     def setup_class(self):
-        ENGINE.execute('''
-                        DELETE FROM "booking";
-                        DELETE FROM "stock";
-                        DELETE FROM "offer";
-                        DELETE FROM "product";
-                        DELETE FROM "venue";
-                        DELETE FROM "offerer";
-                        DELETE FROM "user";
-                        DELETE FROM activity;
-                        DROP TABLE IF EXISTS enriched_offerer_data;
-                        DROP TABLE IF EXISTS enriched_user_data;
-                        DROP TABLE IF EXISTS enriched_stock_data;
-
-                        ''')
+        clean_database()
 
     class CreateEnrichedOffererDataTest:
 
