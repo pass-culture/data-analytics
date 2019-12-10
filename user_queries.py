@@ -10,7 +10,7 @@ recommendation_dates_query = '''
       "user"."canBookFreeOffers"
      FROM "user"
      LEFT JOIN recommendation ON recommendation."userId" = "user".id
-     GROUP BY "user".id
+     GROUP BY "user".id, "user"."canBookFreeOffers"
     )
     '''
 
@@ -120,10 +120,12 @@ def get_typeform_filling_dates(connection: Connection):
       )
 
     SELECT
+     DISTINCT ON (typeform_filled.user_id)
      typeform_filled.issued_at AS "Date de remplissage du typeform",
      typeform_filled.user_id AS user_id
     FROM typeform_filled
     WHERE typeform_filled."canBookFreeOffers"
+    ORDER BY typeform_filled.user_id, typeform_filled.issued_at DESC
     '''
     return pandas.read_sql(query, connection, index_col='user_id')
 

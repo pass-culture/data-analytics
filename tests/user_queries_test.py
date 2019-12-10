@@ -256,7 +256,6 @@ class UserQueriesTest:
                 assert activation_dates["Date d'activation"].empty
 
         class GetTypeformFillingDatesTest:
-
             def test_should_return_the_date_at_which_needs_to_fill_cultural_survey_was_updated_to_false(self):
                 # Given
                 date_before_changes = datetime.utcnow()
@@ -270,6 +269,33 @@ class UserQueriesTest:
                 # Then
                 assert date_before_changes < typeform_filling_dates.loc[
                     1, "Date de remplissage du typeform"] < date_after_used
+
+            def test_should_return_the_last_date_at_which_needs_to_fill_cultural_survey_was_updated_to_false_when_two_updates(
+                    self):
+                # Given
+                create_user(needs_to_fill_cultural_survey=True, id=1)
+                update_table_column(id=1, table_name='"user"', column='"needsToFillCulturalSurvey"', value=False)
+                after_first_update = datetime.utcnow()
+                update_table_column(id=1, table_name='"user"', column='"needsToFillCulturalSurvey"', value=True)
+                update_table_column(id=1, table_name='"user"', column='"needsToFillCulturalSurvey"', value=False)
+                date_after_second_update = datetime.utcnow()
+
+                # When
+                typeform_filling_dates = get_typeform_filling_dates(CONNECTION)
+
+                # Then
+                assert after_first_update < typeform_filling_dates.loc[
+                    1, "Date de remplissage du typeform"] < date_after_second_update
+
+            def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
+                # Given
+                create_user(needs_to_fill_cultural_survey=True, id=1)
+
+                # When
+                typeform_filling_dates = get_typeform_filling_dates(CONNECTION)
+
+                # Then
+                assert typeform_filling_dates.loc[1, "Date de remplissage du typeform"] is None
 
             def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
                 # Given
@@ -292,7 +318,6 @@ class UserQueriesTest:
                 assert typeform_filling_dates.empty
 
         class GetFirstConnectionDatesTest:
-
             def test_should_return_the_creation_date_of_the_first_recommendation_of_the_user(self):
                 # Given
                 create_user(date_created=datetime(2019, 8, 31), can_book_free_offers=True, id=1)
