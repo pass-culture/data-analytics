@@ -5,8 +5,12 @@ C'est l'outil de visualisation de données du pass Culture.
 ## Utiliser Metabase
 ### Démarrer Metabase en local
 Se placer à la racine du projet et taper :
+`docker-compose -f docker_compose_with_metabase.yml up`
 
+### Démarrer uniquement les containers nécessaires aux tests
+Se placer à la racine du projet et taper :
 `docker-compose up`
+
 
 ### Configurer Metabase
 L'url pour aller sur Metabase en local est : http://localhost:3002/
