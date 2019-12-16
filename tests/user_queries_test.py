@@ -246,16 +246,6 @@ class UserQueriesTest:
                 # Then
                 assert typeform_filling_dates.loc[1, "Date de remplissage du typeform"] is None
 
-            def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
-                # Given
-                create_user(needs_to_fill_cultural_survey=True, cultural_survey_filled_date=None, id=1)
-
-                # When
-                typeform_filling_dates = get_typeform_filling_dates(CONNECTION)
-
-                # Then
-                assert typeform_filling_dates.loc[1, "Date de remplissage du typeform"] is None
-
             def test_should_return_empty_series_if_user_cannot_book_free_offers(self):
                 # Given
                 create_user(can_book_free_offers=False)

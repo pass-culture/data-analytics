@@ -7,8 +7,7 @@ services:
     volumes:
       - .:/opt/pass-culture-metabase
     command: >
-      bash -c "cd /opt/pass-culture-metabase;
-               pip install -r ./requirements.txt;
+      bash -c "pip install -r /opt/pass-culture-metabase/requirements.txt;
                python /opt/pass-culture-metabase/run_server.py;
                "
     ports:
@@ -40,7 +39,6 @@ services:
   postgres-product:
     image: postgres:10.10-alpine
     container_name: pcm-postgres-product
-
     env_file:
       - env_file
     ports:
