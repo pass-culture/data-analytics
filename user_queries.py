@@ -40,6 +40,7 @@ def get_experimentation_sessions(connection: Connection):
     query = '''
     WITH experimentation_session AS (
         SELECT
+        DISTINCT ON (user_id)
          "isUsed" AS is_used,
          "userId" AS user_id
         FROM booking
@@ -47,6 +48,7 @@ def get_experimentation_sessions(connection: Connection):
         JOIN offer
          ON offer.id = stock."offerId"
          AND offer.type = 'ThingType.ACTIVATION'
+        ORDER BY user_id, is_used DESC 
     )
 
     SELECT

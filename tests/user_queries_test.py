@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pandas
 import pytest
+from pandas import Int64Index
 
 from db import CONNECTION
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
@@ -100,8 +101,10 @@ class UserQueriesTest:
             experimentation_sessions = get_experimentation_sessions(CONNECTION)
 
             # Then
-            assert experimentation_sessions["Vague d'expérimentation"].equals(
-                pandas.Series(data=[1], name="Vague d'expérimentation", index=[1]))
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[1], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
+            )
 
         def test_should_return_2_when_user_has_unused_activation_booking(self):
             # Given
@@ -117,8 +120,10 @@ class UserQueriesTest:
             experimentation_sessions = get_experimentation_sessions(CONNECTION)
 
             # Then
-            assert experimentation_sessions["Vague d'expérimentation"].equals(
-                pandas.Series(data=[2], name="Vague d'expérimentation", index=[1]))
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[2], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
+            )
 
         def test_should_return_2_when_user_does_not_have_activation_booking(self):
             # Given
@@ -128,8 +133,29 @@ class UserQueriesTest:
             experimentation_sessions = get_experimentation_sessions(CONNECTION)
 
             # Then
-            assert experimentation_sessions["Vague d'expérimentation"].equals(
-                pandas.Series(data=[2], name="Vague d'expérimentation", index=[1]))
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[2], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
+            )
+
+        def test_should_return_1_when_user_has_one_used_and_one_unused_activation_booking(self):
+            # Given
+            create_user(id=1)
+            create_offerer(id=1)
+            create_venue(offerer_id=1)
+            create_product(product_type='ThingType.ACTIVATION', id=1)
+            create_offer(venue_id=1, product_type='ThingType.ACTIVATION', product_id=1, id=1)
+            create_stock(offer_id=1)
+            create_booking(user_id=1, stock_id=1, is_used=False, id=1)
+            create_booking(user_id=1, stock_id=1, is_used=True, token='9JZL30', id=2)
+
+            # When
+            experimentation_sessions = get_experimentation_sessions(CONNECTION)
+
+            # Then
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[1], name="Vague d'expérimentation", index=Int64Index([1], name='user_id')))
 
         def test_should_return_an_empty_series_if_user_cannot_book_free_offers(self):
             # Given
@@ -150,8 +176,10 @@ class UserQueriesTest:
             departements = get_departments(CONNECTION)
 
             # Then
-            assert departements["Département"].equals(
-                pandas.Series(data=["01"], name="Département", index=[1]))
+            pandas.testing.assert_series_equal(
+                departements["Département"],
+                pandas.Series(data=["01"], name="Département", index=Int64Index([1], name='user_id'))
+            )
 
         def test_should_return_empty_series_when_user_cannot_book_free_offer(self):
             # Given
@@ -189,8 +217,10 @@ class UserQueriesTest:
                 activation_dates = get_activation_dates(CONNECTION)
 
                 # Then
-                assert activation_dates["Date d'activation"].equals(
-                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=[1]))
+                pandas.testing.assert_series_equal(
+                    activation_dates["Date d'activation"],
+                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=Int64Index([1], name='user_id'))
+                )
 
             def test_should_return_the_date_at_which_the_user_was_created_when_non_used_activation_booking(self):
                 # Given
@@ -206,8 +236,10 @@ class UserQueriesTest:
                 activation_dates = get_activation_dates(CONNECTION)
 
                 # Then
-                assert activation_dates["Date d'activation"].equals(
-                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=[1]))
+                pandas.testing.assert_series_equal(
+                    activation_dates["Date d'activation"],
+                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=Int64Index([1], name='user_id'))
+                )
 
             def test_should_return_empty_series_when_user_cannot_book_free_offers(self):
                 # Given
