@@ -2,8 +2,9 @@ from datetime import datetime
 
 import pandas
 import pytest
+from pandas import Int64Index
 
-from db import CONNECTION, ENGINE
+from db import CONNECTION
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
     create_booking, create_recommendation, create_product, update_table_column, clean_database
 from user_queries import get_beneficiary_users_details, get_experimentation_sessions, \
@@ -35,7 +36,8 @@ class UserQueriesTest:
             create_user(can_book_free_offers=True, departement_code="93",
                         date_created=datetime(2019, 1, 1, 12, 0, 0), needs_to_fill_cultural_survey=True, id=1)
             create_user(can_book_free_offers=True, departement_code="08", email="em@a.il",
-                        needs_to_fill_cultural_survey=False, cultural_survey_filled_date='2019-12-08', id=active_user_id)
+                        needs_to_fill_cultural_survey=False, cultural_survey_filled_date='2019-12-08',
+                        id=active_user_id)
             create_offerer(id=1)
             create_venue(offerer_id=1, id=1)
             create_product(id=activation_id, product_type='ThingType.ACTIVATION')
@@ -63,10 +65,9 @@ class UserQueriesTest:
             create_recommendation(offer_id=3, user_id=active_user_id, date_created=recommendation_creation_date, id=2)
 
             columns = ["Vague d'expérimentation", "Département", "Date d'activation", "Date de remplissage du typeform",
-                   "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
-                   "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
-                   "Nombre de réservations totales", "Nombre de réservations non annulées"]
-
+                       "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
+                       "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
+                       "Nombre de réservations totales", "Nombre de réservations non annulées"]
 
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
@@ -100,8 +101,10 @@ class UserQueriesTest:
             experimentation_sessions = get_experimentation_sessions(CONNECTION)
 
             # Then
-            assert experimentation_sessions["Vague d'expérimentation"].equals(
-                pandas.Series(data=[1], name="Vague d'expérimentation", index=[1]))
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[1], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
+            )
 
         def test_should_return_2_when_user_has_unused_activation_booking(self):
             # Given
@@ -117,8 +120,10 @@ class UserQueriesTest:
             experimentation_sessions = get_experimentation_sessions(CONNECTION)
 
             # Then
-            assert experimentation_sessions["Vague d'expérimentation"].equals(
-                pandas.Series(data=[2], name="Vague d'expérimentation", index=[1]))
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[2], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
+            )
 
         def test_should_return_2_when_user_does_not_have_activation_booking(self):
             # Given
@@ -128,8 +133,29 @@ class UserQueriesTest:
             experimentation_sessions = get_experimentation_sessions(CONNECTION)
 
             # Then
-            assert experimentation_sessions["Vague d'expérimentation"].equals(
-                pandas.Series(data=[2], name="Vague d'expérimentation", index=[1]))
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[2], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
+            )
+
+        def test_should_return_1_when_user_has_one_used_and_one_unused_activation_booking(self):
+            # Given
+            create_user(id=1)
+            create_offerer(id=1)
+            create_venue(offerer_id=1)
+            create_product(product_type='ThingType.ACTIVATION', id=1)
+            create_offer(venue_id=1, product_type='ThingType.ACTIVATION', product_id=1, id=1)
+            create_stock(offer_id=1)
+            create_booking(user_id=1, stock_id=1, is_used=False, id=1)
+            create_booking(user_id=1, stock_id=1, is_used=True, token='9JZL30', id=2)
+
+            # When
+            experimentation_sessions = get_experimentation_sessions(CONNECTION)
+
+            # Then
+            pandas.testing.assert_series_equal(
+                experimentation_sessions["Vague d'expérimentation"],
+                pandas.Series(data=[1], name="Vague d'expérimentation", index=Int64Index([1], name='user_id')))
 
         def test_should_return_an_empty_series_if_user_cannot_book_free_offers(self):
             # Given
@@ -150,8 +176,10 @@ class UserQueriesTest:
             departements = get_departments(CONNECTION)
 
             # Then
-            assert departements["Département"].equals(
-                pandas.Series(data=["01"], name="Département", index=[1]))
+            pandas.testing.assert_series_equal(
+                departements["Département"],
+                pandas.Series(data=["01"], name="Département", index=Int64Index([1], name='user_id'))
+            )
 
         def test_should_return_empty_series_when_user_cannot_book_free_offer(self):
             # Given
@@ -189,8 +217,10 @@ class UserQueriesTest:
                 activation_dates = get_activation_dates(CONNECTION)
 
                 # Then
-                assert activation_dates["Date d'activation"].equals(
-                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=[1]))
+                pandas.testing.assert_series_equal(
+                    activation_dates["Date d'activation"],
+                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=Int64Index([1], name='user_id'))
+                )
 
             def test_should_return_the_date_at_which_the_user_was_created_when_non_used_activation_booking(self):
                 # Given
@@ -206,8 +236,10 @@ class UserQueriesTest:
                 activation_dates = get_activation_dates(CONNECTION)
 
                 # Then
-                assert activation_dates["Date d'activation"].equals(
-                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=[1]))
+                pandas.testing.assert_series_equal(
+                    activation_dates["Date d'activation"],
+                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=Int64Index([1], name='user_id'))
+                )
 
             def test_should_return_empty_series_when_user_cannot_book_free_offers(self):
                 # Given
@@ -226,7 +258,6 @@ class UserQueriesTest:
                 assert activation_dates["Date d'activation"].empty
 
         class GetTypeformFillingDatesTest:
-
             def test_should_return_the_date_at_which_needs_to_fill_cultural_survey_was_updated_to_false(self):
                 # Given
                 create_user(needs_to_fill_cultural_survey=False, id=1, cultural_survey_filled_date='2019-12-09')
@@ -239,7 +270,7 @@ class UserQueriesTest:
 
             def test_should_return_None_when_has_filled_cultural_survey_was_never_updated_to_false(self):
                 # Given
-                create_user(needs_to_fill_cultural_survey=True, cultural_survey_filled_date=None, id=1)
+                create_user(needs_to_fill_cultural_survey=True, id=1)
 
                 # When
                 typeform_filling_dates = get_typeform_filling_dates(CONNECTION)
@@ -258,7 +289,6 @@ class UserQueriesTest:
                 assert typeform_filling_dates.empty
 
         class GetFirstConnectionDatesTest:
-
             def test_should_return_the_creation_date_of_the_first_recommendation_of_the_user(self):
                 # Given
                 create_user(date_created=datetime(2019, 8, 31), can_book_free_offers=True, id=1)

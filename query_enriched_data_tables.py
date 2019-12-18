@@ -16,11 +16,14 @@ def create_enriched_user_data(connection: Connection):
     get_beneficiary_users_details(connection)\
         .sample(frac=1)\
         .reset_index(drop=True)\
-        .to_sql(name='enriched_user_data', con=connection, if_exists='replace')
+        .to_sql(name='enriched_user_data',
+                con=connection,
+                if_exists='replace')
 
 
 def create_enriched_stock_data(connection:Connection):
     enriched_stock_data = get_stocks_details(connection)
     enriched_stock_data.to_sql(name='enriched_stock_data',
-                                 con=connection,
-                                 if_exists='replace')
+                               con=connection,
+                               if_exists='replace',
+                               chunksize=100000)

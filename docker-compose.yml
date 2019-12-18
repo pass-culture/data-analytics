@@ -7,8 +7,7 @@ services:
     volumes:
       - .:/opt/pass-culture-metabase
     command: >
-      bash -c "cd /opt/pass-culture-metabase;
-               pip install -r ./requirements.txt;
+      bash -c "pip install -r /opt/pass-culture-metabase/requirements.txt;
                python /opt/pass-culture-metabase/run_server.py;
                "
     ports:
@@ -40,38 +39,8 @@ services:
   postgres-product:
     image: postgres:10.10-alpine
     container_name: pcm-postgres-product
-
     env_file:
       - env_file
     ports:
       - 5435:5432
     command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
-
-  postgres-metabase:
-    image: postgres:10.10-alpine
-    container_name: pcm-postgres-metabase
-    environment:
-      - POSTGRES_DB=pass_culture
-      - POSTGRES_USER=metabase
-      - POSTGRES_PASSWORD=metabase
-    ports:
-      - 5436:5432
-    command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
-
-
-  metabase-app:
-    container_name: pcm-metabase-app
-    image: metabase/metabase
-    ports:
-      - 3002:3000
-    environment:
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: pass_culture
-      MB_DB_PORT: 5432
-      MB_DB_USER: metabase
-      MB_DB_PASS: metabase
-      MB_DB_HOST: postgres-metabase
-    depends_on:
-      - postgres-metabase
-    links:
-      - postgres-metabase
