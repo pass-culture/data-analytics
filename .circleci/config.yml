@@ -1,0 +1,14 @@
+version: 2
+ jobs:
+   build:
+     docker:
+       - image: circleci/python:3.6.6
+     steps:
+       - checkout
+       - run: echo "A first hello"
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build

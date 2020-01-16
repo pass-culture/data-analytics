@@ -1,7 +1,5 @@
-import logging
 import os
 from logging import INFO as LOG_LEVEL_INFO
-
 
 LOG_LEVEL = int(os.environ.get('LOG_LEVEL', LOG_LEVEL_INFO))
 
@@ -15,6 +13,7 @@ class AttrDict(dict):
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
                     level=LOG_LEVEL,
                     datefmt='%Y-%m-%d %H:%M:%S')
+
 
 def pc_logging(level, *args):
     global logging

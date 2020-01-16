@@ -13,7 +13,6 @@ def get_offerers_details(connection: Connection) -> pandas.DataFrame:
     )
 
 
-
 def get_creation_dates(connection: Connection) -> pandas.DataFrame:
     query = '''
     SELECT
