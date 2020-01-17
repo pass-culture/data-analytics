@@ -3,9 +3,38 @@ jobs:
  build:
    docker:
      - image: circleci/python:3.6.6
+       environment:
+         DATABASE_URL_TEST: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
+     - image: circleci/postgres:9.6.2
+         name: postgres-product
+         environment:
+           POSTGRES_USER: pass_culture
+           POSTGRES_PASSWORD: passq
+           POSTGRES_DB: pass_culture
+   working_directory: ~/
    steps:
      - checkout
-     - run: echo "A first hello"
+     - run:
+         name: Install requirements
+         command: |
+           python3 -m venv venv
+           . venv/bin/activate
+           pip install -r requirements.txt
+     - run:
+         name: Initialize environment
+           command: |
+             git clone https://github.com/betagouv/pass-culture-api.git;
+             cd pass-culture-api;
+             pip install -r requirements.txt;
+             python -m nltk.downloader punkt stopwords;
+             cp ~/enriched_data/install_models.py install_models.py;
+             PYTHONPATH=. python install_models.py;
+     - run:
+         name: Running tests
+         command: |
+           . venv/bin/activate
+           pytest tests
+           coveralls
 
 workflows:
   version: 2
