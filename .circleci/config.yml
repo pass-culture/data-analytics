@@ -22,13 +22,13 @@ jobs:
            pip install -r requirements.txt
      - run:
          name: Initialize environment
-           command: |
-             git clone https://github.com/betagouv/pass-culture-api.git;
-             cd pass-culture-api;
-             pip install -r requirements.txt;
-             python -m nltk.downloader punkt stopwords;
-             cp ~/enriched_data/install_models.py install_models.py;
-             PYTHONPATH=. python install_models.py;
+         command: |
+           git clone https://github.com/betagouv/pass-culture-api.git;
+           cd pass-culture-api;
+           pip install -r requirements.txt;
+           python -m nltk.downloader punkt stopwords;
+           cp ~/enriched_data/install_models.py install_models.py;
+           PYTHONPATH=. python install_models.py;
      - run:
          name: Running tests
          command: |
