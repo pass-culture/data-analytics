@@ -28,7 +28,7 @@ jobs:
            . venv/bin/activate
            pip install -r requirements.txt;
            python -m nltk.downloader punkt stopwords;
-           cp ~/enriched_data/install_models.py install_models.py;
+           cp ../install_models.py install_models.py;
            PYTHONPATH=. python install_models.py;
      - run:
          name: Running tests
