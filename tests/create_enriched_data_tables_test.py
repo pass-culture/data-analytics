@@ -211,7 +211,8 @@ class EnrichedDataTest:
             get_stocks_details.assert_called_once_with(connection)
             mocked_dataframe.to_sql.assert_called_once_with(chunksize=100000, name='enriched_stock_data',
                                  con=connection,
-                                 if_exists='replace')
+                                 if_exists='replace',
+                                 chunksize=100000)
 
         def test_creates_index_on_stock_id(self):
             # Given
