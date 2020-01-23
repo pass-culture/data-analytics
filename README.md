@@ -29,4 +29,4 @@ Après avoir lancé les conteneurs, taper :
 `docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase; python create_enriched_data_tables.py"`
 
 ## Lancer les tests
-`docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase; pytest"`
+`pytest`

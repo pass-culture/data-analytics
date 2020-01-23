@@ -57,8 +57,7 @@ class EnrichedDataTest:
             # Given
             query = """
             SELECT
-                indexname,
-                indexdef
+                indexname
             FROM
                 pg_indexes
             WHERE
@@ -69,9 +68,7 @@ class EnrichedDataTest:
             create_enriched_offerer_data(connection)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [('ix_enriched_offerer_data_offerer_id',
-                                                         'CREATE INDEX ix_enriched_offerer_data_offerer_id '
-                                                         'ON public.enriched_offerer_data USING btree (offerer_id)')]
+            assert ENGINE.execute(query).fetchall() == [('ix_enriched_offerer_data_offerer_id',)]
 
         def test_replaces_table_if_exists(self):
             # Given
@@ -128,8 +125,7 @@ class EnrichedDataTest:
             # Given
             query = """
                 SELECT
-                    indexname,
-                    indexdef
+                    indexname
                 FROM
                     pg_indexes
                 WHERE
@@ -140,9 +136,7 @@ class EnrichedDataTest:
             create_enriched_user_data(connection)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [('ix_enriched_user_data_index',
-                                                         'CREATE INDEX ix_enriched_user_data_index '
-                                                         'ON public.enriched_user_data USING btree (index)')]
+            assert ENGINE.execute(query).fetchall() == [('ix_enriched_user_data_index',)]
 
         @patch('query_enriched_data_tables.get_beneficiary_users_details')
         def test_shuffles_index(self, get_beneficiary_users_details):
@@ -215,7 +209,7 @@ class EnrichedDataTest:
 
             # Then
             get_stocks_details.assert_called_once_with(connection)
-            mocked_dataframe.to_sql.assert_called_once_with(name='enriched_stock_data',
+            mocked_dataframe.to_sql.assert_called_once_with(chunksize=100000, name='enriched_stock_data',
                                  con=connection,
                                  if_exists='replace')
 
@@ -223,8 +217,7 @@ class EnrichedDataTest:
             # Given
             query = """
             SELECT
-                indexname,
-                indexdef
+                indexname
             FROM
                 pg_indexes
             WHERE
@@ -235,9 +228,7 @@ class EnrichedDataTest:
             create_enriched_stock_data(connection)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [('ix_enriched_stock_data_stock_id',
-                                                         'CREATE INDEX ix_enriched_stock_data_stock_id '
-                                                         'ON public.enriched_stock_data USING btree (stock_id)')]
+            assert ENGINE.execute(query).fetchall() == [('ix_enriched_stock_data_stock_id',)]
 
         def test_replaces_table_if_exists(self):
             # Given
