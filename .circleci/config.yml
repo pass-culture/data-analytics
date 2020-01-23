@@ -35,7 +35,6 @@ jobs:
          command: |
            . venv/bin/activate
            pytest tests
-           coveralls
 
 workflows:
   version: 2
