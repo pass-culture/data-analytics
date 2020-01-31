@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas
 from sqlalchemy.engine import Connection
 
@@ -16,10 +18,11 @@ recommendation_dates_query = '''
 
 
 def get_beneficiary_users_details(connection: Connection):
+    activation_dates = get_activation_dates(connection)
     user_details = [
         get_experimentation_sessions(connection),
         get_departments(connection),
-        get_activation_dates(connection),
+        activation_dates,
         get_typeform_filling_dates(connection),
         get_first_connection_dates(connection),
         get_date_of_first_bookings(connection),
@@ -27,7 +30,8 @@ def get_beneficiary_users_details(connection: Connection):
         get_date_of_bookings_on_third_product_type(connection),
         get_last_recommendation_dates(connection),
         get_number_of_bookings(connection),
-        get_number_of_non_cancelled_bookings(connection)
+        get_number_of_non_cancelled_bookings(connection),
+        get_users_seniority(activation_dates)
     ]
     beneficiary_users_details = pandas.concat(
         user_details,
@@ -282,3 +286,12 @@ def get_number_of_non_cancelled_bookings(connection: Connection):
     WHERE "user"."canBookFreeOffers"
     '''
     return pandas.read_sql(query, connection, index_col='user_id')
+
+
+def get_users_seniority(activation_dates: pandas.DataFrame) -> pandas.Series:
+    now = datetime.now()
+
+    time_since_activation = (now - activation_dates)
+    users_seniority = time_since_activation["Date d'activation"].apply(lambda date: date.days)
+    users_seniority.name = "Ancienneté en jours"
+    return users_seniority
