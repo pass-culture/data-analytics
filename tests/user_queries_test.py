@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pandas
 import pytest
+from freezegun import freeze_time
 from pandas import Int64Index
 
 from db import CONNECTION
@@ -10,7 +11,7 @@ from tests.utils import create_user, create_offerer, create_venue, create_offer,
 from user_queries import get_beneficiary_users_details, get_experimentation_sessions, \
     get_departments, get_activation_dates, get_typeform_filling_dates, get_first_connection_dates, \
     get_date_of_first_bookings, get_date_of_second_bookings, get_date_of_bookings_on_third_product_type, \
-    get_last_recommendation_dates, get_number_of_bookings, get_number_of_non_cancelled_bookings
+    get_last_recommendation_dates, get_number_of_bookings, get_number_of_non_cancelled_bookings, get_users_seniority
 
 
 class UserQueriesTest:
@@ -29,6 +30,7 @@ class UserQueriesTest:
             # Then
             assert beneficiary_users_details.empty
 
+        @freeze_time('2020-01-21 11:00:00')
         def test_should_return_values_for_users_who_can_book_free_offers(self):
             # Given
             activation_id = 1
@@ -67,15 +69,15 @@ class UserQueriesTest:
             columns = ["Vague d'expérimentation", "Département", "Date d'activation", "Date de remplissage du typeform",
                        "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
                        "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
-                       "Nombre de réservations totales", "Nombre de réservations non annulées"]
+                       "Nombre de réservations totales", "Nombre de réservations non annulées","Ancienneté en jours"]
 
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
                 data=[
                     [active_user_id, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
-                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0],
+                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384],
                     [1, "08", datetime(2019, 12, 9), datetime(2019, 12, 8), datetime(2019, 2, 3), datetime(2019, 3, 7),
-                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2]
+                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43]
                 ],
                 columns=columns
             )
@@ -219,7 +221,8 @@ class UserQueriesTest:
                 # Then
                 pandas.testing.assert_series_equal(
                     activation_dates["Date d'activation"],
-                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=Int64Index([1], name='user_id'))
+                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation",
+                                  index=Int64Index([1], name='user_id'))
                 )
 
             def test_should_return_the_date_at_which_the_user_was_created_when_non_used_activation_booking(self):
@@ -238,7 +241,8 @@ class UserQueriesTest:
                 # Then
                 pandas.testing.assert_series_equal(
                     activation_dates["Date d'activation"],
-                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation", index=Int64Index([1], name='user_id'))
+                    pandas.Series(data=[datetime(2019, 8, 31)], name="Date d'activation",
+                                  index=Int64Index([1], name='user_id'))
                 )
 
             def test_should_return_empty_series_when_user_cannot_book_free_offers(self):
@@ -652,3 +656,28 @@ class UserQueriesTest:
 
                 # Then
                 assert non_cancelled_bookings.empty
+
+    class GetUserSeniorityTest:
+        @freeze_time('2020-01-21 11:00:00')
+        def test_if_activation_dates_is_today_return_seniority_of_zero_day(self):
+            # Given
+            activation_dates = pandas.DataFrame([datetime(2020, 1, 21, 11, 0, 0)], columns=["Date d'activation"],
+                                             index=Int64Index([1], name="user_id"))
+
+            # When
+            user_seniority = get_users_seniority(activation_dates)
+
+            # Then
+            pandas.testing.assert_series_equal(user_seniority, pandas.Series([0], name="Ancienneté en jours",
+                                                                             index=Int64Index([1], name="user_id")))
+
+        def test_if_activation_dates_is_empty_return_empty_series(self):
+            # Given
+            activation_dates = pandas.DataFrame([], columns=["Date d'activation"],
+                                                 index=Int64Index([], name="user_id"))
+
+            # When
+            user_seniority = get_users_seniority(activation_dates)
+
+            # Then
+            assert user_seniority.empty
