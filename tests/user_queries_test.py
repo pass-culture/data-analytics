@@ -12,7 +12,7 @@ from user_queries import get_beneficiary_users_details, get_experimentation_sess
     get_departments, get_activation_dates, get_typeform_filling_dates, get_first_connection_dates, \
     get_date_of_first_bookings, get_date_of_second_bookings, get_date_of_bookings_on_third_product_type, \
     get_last_recommendation_dates, get_number_of_bookings, get_number_of_non_cancelled_bookings, get_users_seniority, \
-    get_actual_amount_spent
+    get_actual_amount_spent, get_theoric_amount_spent
 
 
 class UserQueriesTest:
@@ -74,15 +74,15 @@ class UserQueriesTest:
                        "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
                        "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
                        "Nombre de réservations totales", "Nombre de réservations non annulées", "Ancienneté en jours",
-                       "Montant réél dépensé"]
+                       "Montant réél dépensé", "Montant théorique dépensé"]
 
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
                 data=[
                     [active_user_id, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
-                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384, 0.],
+                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384, 0., 0.],
                     [1, "08", datetime(2019, 12, 9), datetime(2019, 12, 8), datetime(2019, 2, 3), datetime(2019, 3, 7),
-                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43, 10.]
+                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43, 10., 30.]
                 ],
                 columns=columns
             )
@@ -686,7 +686,8 @@ class UserQueriesTest:
             # Then
             assert user_seniority.empty
 
-    class GetUserActualExpense:
+    class GetUserActualAmountSpent:
+
         def test_if_user_has_not_booked_return_zero(self):
             # Given
             create_user(id=45)
@@ -770,7 +771,7 @@ class UserQueriesTest:
             pandas.testing.assert_frame_equal(amount_spent, pandas.DataFrame([0.], columns=["Montant réél dépensé"],
                                                                              index=Int64Index([45], name="user_id")))
 
-        def test_if_user_cannont_book_free_offer_return_empty_data_frame(self):
+        def test_if_user_cannot_book_free_offer_return_empty_data_frame(self):
             # Given
             create_user(id=45, can_book_free_offers=False)
 
@@ -779,3 +780,103 @@ class UserQueriesTest:
 
             # Then
             assert amount_spent.empty
+
+    class GetUserTheoricAmountSpent:
+
+        def test_if_user_cannot_book_free_offer_return_empty_data_frame(self):
+            # Given
+            create_user(id=45, can_book_free_offers=False)
+
+            # When
+            theoric_amount_spent = get_theoric_amount_spent(CONNECTION)
+
+            # Then
+            assert theoric_amount_spent.empty
+
+        def test_if_user_has_not_booked_return_0(self):
+            # Given
+            create_user(id=45)
+
+            # When
+            theoric_amount_spent = get_theoric_amount_spent(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent,
+                                              pandas.DataFrame([0.], columns=["Montant théorique dépensé"],
+                                                               index=Int64Index([45], name="user_id")))
+
+        def test_if_is_cancelled_return_0(self):
+            # Given
+            create_user(id=45)
+            create_offerer(id=1)
+            create_venue(offerer_id=1)
+            create_product(id=1, )
+            create_offer(id=1, product_id=1, venue_id=1)
+            create_stock(offer_id=1, id=1)
+            create_deposit(user_id=45)
+            create_booking(user_id=45, is_used=True, is_cancelled=True, amount=10, quantity=1, stock_id=1)
+
+            # When
+            theoric_amount_spent = get_theoric_amount_spent(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent,
+                                              pandas.DataFrame([0.], columns=["Montant théorique dépensé"],
+                                                               index=Int64Index([45], name="user_id")))
+
+        def test_if_booking_is_not_used_and_amount_10_return_10(self):
+            # Given
+            create_user(id=45)
+            create_offerer(id=1)
+            create_venue(offerer_id=1)
+            create_product(id=1, )
+            create_offer(id=1, product_id=1, venue_id=1)
+            create_stock(offer_id=1, id=1)
+            create_deposit(user_id=45)
+            create_booking(user_id=45, is_used=False, is_cancelled=False, amount=10, quantity=1, stock_id=1)
+
+            # When
+            theoric_amount_spent = get_theoric_amount_spent(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent,
+                                              pandas.DataFrame([10.], columns=["Montant théorique dépensé"],
+                                                               index=Int64Index([45], name="user_id")))
+
+        def test_if_booking_is_used_and_amount_10_return_10(self):
+            # Given
+            create_user(id=45)
+            create_offerer(id=1)
+            create_venue(offerer_id=1)
+            create_product(id=1, )
+            create_offer(id=1, product_id=1, venue_id=1)
+            create_stock(offer_id=1, id=1)
+            create_deposit(user_id=45)
+            create_booking(user_id=45, is_used=True, is_cancelled=False, amount=10, quantity=1, stock_id=1)
+
+            # When
+            theoric_amount_spent = get_theoric_amount_spent(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent,
+                                              pandas.DataFrame([10.], columns=["Montant théorique dépensé"],
+                                                               index=Int64Index([45], name="user_id")))
+
+        def test_if_booking_amount_10_and_quantity_2_return_20(self):
+            # Given
+            create_user(id=45)
+            create_offerer(id=1)
+            create_venue(offerer_id=1)
+            create_product(id=1, )
+            create_offer(id=1, product_id=1, venue_id=1)
+            create_stock(offer_id=1, id=1)
+            create_deposit(user_id=45)
+            create_booking(user_id=45, is_used=True, is_cancelled=False, amount=10, quantity=2, stock_id=1)
+
+            # When
+            theoric_amount_spent = get_theoric_amount_spent(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent,
+                                              pandas.DataFrame([20.], columns=["Montant théorique dépensé"],
+                                                               index=Int64Index([45], name="user_id")))

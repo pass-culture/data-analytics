@@ -33,7 +33,8 @@ def get_beneficiary_users_details(connection: Connection):
         get_number_of_bookings(connection),
         get_number_of_non_cancelled_bookings(connection),
         get_users_seniority(activation_dates),
-        get_actual_amount_spent(connection)
+        get_actual_amount_spent(connection),
+        get_theoric_amount_spent(connection)
     ]
     beneficiary_users_details = pandas.concat(
         user_details,
@@ -307,6 +308,18 @@ def get_actual_amount_spent(connection: Connection) -> pandas.DataFrame:
     WHERE "user"."canBookFreeOffers"
     GROUP BY "user".id
     '''
+
+    sql = pandas.read_sql(query, connection, index_col='user_id')
+    return sql
+
+def get_theoric_amount_spent(connection: Connection) -> pandas.DataFrame:
+    query = '''
+        SELECT "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
+        FROM "user"
+        LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
+        WHERE "user"."canBookFreeOffers"
+        GROUP BY "user".id
+        '''
 
     sql = pandas.read_sql(query, connection, index_col='user_id')
     return sql
