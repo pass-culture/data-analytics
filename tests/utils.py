@@ -130,6 +130,13 @@ def create_payment_status(payment_id, id=1, date='2019-11-29', status='PENDING')
                 ''')
 
 
+def create_deposit(id=1, amount=500, user_id=1, source='string', date_created='2019-11-29'):
+    ENGINE.execute(f'''
+                INSERT INTO deposit (id, amount, "userId", source, "dateCreated")
+                VALUES ({id}, {amount}, {user_id}, '{source}', '{date_created}')
+                ''')
+
+
 def update_table_column(id, table_name, column, value):
     ENGINE.execute(f'''
             UPDATE {table_name} 
@@ -140,6 +147,7 @@ def update_table_column(id, table_name, column, value):
 
 def clean_database():
     ENGINE.execute('''
+    DELETE FROM "deposit";
     DELETE FROM "recommendation";
     DELETE FROM payment_status;
     DELETE FROM payment;
