@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas
 import pytest
@@ -536,17 +536,16 @@ class UserQueriesTest:
                 create_venue(offerer_id=1)
                 create_product(id=1, product_type='ThingType.AUDIOVISUEL')
                 create_offer(id=1, product_type='ThingType.AUDIOVISUEL', product_id=1, venue_id=1)
-                create_recommendation(offer_id=1, user_id=1, date_created=datetime.utcnow(), id=1)
-                date_after_first_recommendation = datetime.utcnow()
-                create_recommendation(offer_id=1, user_id=1, date_created=datetime.utcnow(), id=2)
-                date_after_second_recommendation = datetime.utcnow()
+                first_recommendation_date = datetime.utcnow() - timedelta(seconds=60)
+                create_recommendation(offer_id=1, user_id=1, date_created=first_recommendation_date, id=1)
+                second_recommendation_date = datetime.utcnow()
+                create_recommendation(offer_id=1, user_id=1, date_created=second_recommendation_date, id=2)
 
                 # When
                 last_recommendation_dates = get_last_recommendation_dates(CONNECTION)
 
                 # Then
-                assert date_after_first_recommendation < last_recommendation_dates.loc[
-                    1, "Date de dernière recommandation"] < date_after_second_recommendation
+                assert last_recommendation_dates.loc[1, "Date de dernière recommandation"] == second_recommendation_date
 
             def test_should_return_None_when_no_recommendation_for_the_user(self):
                 # Given

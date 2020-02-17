@@ -20,63 +20,62 @@ def create_user(id=1, email='test@email.com', can_book_free_offers=True, is_admi
 
 def create_offerer(id=1, thumb_count=0, is_active=True, postal_code='93100', city='Montreuil',
                    date_created='2019-11-20',
-                   name='Test Offerer', siren='123456789'):
+                   name='Test Offerer', siren='123456789', fields_updated='{}'):
     ENGINE.execute(f'''
-    INSERT INTO offerer (id, "thumbCount", "isActive", "postalCode", city, "dateCreated", name, siren)
-    VALUES ({id}, {thumb_count}, {is_active}, '{postal_code}', '{city}', '{date_created}', '{name}', '{siren}')
+    INSERT INTO offerer (id, "thumbCount", "isActive", "postalCode", city, "dateCreated", name, siren, "fieldsUpdated")
+    VALUES ({id}, {thumb_count}, {is_active}, '{postal_code}', '{city}', '{date_created}', '{name}', '{siren}', '{fields_updated}')
     ''')
 
 
 def create_venue(offerer_id, id=1, thumb_count=0, name='Test Venue', siret='12345678912345', postal_code='93',
-                 city='Montreuil',
-                 departement_code='93', is_virtual=False):
+                 city='Montreuil', departement_code='93', is_virtual=False, fields_updated='{}'):
     if not siret:
-        siret='NULL'
+        siret = 'NULL'
     else:
         siret = f"'{siret}'"
 
     if not postal_code:
-        postal_code='NULL'
+        postal_code = 'NULL'
     else:
         postal_code = f"'{postal_code}'"
 
     if not city:
-        city='NULL'
+        city = 'NULL'
     else:
         city = f"'{city}'"
 
     if not departement_code:
-        departement_code='NULL'
+        departement_code = 'NULL'
     else:
         departement_code = f"'{departement_code}'"
 
     ENGINE.execute(f'''
-    INSERT INTO venue (id, "thumbCount", "name", "siret", "postalCode", city, "departementCode", "managingOffererId", "isVirtual")
-    VALUES ({id}, {thumb_count}, '{name}', {siret}, {postal_code}, {city}, {departement_code}, {offerer_id}, {is_virtual})
+    INSERT INTO venue (id, "thumbCount", "name", "siret", "postalCode", city, "departementCode", "managingOffererId", "isVirtual", "fieldsUpdated")
+    VALUES ({id}, {thumb_count}, '{name}', {siret}, {postal_code}, {city}, {departement_code}, {offerer_id}, {is_virtual}, '{fields_updated}')
     ''')
 
 
 def create_product(id=1, thumb_count=0, product_type='ThingType.LIVRE_EDITION', name='Livre',
-                   media_urls=['https://url.test', 'https://someurl.test'],
+                   media_urls=['https://url.test', 'https://someurl.test'], fields_updated='{}',
                    url=None, is_national=False):
     ENGINE.execute(f'''
-            INSERT INTO product (id, "thumbCount", type, name, "mediaUrls", url, "isNational")
-            VALUES ({id}, {thumb_count}, '{product_type}', '{name}', ARRAY{media_urls}, '{url}', {is_national})
+            INSERT INTO product (id, "thumbCount", type, name, "mediaUrls", url, "isNational", "fieldsUpdated")
+            VALUES ({id}, {thumb_count}, '{product_type}', '{name}', ARRAY{media_urls}, '{url}', {is_national}, '{fields_updated}')
             ''')
 
 
 def create_offer(venue_id, product_id, id=1, is_active=True, product_type='ThingType.LIVRE_EDITION',
-                 name='Livre',
-                 media_urls=['https://url.test', 'https://someurl.test'],
-                 url=None, is_national=False, date_created='2019-11-20', is_duo=False):
+                 name='Livre', media_urls=['https://url.test', 'https://someurl.test'], url=None, is_national=False,
+                 date_created='2019-11-20', is_duo=False, fields_updated='{}'):
     ENGINE.execute(f'''
-                INSERT INTO offer (id, "venueId", "productId", "isActive", type, name, "mediaUrls", url, "isNational", "dateCreated", "isDuo")
-                VALUES ({id}, {venue_id}, {product_id}, {is_active}, '{product_type}', '{name}', ARRAY{media_urls}, '{url}', {is_national}, '{date_created}', {is_duo})
+                INSERT INTO offer (id, "venueId", "productId", "isActive", type, name, "mediaUrls", url, "isNational", "dateCreated", "isDuo", "fieldsUpdated")
+                VALUES ({id}, {venue_id}, {product_id}, {is_active}, '{product_type}', '{name}', ARRAY{media_urls}, '{url}', {is_national}, '{date_created}', {is_duo}, '{fields_updated}')
                 ''')
 
 
-def create_stock(offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-20', date_created='2019-11-20', price=0, available=10,
-                 groupe_size=1, booking_limit_datetime=None, beginning_datetime=None):
+def create_stock(offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-20', date_created='2019-11-20', price=0,
+                 available=10, groupe_size=1, booking_limit_datetime=None, beginning_datetime=None,
+                 fields_updated='{}'):
     if not booking_limit_datetime:
         booking_limit_datetime = 'NULL'
     else:
@@ -88,8 +87,8 @@ def create_stock(offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-2
         beginning_datetime = f"'{beginning_datetime}'"
 
     ENGINE.execute(f'''
-        INSERT INTO stock (id, "isSoftDeleted", "dateModified", "dateCreated", "offerId", price, available, "groupSize", "beginningDatetime", "bookingLimitDatetime")
-        VALUES ({id}, {is_soft_deleted}, '{date_modified}', '{date_created}', {offer_id}, {price}, {available}, {groupe_size}, {beginning_datetime}, {booking_limit_datetime})
+        INSERT INTO stock (id, "isSoftDeleted", "dateModified", "dateCreated", "offerId", price, available, "groupSize", "beginningDatetime", "bookingLimitDatetime", "fieldsUpdated")
+        VALUES ({id}, {is_soft_deleted}, '{date_modified}', '{date_created}', {offer_id}, {price}, {available}, {groupe_size}, {beginning_datetime}, {booking_limit_datetime}, '{fields_updated}')
         ''')
 
 
@@ -116,7 +115,8 @@ def create_recommendation(offer_id, user_id, mediation_id='NULL', id=1, date_cre
                 ''')
 
 
-def create_payment(booking_id, amount=10, reimbursement_rule='test', reimbursement_rate=1, recipient_name='Toto', recipient_siren='123456789', author='test', id=1):
+def create_payment(booking_id, amount=10, reimbursement_rule='test', reimbursement_rate=1, recipient_name='Toto',
+                   recipient_siren='123456789', author='test', id=1):
     ENGINE.execute(f'''
                 INSERT INTO payment (id, "bookingId", amount, "reimbursementRule", "reimbursementRate", "recipientName", "recipientSiren", author)
                 VALUES ({id}, {booking_id}, {amount}, '{reimbursement_rule}', {reimbursement_rate}, '{recipient_name}' ,'{recipient_siren}', '{author}')
@@ -136,6 +136,7 @@ def update_table_column(id, table_name, column, value):
             SET {column} = ({value})
             WHERE id={id}
             ''')
+
 
 def clean_database():
     ENGINE.execute('''
