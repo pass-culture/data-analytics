@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pandas
+from pandas import Int64Index
 from sqlalchemy.engine import Connection
 
 recommendation_dates_query = '''
@@ -31,7 +32,8 @@ def get_beneficiary_users_details(connection: Connection):
         get_last_recommendation_dates(connection),
         get_number_of_bookings(connection),
         get_number_of_non_cancelled_bookings(connection),
-        get_users_seniority(activation_dates)
+        get_users_seniority(activation_dates),
+        get_actual_amount_spent(connection)
     ]
     beneficiary_users_details = pandas.concat(
         user_details,
@@ -120,13 +122,13 @@ def get_typeform_filling_dates(connection: Connection):
 
 def get_first_connection_dates(connection: Connection):
     query = recommendation_dates_query + \
-        '''
-            SELECT
-             recommendation_dates.first_recommendation_date AS "Date de première connexion",
-             recommendation_dates.user_id AS user_id
-            FROM recommendation_dates
-            WHERE recommendation_dates."canBookFreeOffers"
             '''
+                SELECT
+                 recommendation_dates.first_recommendation_date AS "Date de première connexion",
+                 recommendation_dates.user_id AS user_id
+                FROM recommendation_dates
+                WHERE recommendation_dates."canBookFreeOffers"
+                '''
 
     return pandas.read_sql(query, connection, index_col='user_id')
 
@@ -225,13 +227,13 @@ def get_date_of_bookings_on_third_product_type(connection: Connection):
 
 def get_last_recommendation_dates(connection: Connection):
     query = recommendation_dates_query + \
-        '''
-            SELECT
-             recommendation_dates.last_recommendation_date AS "Date de dernière recommandation",
-             recommendation_dates.user_id AS user_id
-            FROM recommendation_dates
-            WHERE recommendation_dates."canBookFreeOffers"
             '''
+                SELECT
+                 recommendation_dates.last_recommendation_date AS "Date de dernière recommandation",
+                 recommendation_dates.user_id AS user_id
+                FROM recommendation_dates
+                WHERE recommendation_dates."canBookFreeOffers"
+                '''
     return pandas.read_sql(query, connection, index_col='user_id')
 
 
@@ -295,3 +297,16 @@ def get_users_seniority(activation_dates: pandas.DataFrame) -> pandas.Series:
     users_seniority = time_since_activation["Date d'activation"].apply(lambda date: date.days)
     users_seniority.name = "Ancienneté en jours"
     return users_seniority
+
+
+def get_actual_amount_spent(connection: Connection) -> pandas.DataFrame:
+    query = '''
+    SELECT "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
+    FROM "user"
+    LEFT JOIN booking ON "user".id = booking."userId" AND booking."isUsed" IS TRUE AND booking."isCancelled" IS FALSE
+    WHERE "user"."canBookFreeOffers"
+    GROUP BY "user".id
+    '''
+
+    sql = pandas.read_sql(query, connection, index_col='user_id')
+    return sql
