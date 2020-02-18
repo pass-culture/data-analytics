@@ -824,7 +824,7 @@ class UserQueriesTest:
                                               pandas.DataFrame([0.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
 
-        def test_if_booking_is_not_used_and_amount_10_return_10(self):
+        def test_if_booking_is_not_used_and_not_cancelled_and_amount_10_return_10(self):
             # Given
             create_user(id=45)
             create_offerer(id=1)
@@ -843,7 +843,7 @@ class UserQueriesTest:
                                               pandas.DataFrame([10.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
 
-        def test_if_booking_is_used_and_amount_10_return_10(self):
+        def test_if_booking_is_used_and_not_cancelled_and_amount_10_return_10(self):
             # Given
             create_user(id=45)
             create_offerer(id=1)
