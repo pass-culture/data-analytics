@@ -163,4 +163,6 @@ def clean_database():
     DROP TABLE IF EXISTS enriched_offerer_data;
     DROP TABLE IF EXISTS enriched_user_data;
     DROP TABLE IF EXISTS enriched_stock_data;
+    DROP VIEW IF EXISTS stock_information;
+    DROP VIEW IF EXISTS stock_offer_information;
     ''')

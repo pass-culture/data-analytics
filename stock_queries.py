@@ -1,6 +1,8 @@
 import pandas
 from sqlalchemy.engine import Connection
 
+from db import ENGINE
+
 STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "offer_name": "Nom de l'offre",
                  "offerer_id": "offerer_id",
@@ -104,3 +106,34 @@ def get_stocks_booking_information(connection: Connection):
     '''
     return pandas \
         .read_sql(query, connection, index_col="stock_id")
+
+def create_stock_information() -> None:
+    query = f'''
+    CREATE VIEW stock_information AS
+        (SELECT
+         id AS stock_id,
+         "offerId" AS "{STOCK_COLUMNS["offer_id"]}",
+         "dateCreated" AS "{STOCK_COLUMNS["stock_issued_at"]}",
+         "bookingLimitDatetime" AS "{STOCK_COLUMNS["booking_limit_datetime"]}",
+         "beginningDatetime" AS "{STOCK_COLUMNS["beginning_datetime"]}",
+         available AS "{STOCK_COLUMNS["available"]}"
+        FROM stock)
+        '''
+    ENGINE.execute(query)
+
+
+def create_stocks_offer_information() -> None:
+    query = f'''
+    CREATE VIEW stock_offer_information AS
+    (SELECT
+     stock.id AS stock_id,
+     name AS "{STOCK_COLUMNS["offer_name"]}",
+     type AS "{STOCK_COLUMNS["offer_type"]}"
+    FROM stock
+    JOIN offer ON stock."offerId"=offer.id)
+    '''
+    ENGINE.execute(query)
+
+
+def create_stock_venue_information() -> None:
+    pass

@@ -5,7 +5,8 @@ import pytest
 
 from db import ENGINE, CONNECTION
 from stock_queries import get_stocks_information, get_stocks_offer_information, get_stocks_venue_information, \
-    get_stocks_booking_information, get_stocks_details
+    get_stocks_booking_information, get_stocks_details, create_stock_information, create_stocks_offer_information, \
+    create_stock_venue_information
 from tests.utils import create_stock, create_offer, create_venue, create_offerer, create_product, create_booking, \
     create_user, create_payment, create_payment_status, clean_database
 
@@ -341,3 +342,89 @@ class StockQueriesTest:
             # Then
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"],
                                                expected_stocks_booking_information)
+
+
+    class CreateStockInformationTest:
+        def test_should_create_a_view_with_relevant_stock_information(self):
+            # Given
+            create_product(id=1)
+            create_offerer(id=1)
+            create_venue(id=1, offerer_id=1)
+            create_offer(id=2, venue_id=1, product_id=1)
+            create_stock(id=1, offer_id=2, available=10, booking_limit_datetime='2019-11-23',
+                         beginning_datetime=None, date_created='2019-11-01')
+
+            expected_stocks_information = pandas.DataFrame(
+                index=pandas.Index(data=[1], name='stock_id'),
+                data={"Identifiant de l'offre": 2,
+                      "Date de création du stock": datetime(2019, 11, 1),
+                      "Date limite de réservation": datetime(2019, 11, 23),
+                      "Date de début de l'évènement": pandas.NaT,
+                      "Stock disponible brut de réservations": 10})
+
+            # When
+            create_stock_information()
+
+            # Then
+            stock_information = pandas.read_sql_table('stock_information', CONNECTION, index_col='stock_id')
+            pandas.testing.assert_frame_equal(stock_information, expected_stocks_information)
+
+    class CreateStockOfferInformationTest:
+        def test_should_create_a_view_with_information_directly_linked_to_offer(self):
+            # Given
+            create_product(id=1, name='Test offer', product_type='EventType.CINEMA')
+            create_offerer(id=1)
+            create_venue(id=1, offerer_id=1)
+            create_offer(id=2, venue_id=1, product_id=1, name='Test offer', product_type='EventType.CINEMA')
+            create_stock(id=1, offer_id=2)
+
+            expected_stocks_information = pandas.DataFrame(index=pandas.Index(data=[1], name='stock_id'),
+                                                           data={"Nom de l'offre": "Test offer",
+                                                                 "Type d'offre": "EventType.CINEMA"})
+
+            # When
+            create_stocks_offer_information()
+
+            # Then
+            stock_offer_information = pandas.read_sql_table('stock_offer_information', CONNECTION, index_col='stock_id')
+            pandas.testing.assert_frame_equal(stock_offer_information, expected_stocks_information)
+
+    class CreateStockVenueInformationTest:
+        def test_should_create_view_with_all_information_directly_linked_to_venue_with_departement_code_when_physical_venue(self):
+            # Given
+            create_product(id=1)
+            create_offerer(id=3)
+            create_venue(id=1, offerer_id=3, departement_code='06', postal_code='06000')
+            create_offer(id=2, venue_id=1, product_id=1)
+            create_stock(id=1, offer_id=2)
+
+            expected_stocks_information = pandas.DataFrame(index=pandas.Index(data=[1], name='stock_id'),
+                                                           data={"offerer_id": 3,
+                                                                 "Département": "06"})
+
+            # When
+            create_stock_venue_information(CONNECTION)
+
+            # Then
+            stock_venue_information = pandas.read_sql_table('stock_offer_information', CONNECTION, index_col='stock_id')
+            pandas.testing.assert_frame_equal(stock_venue_information, expected_stocks_information)
+
+        def test_should_create_view_with_all_information_directly_linked_to_venue_without_departement_code_when_virtual_venue(
+                self):
+            # Given
+            create_product(id=1)
+            create_offerer(id=3)
+            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+                         is_virtual=True)
+            create_offer(id=2, venue_id=1, product_id=1)
+            create_stock(id=1, offer_id=2)
+
+            expected_stocks_information = pandas.DataFrame(index=pandas.Index(data=[1], name='stock_id'),
+                                                           data={"offerer_id": 3,
+                                                                 "Département": None})
+
+            # When
+            stocks_venue_information = get_stocks_venue_information(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(stocks_venue_information, expected_stocks_information)
