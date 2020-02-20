@@ -34,8 +34,9 @@ def get_beneficiary_users_details(connection: Connection):
         get_number_of_non_cancelled_bookings(connection),
         get_users_seniority(activation_dates),
         get_actual_amount_spent(connection),
-        get_theoric_amount_spent(connection)
-    ]
+        get_theoric_amount_spent(connection),
+        get_theoric_amount_spent_in_digital_goods(connection),
+        get_theoric_amount_spent_in_physical_goods(connection)]
     beneficiary_users_details = pandas.concat(
         user_details,
         axis=1

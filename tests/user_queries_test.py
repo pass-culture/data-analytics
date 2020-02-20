@@ -50,7 +50,7 @@ class UserQueriesTest:
             create_product(id=2, product_type='ThingType.JEUX_VIDEO')
             create_product(id=3, product_type='ThingType.AUDIOVISUEL')
             create_product(id=4, product_type='ThingType.CINEMA_ABO')
-            create_offer(venue_id=1, product_id=2, product_type='ThingType.JEUX_VIDEO', id=2)
+            create_offer(venue_id=1, product_id=2, product_type='ThingType.JEUX_VIDEO', id=2, url='u.rl')
             create_offer(venue_id=1, product_id=3, product_type='ThingType.AUDIOVISUEL', id=3)
             create_offer(venue_id=1, product_id=4, product_type='ThingType.CINEMA_ABO', id=4)
 
@@ -74,15 +74,16 @@ class UserQueriesTest:
                        "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
                        "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
                        "Nombre de réservations totales", "Nombre de réservations non annulées", "Ancienneté en jours",
-                       "Montant réél dépensé", "Montant théorique dépensé"]
+                       "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques", "Dépenses physiques"]
 
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
                 data=[
-                    [active_user_id, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
-                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384, 0., 0.],
+                    [2, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
+                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384, 0., 0., 0., 0.],
                     [1, "08", datetime(2019, 12, 9), datetime(2019, 12, 8), datetime(2019, 2, 3), datetime(2019, 3, 7),
-                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43, 10., 30.]
+                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43, 10., 30., 20.,
+                     10.]
                 ],
                 columns=columns
             )
@@ -91,6 +92,8 @@ class UserQueriesTest:
             beneficiary_users_details = get_beneficiary_users_details(CONNECTION)
 
             # Then
+            print(get_theoric_amount_spent_in_digital_goods(CONNECTION))
+            print(beneficiary_users_details.iloc[:,14])
             pandas.testing.assert_frame_equal(beneficiary_users_details, expected_beneficiary_users_details)
 
     class GetExperimentationSessionsTest:
