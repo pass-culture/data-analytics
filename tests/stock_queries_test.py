@@ -4,10 +4,9 @@ import pandas
 import pytest
 from numpy import datetime64
 
-from db import CONNECTION, SESSION
-from stock_queries import create_stock_information, create_stocks_offer_information, \
-    create_stock_venue_information, create_stocks_booking_information, get_stock_information_query, \
-    get_stocks_offer_information_query, get_stock_venue_information_query, get_stocks_booking_information_query
+from db import CONNECTION
+from stock_queries import _get_stock_information_query, \
+    _get_stocks_offer_information_query, _get_stock_venue_information_query, _get_stocks_booking_information_query
 from tests.utils import create_stock, create_offer, create_venue, create_offerer, create_product, create_booking, \
     create_user, create_payment, create_payment_status, clean_database
 
@@ -18,7 +17,7 @@ class StockQueriesTest:
         clean_database()
 
     class GetStockInformationQueryTest:
-        def test_should_create_a_view_with_relevant_stock_information(self):
+        def test_should_query_information_directly_linked_to_offer(self):
             # Given
             create_product(id=1)
             create_offerer(id=1)
@@ -36,7 +35,7 @@ class StockQueriesTest:
                       "Stock disponible brut de réservations": 10})
 
             # When
-            query = get_stock_information_query()
+            query = _get_stock_information_query()
 
             # Then
             stock_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -44,7 +43,7 @@ class StockQueriesTest:
             pandas.testing.assert_frame_equal(stock_information, expected_stocks_information)
 
     class GetStockOfferInformationQueryTest:
-        def test_should_create_a_view_with_information_directly_linked_to_offer(self):
+        def test_should_query_information_directly_linked_to_offer(self):
             # Given
             create_product(id=1, name='Test offer', product_type='EventType.CINEMA')
             create_offerer(id=1)
@@ -57,14 +56,14 @@ class StockQueriesTest:
                                                                  "Type d'offre": "EventType.CINEMA"})
 
             # When
-            query = get_stocks_offer_information_query()
+            query = _get_stocks_offer_information_query()
 
             # Then
             stock_offer_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
             pandas.testing.assert_frame_equal(stock_offer_information, expected_stocks_information)
 
     class GetStockVenueInformationQueryTest:
-        def test_should_create_view_with_all_information_directly_linked_to_venue_without_departement_code_when_virtual_venue(
+        def test_should_query_all_information_directly_linked_to_venue_without_departement_code_when_virtual_venue(
                 self):
             # Given
             create_product(id=1)
@@ -83,7 +82,7 @@ class StockQueriesTest:
                                                                  "Département": [None, "06"]})
 
             # When
-            query = get_stock_venue_information_query()
+            query = _get_stock_venue_information_query()
 
             # Then
             stocks_venue_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -112,7 +111,7 @@ class StockQueriesTest:
                 name="Nombre total de réservations")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
             # Then
             stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -140,7 +139,7 @@ class StockQueriesTest:
                 name="Nombre total de réservations")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
             # Then
             stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -169,7 +168,7 @@ class StockQueriesTest:
                 name="Nombre de réservations annulées")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
             # Then
             stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -194,7 +193,7 @@ class StockQueriesTest:
                 name="Nombre de réservations annulées")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
             # Then
             stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -225,7 +224,7 @@ class StockQueriesTest:
                 name="Nombre de réservations ayant un paiement")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
             # Then
             stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
@@ -256,7 +255,7 @@ class StockQueriesTest:
                 name="Nombre de réservations ayant un paiement")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
             # Then
             stocks_booking_information = pandas.read_sql(query, CONNECTION,
@@ -292,7 +291,7 @@ class StockQueriesTest:
                 name="Nombre de réservations ayant un paiement")
 
             # When
-            query = get_stocks_booking_information_query()
+            query = _get_stocks_booking_information_query()
 
 
             # Then

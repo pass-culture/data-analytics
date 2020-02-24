@@ -175,7 +175,6 @@ def clean_database():
     DELETE FROM "user";
     DROP TABLE IF EXISTS enriched_offerer_data;
     DROP TABLE IF EXISTS enriched_user_data;
-    DROP TABLE IF EXISTS enriched_stock_data;
     ''')
     SESSION.commit()
 

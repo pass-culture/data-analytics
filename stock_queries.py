@@ -14,7 +14,7 @@ STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "bookings_paid": "Nombre de réservations ayant un paiement"}
 
 
-def get_stock_information_query():
+def _get_stock_information_query() -> str:
     return f'''
     (SELECT
      id AS stock_id,
@@ -26,7 +26,7 @@ def get_stock_information_query():
      FROM stock)
     '''
 
-def get_stocks_offer_information_query():
+def _get_stocks_offer_information_query() -> str:
     return f'''
     (SELECT
      stock.id AS stock_id,
@@ -36,7 +36,7 @@ def get_stocks_offer_information_query():
     JOIN offer ON stock."offerId"=offer.id)
     '''
 
-def get_stock_venue_information_query():
+def _get_stock_venue_information_query() -> str:
     return f'''
     (SELECT
      stock.id AS stock_id,
@@ -47,7 +47,7 @@ def get_stock_venue_information_query():
     JOIN venue ON offer."venueId"=venue.id)
     '''
 
-def get_stocks_booking_information_query():
+def _get_stocks_booking_information_query() -> str:
     return f'''
     (WITH last_status AS 
     ( SELECT DISTINCT ON (payment_status."paymentId") payment_status."paymentId", 
@@ -84,37 +84,39 @@ def get_stocks_booking_information_query():
     '''
 
 
-def create_stock_information() -> None:
+def create_stock_view() -> None:
     view_query = f'''
     CREATE OR REPLACE VIEW stock_information AS
-        {get_stock_information_query()}
+        {_get_stock_information_query()}
         '''
     SESSION.execute(view_query)
     SESSION.commit()
 
 
-def create_stocks_offer_information() -> None:
+def create_stocks_offer_view() -> None:
     view_query = f'''
     CREATE OR REPLACE VIEW stock_offer_information AS
-    {get_stocks_offer_information_query()}
+    {_get_stocks_offer_information_query()}
     '''
     SESSION.execute(view_query)
     SESSION.commit()
 
 
-def create_stock_venue_information() -> None:
+def create_stock_venue_view() -> None:
     query_view = f'''
     CREATE OR REPLACE VIEW stock_venue_information AS
-    {get_stock_venue_information_query()}
+    {_get_stock_venue_information_query()}
     '''
     SESSION.execute(query_view)
     SESSION.commit()
 
 
-def create_stocks_booking_information() -> None:
+def create_stocks_booking_view() -> None:
     query = f'''
         CREATE OR REPLACE VIEW stock_booking_information AS
-        {get_stocks_booking_information_query()}
+        {_get_stocks_booking_information_query()}
         '''
     SESSION.execute(query)
     SESSION.commit()
+
+
