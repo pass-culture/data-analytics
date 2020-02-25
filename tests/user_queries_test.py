@@ -12,7 +12,8 @@ from user_queries import get_beneficiary_users_details, get_experimentation_sess
     get_departments, get_activation_dates, get_typeform_filling_dates, get_first_connection_dates, \
     get_date_of_first_bookings, get_date_of_second_bookings, get_date_of_bookings_on_third_product_type, \
     get_last_recommendation_dates, get_number_of_bookings, get_number_of_non_cancelled_bookings, get_users_seniority, \
-    get_actual_amount_spent, get_theoric_amount_spent, get_theoric_amount_spent_in_physical_goods, get_theoric_amount_spent_in_digital_goods
+    get_actual_amount_spent, get_theoric_amount_spent, get_theoric_amount_spent_in_physical_goods, \
+    get_theoric_amount_spent_in_digital_goods
 
 
 class UserQueriesTest:
@@ -92,8 +93,6 @@ class UserQueriesTest:
             beneficiary_users_details = get_beneficiary_users_details(CONNECTION)
 
             # Then
-            print(get_theoric_amount_spent_in_digital_goods(CONNECTION))
-            print(beneficiary_users_details.iloc[:,14])
             pandas.testing.assert_frame_equal(beneficiary_users_details, expected_beneficiary_users_details)
 
     class GetExperimentationSessionsTest:
@@ -884,8 +883,6 @@ class UserQueriesTest:
                                               pandas.DataFrame([20.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
 
-
-
     class GetTheoricAmountSpentInDigitalGoodsTest:
         def test_if_user_has_no_booking_return_0(self):
             # Given
@@ -896,8 +893,8 @@ class UserQueriesTest:
 
             # Then
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
-                                                     pandas.DataFrame([0.], columns=["Dépenses numériques"],
-                                                                      index=Int64Index([1], name="user_id")))
+                                              pandas.DataFrame([0.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
 
         def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
             # Given
@@ -1014,8 +1011,8 @@ class UserQueriesTest:
 
             # Then
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
-                                                     pandas.DataFrame([0.], columns=["Dépenses physiques"],
-                                                                      index=Int64Index([1], name="user_id")))
+                                              pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
 
         def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
             # Given
@@ -1053,7 +1050,7 @@ class UserQueriesTest:
             create_offerer(id=10)
             create_product(id=1, product_type='ThingType.JEUX_VIDEO_ABO')
             create_venue(id=15, offerer_id=10)
-            create_offer(id=30, venue_id=15, product_type='ThingType.JEUX_VIDEO_ABO', product_id=1)
+            create_offer(id=30, venue_id=15, product_type='ThingType.JEUX_VIDEO_ABO', url='u.rl', product_id=1)
             create_stock(id=20, offer_id=30)
             create_booking(user_id=1, amount=10, quantity=1, stock_id=20)
 
@@ -1070,9 +1067,9 @@ class UserQueriesTest:
             create_user(id=1)
             create_deposit(amount=500)
             create_offerer(id=10)
-            create_product(id=1, product_type='ThingType.INSTRUMENT')
+            create_product(id=1, product_type='ThingType.MUSIQUE')
             create_venue(id=15, offerer_id=10)
-            create_offer(id=30, venue_id=15, product_type='ThingType.INSTRUMENT', url='u.rl', product_id=1)
+            create_offer(id=30, venue_id=15, product_type='ThingType.MUSIQUE', url='u.rl', product_id=1)
             create_stock(id=20, offer_id=30)
             create_booking(user_id=1, amount=10, quantity=1, stock_id=20)
 
@@ -1103,14 +1100,14 @@ class UserQueriesTest:
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
 
-        def test_if_booking_on_non_capped_type_with_url_return_0(self):
+        def test_if_booking_on_non_capped_type_without_url_return_0(self):
             # Given
             create_user(id=1)
             create_deposit(amount=500)
             create_offerer(id=10)
-            create_product(id=1, product_type='ThingType.CINEMA_CARD')
+            create_product(id=1, product_type='EventType.CINEMA')
             create_venue(id=15, offerer_id=10)
-            create_offer(id=30, venue_id=15, product_type='ThingType.CINEMA_CARD', url='url', product_id=1)
+            create_offer(id=30, venue_id=15, product_type='EventType.CINEMA', url=None, product_id=1)
             create_stock(id=20, offer_id=30)
             create_booking(user_id=1, is_cancelled=False, amount=10, quantity=1, stock_id=20)
 
