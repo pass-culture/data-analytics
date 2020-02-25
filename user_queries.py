@@ -34,8 +34,9 @@ def get_beneficiary_users_details(connection: Connection):
         get_number_of_non_cancelled_bookings(connection),
         get_users_seniority(activation_dates),
         get_actual_amount_spent(connection),
-        get_theoric_amount_spent(connection)
-    ]
+        get_theoric_amount_spent(connection),
+        get_theoric_amount_spent_in_digital_goods(connection),
+        get_theoric_amount_spent_in_physical_goods(connection)]
     beneficiary_users_details = pandas.concat(
         user_details,
         axis=1
@@ -323,3 +324,44 @@ def get_theoric_amount_spent(connection: Connection) -> pandas.DataFrame:
 
     sql = pandas.read_sql(query, connection, index_col='user_id')
     return sql
+
+
+def get_theoric_amount_spent_in_digital_goods(connection: Connection) -> pandas.DataFrame:
+    query = '''
+    WITH eligible_booking AS (
+    SELECT * FROM booking
+    LEFT JOIN stock ON booking."stockId" = stock.id
+    LEFT JOIN offer ON stock."offerId" = offer.id
+    WHERE offer.type IN ('ThingType.AUDIOVISUEL', 'ThingType.JEUX_VIDEO', 'ThingType.JEUX_VIDEO_ABO', 
+    'ThingType.LIVRE_AUDIO', 'ThingType.LIVRE_EDITION', 'ThingType.MUSIQUE', 'ThingType.PRESSE_ABO')
+    AND offer.url IS NOT NULL
+    AND booking."isCancelled" IS NOT TRUE
+    )
+
+    SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses numériques"
+    FROM "user"
+    LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
+    WHERE "user"."canBookFreeOffers" IS TRUE
+    GROUP BY "user".id 
+    '''
+    return pandas.read_sql(query, connection, index_col='user_id')
+
+
+def get_theoric_amount_spent_in_physical_goods(connection: Connection) -> pandas.DataFrame:
+    query = '''
+    WITH eligible_booking AS (
+    SELECT * FROM booking
+    LEFT JOIN stock ON booking."stockId" = stock.id
+    LEFT JOIN offer ON stock."offerId" = offer.id
+    WHERE offer.type IN ('ThingType.INSTRUMENT','ThingType.JEUX','ThingType.LIVRE_EDITION','ThingType.MUSIQUE','ThingType.OEUVRE_ART','ThingType.AUDIOVISUEL')
+    AND offer.url IS NULL
+    AND booking."isCancelled" IS NOT TRUE
+    )
+
+    SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses physiques"
+    FROM "user"
+    LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
+    WHERE "user"."canBookFreeOffers" IS TRUE
+    GROUP BY "user".id 
+    '''
+    return pandas.read_sql(query, connection, index_col='user_id')

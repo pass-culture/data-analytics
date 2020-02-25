@@ -12,7 +12,8 @@ from user_queries import get_beneficiary_users_details, get_experimentation_sess
     get_departments, get_activation_dates, get_typeform_filling_dates, get_first_connection_dates, \
     get_date_of_first_bookings, get_date_of_second_bookings, get_date_of_bookings_on_third_product_type, \
     get_last_recommendation_dates, get_number_of_bookings, get_number_of_non_cancelled_bookings, get_users_seniority, \
-    get_actual_amount_spent, get_theoric_amount_spent
+    get_actual_amount_spent, get_theoric_amount_spent, get_theoric_amount_spent_in_physical_goods, \
+    get_theoric_amount_spent_in_digital_goods
 
 
 class UserQueriesTest:
@@ -50,7 +51,7 @@ class UserQueriesTest:
             create_product(id=2, product_type='ThingType.JEUX_VIDEO')
             create_product(id=3, product_type='ThingType.AUDIOVISUEL')
             create_product(id=4, product_type='ThingType.CINEMA_ABO')
-            create_offer(venue_id=1, product_id=2, product_type='ThingType.JEUX_VIDEO', id=2)
+            create_offer(venue_id=1, product_id=2, product_type='ThingType.JEUX_VIDEO', id=2, url='u.rl')
             create_offer(venue_id=1, product_id=3, product_type='ThingType.AUDIOVISUEL', id=3)
             create_offer(venue_id=1, product_id=4, product_type='ThingType.CINEMA_ABO', id=4)
 
@@ -74,15 +75,16 @@ class UserQueriesTest:
                        "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
                        "Date de première réservation dans 3 catégories différentes", "Date de dernière recommandation",
                        "Nombre de réservations totales", "Nombre de réservations non annulées", "Ancienneté en jours",
-                       "Montant réél dépensé", "Montant théorique dépensé"]
+                       "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques", "Dépenses physiques"]
 
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
                 data=[
-                    [active_user_id, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
-                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384, 0., 0.],
+                    [2, "93", datetime(2019, 1, 1, 12, 0, 0), pandas.NaT, pandas.NaT, pandas.NaT,
+                     pandas.NaT, pandas.NaT, pandas.NaT, 0, 0, 384, 0., 0., 0., 0.],
                     [1, "08", datetime(2019, 12, 9), datetime(2019, 12, 8), datetime(2019, 2, 3), datetime(2019, 3, 7),
-                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43, 10., 30.]
+                     datetime(2019, 4, 7), datetime(2019, 5, 7), recommendation_creation_date, 3, 2, 43, 10., 30., 20.,
+                     10.]
                 ],
                 columns=columns
             )
@@ -880,3 +882,239 @@ class UserQueriesTest:
             pandas.testing.assert_frame_equal(theoric_amount_spent,
                                               pandas.DataFrame([20.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
+
+    class GetTheoricAmountSpentInDigitalGoodsTest:
+        def test_if_user_has_no_booking_return_0(self):
+            # Given
+            create_user(id=1)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([0.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
+            # Given
+            create_user(id=1, can_book_free_offers=False)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            assert theoric_amount_spent_in_digital.empty
+
+        def test_if_booking_on_digital_good_return_amount(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.MUSIQUE')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.MUSIQUE', url='url', product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, amount=10, quantity=2, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([20.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_not_on_digital_good_type_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.INSTRUMENT')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.INSTRUMENT', product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([0.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_digital_good_type_but_url_empty_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.AUDIOVISUEL')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.AUDIOVISUEL', url=None, product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([0.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_digital_good_is_cancelled_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.AUDIOVISUEL')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.AUDIOVISUEL', url='url', product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, is_cancelled=True, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([0.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_non_capped_type_with_url_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.CINEMA_CARD')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.CINEMA_CARD', url='url', product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, is_cancelled=False, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_digital_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([0.], columns=["Dépenses numériques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+    class GetTheoricAmountSpentInPhysicalGoodsTest:
+        def test_if_user_has_no_booking_return_0(self):
+            # Given
+            create_user(id=1)
+
+            # When
+            theoric_amount_spent_in_physical = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
+                                              pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
+            # Given
+            create_user(id=1, can_book_free_offers=False)
+
+            # When
+            theoric_amount_spent_in_physical = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            assert theoric_amount_spent_in_physical.empty
+
+        def test_if_booking_on_physical_good_return_amount(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.INSTRUMENT')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.INSTRUMENT', url=None, product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, amount=10, quantity=2, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_physical = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
+                                              pandas.DataFrame([20.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_not_on_physical_good_type_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.JEUX_VIDEO_ABO')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.JEUX_VIDEO_ABO', url='u.rl', product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_physical = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
+                                              pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_physical_good_type_but_has_url_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.MUSIQUE')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.MUSIQUE', url='u.rl', product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_digital = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
+                                              pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_physical_good_is_cancelled_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='ThingType.INSTRUMENT')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='ThingType.INSTRUMENT', url=None, product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, is_cancelled=True, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_physical = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
+                                              pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_non_capped_type_without_url_return_0(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type='EventType.CINEMA')
+            create_venue(id=15, offerer_id=10)
+            create_offer(id=30, venue_id=15, product_type='EventType.CINEMA', url=None, product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_booking(user_id=1, is_cancelled=False, amount=10, quantity=1, stock_id=20)
+
+            # When
+            theoric_amount_spent_in_physical = get_theoric_amount_spent_in_physical_goods(CONNECTION)
+
+            # Then
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
+                                              pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))

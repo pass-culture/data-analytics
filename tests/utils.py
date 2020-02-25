@@ -67,9 +67,10 @@ def create_product(id=1, thumb_count=0, product_type='ThingType.LIVRE_EDITION', 
 def create_offer(venue_id, product_id, id=1, is_active=True, product_type='ThingType.LIVRE_EDITION',
                  name='Livre', media_urls=['https://url.test', 'https://someurl.test'], url=None, is_national=False,
                  date_created='2019-11-20', is_duo=False, fields_updated='{}'):
+    url='Null' if not url else f"'{url}'"
     ENGINE.execute(f'''
                 INSERT INTO offer (id, "venueId", "productId", "isActive", type, name, "mediaUrls", url, "isNational", "dateCreated", "isDuo", "fieldsUpdated")
-                VALUES ({id}, {venue_id}, {product_id}, {is_active}, '{product_type}', '{name}', ARRAY{media_urls}, '{url}', {is_national}, '{date_created}', {is_duo}, '{fields_updated}')
+                VALUES ({id}, {venue_id}, {product_id}, {is_active}, '{product_type}', '{name}', ARRAY{media_urls}, {url}, {is_national}, '{date_created}', {is_duo}, '{fields_updated}')
                 ''')
 
 
