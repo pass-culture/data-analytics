@@ -78,7 +78,7 @@ def create_offer(app, venue_id, product_id, id=1, is_active=True, product_type='
     with app.app_context():
         db.session.execute(f'''
                     INSERT INTO offer (id, "venueId", "productId", "isActive", type, name, "mediaUrls", url, "isNational", "dateCreated", "isDuo", "fieldsUpdated")
-                    VALUES ({id}, {venue_id}, {product_id}, {is_active}, '{product_type}', '{name}', ARRAY{media_urls}, '{url}', {is_national}, '{date_created}', {is_duo}, '{fields_updated}')
+                    VALUES ({id}, {venue_id}, {product_id}, {is_active}, '{product_type}', '{name}', ARRAY{media_urls}, {url}, {is_national}, '{date_created}', {is_duo}, '{fields_updated}')
                     ''')
         db.session.commit()
 

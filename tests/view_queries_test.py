@@ -3,13 +3,13 @@ from datetime import datetime
 import pandas
 import pytest
 
-from db import db
 from db import CONNECTION
-from query_enriched_data_tables import create_enriched_stock_data
-from stock_queries import create_stock_view, create_stocks_offer_view, create_stock_venue_view, \
-    create_stocks_booking_view
+from db import db
+from stock_queries import create_stocks_booking_view
 from tests.utils import clean_database, create_user, create_product, create_offerer, create_venue, create_offer, \
     create_stock, create_booking, create_payment, create_payment_status
+from view_queries import create_enriched_stock_view
+
 
 class ViewQueriesTest:
     @pytest.fixture(autouse=True)
@@ -21,7 +21,7 @@ class ViewQueriesTest:
         db.session.execute('DROP VIEW enriched_stock_data;')
         db.session.commit()
 
-    class GetEnrichedStockDataTest:
+    class CreateEnrichedStockViewTest:
         def test_should_return_all_values(self, app):
             # Given
             create_user(app, id=1)
@@ -41,9 +41,6 @@ class ViewQueriesTest:
             create_payment_status(app, payment_id=1, id=1, date='2019-01-01', status='PENDING')
 
             with app.app_context():
-                create_stock_view()
-                create_stocks_offer_view()
-                create_stock_venue_view()
                 create_stocks_booking_view()
 
             expected_stocks_details = pandas.DataFrame(
@@ -66,7 +63,7 @@ class ViewQueriesTest:
 
             # When
             with app.app_context():
-                create_enriched_stock_data()
+                create_enriched_stock_view()
 
             # Then
             stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')

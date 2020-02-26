@@ -14,39 +14,6 @@ STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "bookings_paid": "Nombre de réservations ayant un paiement"}
 
 
-def _get_stock_information_query() -> str:
-    return f'''
-    (SELECT
-     id AS stock_id,
-     "offerId" AS "{STOCK_COLUMNS["offer_id"]}",
-     "dateCreated" AS "{STOCK_COLUMNS["stock_issued_at"]}",
-     "bookingLimitDatetime" AS "{STOCK_COLUMNS["booking_limit_datetime"]}",
-     "beginningDatetime" AS "{STOCK_COLUMNS["beginning_datetime"]}",
-     available AS "{STOCK_COLUMNS["available"]}"
-     FROM stock)
-    '''
-
-def _get_stocks_offer_information_query() -> str:
-    return f'''
-    (SELECT
-     stock.id AS stock_id,
-     name AS "{STOCK_COLUMNS["offer_name"]}",
-     type AS "{STOCK_COLUMNS["offer_type"]}"
-    FROM stock
-    JOIN offer ON stock."offerId"=offer.id)
-    '''
-
-def _get_stock_venue_information_query() -> str:
-    return f'''
-    (SELECT
-     stock.id AS stock_id,
-     venue."managingOffererId" AS "{STOCK_COLUMNS["offerer_id"]}",
-     venue."departementCode" AS "{STOCK_COLUMNS["venue_departement_code"]}"
-    FROM stock
-    JOIN offer ON stock."offerId"=offer.id
-    JOIN venue ON offer."venueId"=venue.id)
-    '''
-
 def _get_stocks_booking_information_query() -> str:
     return f'''
     (WITH last_status AS 
@@ -83,34 +50,6 @@ def _get_stocks_booking_information_query() -> str:
     ORDER BY stock.id)
     '''
 
-
-def create_stock_view() -> None:
-    view_query = f'''
-    CREATE OR REPLACE VIEW stock_information AS
-        {_get_stock_information_query()}
-        '''
-    db.session.execute(view_query)
-    db.session.commit()
-
-
-def create_stocks_offer_view() -> None:
-    view_query = f'''
-    CREATE OR REPLACE VIEW stock_offer_information AS
-    {_get_stocks_offer_information_query()}
-    '''
-    db.session.execute(view_query)
-    db.session.commit()
-
-
-def create_stock_venue_view() -> None:
-    query_view = f'''
-    CREATE OR REPLACE VIEW stock_venue_information AS
-    {_get_stock_venue_information_query()}
-    '''
-    db.session.execute(query_view)
-    db.session.commit()
-
-
 def create_stocks_booking_view() -> None:
     query = f'''
         CREATE OR REPLACE VIEW stock_booking_information AS
@@ -118,5 +57,3 @@ def create_stocks_booking_view() -> None:
         '''
     db.session.execute(query)
     db.session.commit()
-
-
