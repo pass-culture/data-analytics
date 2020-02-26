@@ -3,57 +3,58 @@ from unittest.mock import patch, MagicMock
 import pandas
 import pytest
 
+from db import db
+from db import CONNECTION
 from create_enriched_data_tables import create_enriched_offerer_data, \
     create_enriched_user_data
-from db import CONNECTION, ENGINE
-from query_enriched_data_tables import create_enriched_stock_data
-from tests.utils import create_offerer, create_user, create_venue, create_offer, create_product, create_stock, \
-    clean_database
-
-connection = CONNECTION
-
+from tests.utils import create_offerer, create_user, clean_database
 
 class EnrichedDataTest:
     @pytest.fixture(autouse=True)
-    def setup_class(self):
-        clean_database()
+    def setup_class(self, app):
+        with app.app_context():
+            clean_database(app)
 
     class CreateEnrichedOffererDataTest:
 
-        def test_creates_enriched_offerer_data_table(self):
+        def test_creates_enriched_offerer_data_table(self, app):
             # Given
             query = 'SELECT COUNT(*) FROM enriched_offerer_data'
 
             # When
-            create_enriched_offerer_data(connection)
+            create_enriched_offerer_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [(0,)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [(0,)]
+                db.session.commit()
 
-        def test_populates_table_when_existing_offerer(self):
+        def test_populates_table_when_existing_offerer(self, app):
             # Given
-            create_offerer()
+            create_offerer(app)
 
             query = 'SELECT COUNT(*) FROM enriched_offerer_data'
 
             # When
-            create_enriched_offerer_data(connection)
+            create_enriched_offerer_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [(1,)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [(1,)]
+                db.session.commit()
 
         @patch('query_enriched_data_tables.get_offerers_details')
-        def test_saves_offerers_details(self, get_offerers_details):
+        def test_saves_offerers_details(self, get_offerers_details, app):
             # Given
             get_offerers_details.return_value = pandas.DataFrame()
 
             # When
-            create_enriched_offerer_data(connection)
+            create_enriched_offerer_data(CONNECTION)
 
             # Then
-            get_offerers_details.assert_called_once_with(connection)
+            get_offerers_details.assert_called_once_with(CONNECTION)
 
-        def test_creates_index_on_offerer_id(self):
+        def test_creates_index_on_offerer_id(self, app):
             # Given
             query = """
             SELECT
@@ -65,63 +66,71 @@ class EnrichedDataTest:
             """
 
             # When
-            create_enriched_offerer_data(connection)
+            create_enriched_offerer_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [('ix_enriched_offerer_data_offerer_id',)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [('ix_enriched_offerer_data_offerer_id',)]
+                db.session.commit()
 
-        def test_replaces_table_if_exists(self):
+        def test_replaces_table_if_exists(self, app):
             # Given
             enriched_offerer_data = pandas.DataFrame(
                 {'Date de création': '2019-11-18', 'Date de création du premier stock': '2019-11-18',
                  'Date de première réservation': '2019-11-18', 'Nombre d’offres': 0,
                  'Nombre de réservations non annulées': 0}, index={'offerer_id': 1})
             enriched_offerer_data.to_sql(name='enriched_offerer_data',
-                                         con=connection)
+                                         con=CONNECTION)
             query = 'SELECT COUNT(*) FROM enriched_offerer_data'
 
             # When
-            create_enriched_offerer_data(connection)
+            create_enriched_offerer_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [(0,)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [(0,)]
+                db.session.commit()
 
     class CreateEnrichedUserDataTest:
 
-        def test_creates_enriched_user_data_table(self):
+        def test_creates_enriched_user_data_table(self, app):
             # Given
             query = 'SELECT COUNT(*) FROM enriched_user_data'
 
             # When
-            create_enriched_user_data(connection)
+            create_enriched_user_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [(0,)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [(0,)]
+                db.session.commit()
 
-        def test_populates_table_when_existing_user(self):
+        def test_populates_table_when_existing_user(self, app):
             # Given
-            create_user()
+            create_user(app)
 
             query = 'SELECT COUNT(*) FROM enriched_user_data'
 
             # When
-            create_enriched_user_data(connection)
+            create_enriched_user_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [(1,)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [(1,)]
+                db.session.commit()
 
         @patch('query_enriched_data_tables.get_beneficiary_users_details')
-        def test_saves_users_details(self, get_beneficiary_users_details):
+        def test_saves_users_details(self, get_beneficiary_users_details, app):
             # Given
             get_beneficiary_users_details.return_value = pandas.DataFrame()
 
             # When
-            create_enriched_user_data(connection)
+            create_enriched_user_data(CONNECTION)
 
             # Then
-            get_beneficiary_users_details.assert_called_once_with(connection)
+            get_beneficiary_users_details.assert_called_once_with(CONNECTION)
 
-        def test_creates_index(self):
+        def test_creates_index(self, app):
             # Given
             query = """
                 SELECT
@@ -133,24 +142,26 @@ class EnrichedDataTest:
                 """
 
             # When
-            create_enriched_user_data(connection)
+            create_enriched_user_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [('ix_enriched_user_data_index',)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [('ix_enriched_user_data_index',)]
+                db.session.commit()
 
         @patch('query_enriched_data_tables.get_beneficiary_users_details')
-        def test_shuffles_index(self, get_beneficiary_users_details):
+        def test_shuffles_index(self, get_beneficiary_users_details, app):
             # Given
             enriched_user_data = MagicMock()
             get_beneficiary_users_details.return_value = enriched_user_data
 
             # When
-            create_enriched_user_data(connection)
+            create_enriched_user_data(CONNECTION)
 
             # Then
             enriched_user_data.sample.assert_called_once_with(frac=1)
 
-        def test_replaces_table_if_exists(self):
+        def test_replaces_table_if_exists(self, app):
             # Given
             enriched_user_data = pandas.DataFrame(
                 {'Vague d\'expérimentation': 1, 'Département': '78', 'Date d\'activation': '2019-11-18',
@@ -160,92 +171,13 @@ class EnrichedDataTest:
                  'Date de dernière recommandation': '2019-11-18', 'Nombre de réservations totales': 3,
                  'Nombre de réservations non annulées': 3}, index={'index': 1})
             enriched_user_data.to_sql(name='enriched_user_data',
-                                      con=connection)
+                                      con=CONNECTION)
             query = 'SELECT COUNT(*) FROM enriched_user_data'
 
             # When
-            create_enriched_user_data(connection)
+            create_enriched_user_data(CONNECTION)
 
             # Then
-            assert ENGINE.execute(query).fetchall() == [(0,)]
-
-    class CreateEnrichedStockDataTest:
-
-        def test_initializes_empty_table_when_no_existing_offerer(self):
-            # Given
-            query = 'SELECT COUNT(*) FROM enriched_stock_data'
-
-            # When
-            create_enriched_stock_data(connection)
-
-            # Then
-            assert ENGINE.execute(query).fetchall() == [(0,)]
-
-        def test_populates_table_when_existing_offerer(self):
-            # Given
-            create_offerer(id=1)
-            create_venue(offerer_id=1, id=1)
-            create_product(id=1)
-            create_offer(venue_id=1, product_id=1, id=1)
-            create_stock(offer_id=1, id=1)
-
-            query = 'SELECT COUNT(*) FROM enriched_stock_data'
-
-            # When
-            create_enriched_stock_data(connection)
-
-            # Then
-            assert ENGINE.execute(query).fetchall() == [(1,)]
-
-        @patch('query_enriched_data_tables.get_stocks_details')
-        def test_saves_stocks_details(self, get_stocks_details):
-            # Given
-            mocked_dataframe = MagicMock()
-            mocked_dataframe.to_sql.return_value = MagicMock()
-            get_stocks_details.return_value = mocked_dataframe
-
-            # When
-            create_enriched_stock_data(connection)
-
-            # Then
-            get_stocks_details.assert_called_once_with(connection)
-            mocked_dataframe.to_sql.assert_called_once_with(name='enriched_stock_data',
-                                 con=connection,
-                                 if_exists='replace',
-                                 chunksize=100000)
-
-        def test_creates_index_on_stock_id(self):
-            # Given
-            query = """
-            SELECT
-                indexname
-            FROM
-                pg_indexes
-            WHERE
-                tablename = 'enriched_stock_data';
-            """
-
-            # When
-            create_enriched_stock_data(connection)
-
-            # Then
-            assert ENGINE.execute(query).fetchall() == [('ix_enriched_stock_data_stock_id',)]
-
-        def test_replaces_table_if_exists(self):
-            # Given
-            enriched_stock_data = pandas.DataFrame(
-                {'Date de création': '2019-11-18',
-                 'Date de création du premier stock': '2019-11-18',
-                 'Date de première réservation': '2019-11-18',
-                 'Nombre d’offres': 0,
-                 'Nombre de réservations non annulées': 0},
-                index={'offerer_id': 1})
-            enriched_stock_data.to_sql(name='enriched_stock_data',
-                                         con=connection)
-            query = 'SELECT COUNT(*) FROM enriched_stock_data'
-
-            # When
-            create_enriched_stock_data(connection)
-
-            # Then
-            assert ENGINE.execute(query).fetchall() == [(0,)]
+            with app.app_context():
+                assert db.session.execute(query).fetchall() == [(0,)]
+                db.session.commit()
