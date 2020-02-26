@@ -13,18 +13,18 @@ from tests.utils import create_stock, create_offer, create_venue, create_offerer
 
 class StockQueriesTest:
     @pytest.fixture(autouse=True)
-    def setup_class(self):
-        clean_database()
+    def setup_class(self, app):
+        clean_database(app)
 
     class GetStockInformationQueryTest:
-        def test_should_query_information_directly_linked_to_offer(self):
+        def test_should_query_information_directly_linked_to_offer(self, app):
             # Given
-            create_product(id=1)
-            create_offerer(id=1)
-            create_venue(id=1, offerer_id=1)
-            create_offer(id=2, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=2, available=10, booking_limit_datetime='2019-11-23',
-                         beginning_datetime=None, date_created='2019-11-01')
+            create_product(app, id=1)
+            create_offerer(app, id=1)
+            create_venue(app, offerer_id=1, id=1)
+            create_offer(app, venue_id=1, product_id=1, id=2)
+            create_stock(app, offer_id=2, id=1, date_created='2019-11-01', available=10,
+                         booking_limit_datetime='2019-11-23', beginning_datetime=None)
 
             expected_stocks_information = pandas.DataFrame(
                 index=pandas.Index(data=[1], name='stock_id'),
@@ -43,13 +43,13 @@ class StockQueriesTest:
             pandas.testing.assert_frame_equal(stock_information, expected_stocks_information)
 
     class GetStockOfferInformationQueryTest:
-        def test_should_query_information_directly_linked_to_offer(self):
+        def test_should_query_information_directly_linked_to_offer(self, app):
             # Given
-            create_product(id=1, name='Test offer', product_type='EventType.CINEMA')
-            create_offerer(id=1)
-            create_venue(id=1, offerer_id=1)
-            create_offer(id=2, venue_id=1, product_id=1, name='Test offer', product_type='EventType.CINEMA')
-            create_stock(id=1, offer_id=2)
+            create_product(app, id=1, product_type='EventType.CINEMA', name='Test offer')
+            create_offerer(app, id=1)
+            create_venue(app, offerer_id=1, id=1)
+            create_offer(app, venue_id=1, product_id=1, id=2, product_type='EventType.CINEMA', name='Test offer')
+            create_stock(app, offer_id=2, id=1)
 
             expected_stocks_information = pandas.DataFrame(index=pandas.Index(data=[1], name='stock_id'),
                                                            data={"Nom de l'offre": "Test offer",
@@ -64,19 +64,19 @@ class StockQueriesTest:
 
     class GetStockVenueInformationQueryTest:
         def test_should_query_all_information_directly_linked_to_venue_without_departement_code_when_virtual_venue(
-                self):
+                self, app):
             # Given
-            create_product(id=1)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_product(app, id=1)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=2, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=2)
+            create_offer(app, venue_id=1, product_id=1, id=2)
+            create_stock(app, offer_id=2, id=1)
 
-            create_product(id=2)
-            create_venue(id=2, offerer_id=3, departement_code='06', postal_code='06000')
-            create_offer(id=3, venue_id=2, product_id=2)
-            create_stock(id=2, offer_id=3)
+            create_product(app, id=2)
+            create_venue(app, offerer_id=3, id=2, postal_code='06000', departement_code='06')
+            create_offer(app, venue_id=2, product_id=2, id=3)
+            create_stock(app, offer_id=3, id=2)
             expected_stocks_information = pandas.DataFrame(index=pandas.Index(data=[1, 2], name='stock_id'),
                                                            data={"offerer_id": [3, 3],
                                                                  "Département": [None, "06"]})
@@ -89,21 +89,21 @@ class StockQueriesTest:
             pandas.testing.assert_frame_equal(stocks_venue_information, expected_stocks_information)
 
     class GetStocksBookingInformationQueryTest:
-        def test_should_return_column_with_total_number_of_bookings_cancelled_and_not(self):
+        def test_should_return_column_with_total_number_of_bookings_cancelled_and_not(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
-            create_offer(id=2, venue_id=1, product_id=2)
-            create_stock(id=2, offer_id=2)
-            create_booking(user_id=1, stock_id=1, quantity=2, id=4, is_cancelled=True)
-            create_booking(user_id=2, stock_id=2, quantity=1, id=5, token='IS02JE')
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
+            create_offer(app, venue_id=1, product_id=2, id=2)
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2, is_cancelled=True)
+            create_booking(app, user_id=2, stock_id=2, id=5, quantity=1, token='IS02JE')
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -118,20 +118,20 @@ class StockQueriesTest:
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre total de réservations"],
                                                expected_stocks_booking_information)
 
-        def test_should_return_column_with_total_number_of_bookings_at_0_when_no_booking(self):
+        def test_should_return_column_with_total_number_of_bookings_at_0_when_no_booking(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
-            create_offer(id=2, venue_id=1, product_id=2)
-            create_stock(id=2, offer_id=2)
-            create_booking(user_id=1, stock_id=1, quantity=2, id=4, is_cancelled=True)
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
+            create_offer(app, venue_id=1, product_id=2, id=2)
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2, is_cancelled=True)
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -146,21 +146,21 @@ class StockQueriesTest:
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre total de réservations"],
                                                expected_stocks_booking_information)
 
-        def test_should_return_column_with_number_of_cancelled_bookings(self):
+        def test_should_return_column_with_number_of_cancelled_bookings(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
-            create_offer(id=2, venue_id=1, product_id=2)
-            create_stock(id=2, offer_id=2)
-            create_booking(user_id=1, stock_id=1, quantity=2, id=4, is_cancelled=True)
-            create_booking(user_id=2, stock_id=2, quantity=1, id=5, token='IS02JE')
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
+            create_offer(app, venue_id=1, product_id=2, id=2)
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2, is_cancelled=True)
+            create_booking(app, user_id=2, stock_id=2, id=5, quantity=1, token='IS02JE')
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -175,17 +175,17 @@ class StockQueriesTest:
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations annulées"],
                                                expected_stocks_booking_information)
 
-        def test_should_return_column_with_0_cancelled_bookings_if_no_booking(self):
+        def test_should_return_column_with_0_cancelled_bookings_if_no_booking(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1], name='stock_id'),
@@ -200,23 +200,23 @@ class StockQueriesTest:
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations annulées"],
                                                expected_stocks_booking_information)
 
-        def test_should_return_column_with_number_of_bookings_appearing_on_payment(self):
+        def test_should_return_column_with_number_of_bookings_appearing_on_payment(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
-            create_offer(id=2, venue_id=1, product_id=2)
-            create_stock(id=2, offer_id=2)
-            create_booking(user_id=1, stock_id=1, quantity=2, id=4)
-            create_booking(user_id=2, stock_id=2, quantity=1, id=5, token='IS02JE')
-            create_payment(booking_id=4, id=1)
-            create_payment_status(payment_id=1)
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
+            create_offer(app, venue_id=1, product_id=2, id=2)
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2)
+            create_booking(app, user_id=2, stock_id=2, id=5, quantity=1, token='IS02JE')
+            create_payment(app, booking_id=4, id=1)
+            create_payment_status(app, payment_id=1)
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -231,23 +231,23 @@ class StockQueriesTest:
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"],
                                                expected_stocks_booking_information)
 
-        def test_should_not_count_bookings_appearing_on_payment_if_payment_s_current_status_is_banned(self):
+        def test_should_not_count_bookings_appearing_on_payment_if_payment_s_current_status_is_banned(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
-            create_offer(id=2, venue_id=1, product_id=2)
-            create_stock(id=2, offer_id=2)
-            create_booking(user_id=1, stock_id=1, quantity=2, id=4)
-            create_payment(booking_id=4, id=1)
-            create_payment_status(payment_id=1, status='PENDING', date='2019-01-01', id=1)
-            create_payment_status(payment_id=1, status='BANNED', date='2019-01-02', id=2)
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
+            create_offer(app, venue_id=1, product_id=2, id=2)
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2)
+            create_payment(app, booking_id=4, id=1)
+            create_payment_status(app, payment_id=1, id=1, date='2019-01-01', status='PENDING')
+            create_payment_status(app, payment_id=1, id=2, date='2019-01-02', status='BANNED')
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -267,23 +267,23 @@ class StockQueriesTest:
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"],
                                                expected_stocks_booking_information)
 
-        def test_should_count_bookings_appearing_on_payment_if_payment_is_no_longer_banned(self):
+        def test_should_count_bookings_appearing_on_payment_if_payment_is_no_longer_banned(self, app):
             # Given
-            create_user(id=1)
-            create_user(id=2, email='other@test.com')
-            create_product(id=1)
-            create_product(id=2)
-            create_offerer(id=3)
-            create_venue(id=1, offerer_id=3, siret=None, departement_code=None, postal_code=None, city=None,
+            create_user(app, id=1)
+            create_user(app, id=2, email='other@test.com')
+            create_product(app, id=1)
+            create_product(app, id=2)
+            create_offerer(app, id=3)
+            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(id=3, venue_id=1, product_id=1)
-            create_stock(id=1, offer_id=3)
-            create_offer(id=2, venue_id=1, product_id=2)
-            create_stock(id=2, offer_id=2)
-            create_booking(user_id=1, stock_id=1, quantity=2, id=4)
-            create_payment(booking_id=4, id=1)
-            create_payment_status(payment_id=1, status='BANNED', date='2019-07-18', id=1)
-            create_payment_status(payment_id=1, status='SENT', date='2019-07-19', id=2)
+            create_offer(app, venue_id=1, product_id=1, id=3)
+            create_stock(app, offer_id=3, id=1)
+            create_offer(app, venue_id=1, product_id=2, id=2)
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2)
+            create_payment(app, booking_id=4, id=1)
+            create_payment_status(app, payment_id=1, id=1, date='2019-07-18', status='BANNED')
+            create_payment_status(app, payment_id=1, id=2, date='2019-07-19', status='SENT')
 
             expected_stocks_booking_information = pandas.Series(
                 index=pandas.Index(data=[1, 2], name='stock_id'),

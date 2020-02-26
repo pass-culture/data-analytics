@@ -1,4 +1,4 @@
-from db import SESSION
+from db import db
 
 STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "offer_name": "Nom de l'offre",
@@ -89,8 +89,8 @@ def create_stock_view() -> None:
     CREATE OR REPLACE VIEW stock_information AS
         {_get_stock_information_query()}
         '''
-    SESSION.execute(view_query)
-    SESSION.commit()
+    db.session.execute(view_query)
+    db.session.commit()
 
 
 def create_stocks_offer_view() -> None:
@@ -98,8 +98,8 @@ def create_stocks_offer_view() -> None:
     CREATE OR REPLACE VIEW stock_offer_information AS
     {_get_stocks_offer_information_query()}
     '''
-    SESSION.execute(view_query)
-    SESSION.commit()
+    db.session.execute(view_query)
+    db.session.commit()
 
 
 def create_stock_venue_view() -> None:
@@ -107,8 +107,8 @@ def create_stock_venue_view() -> None:
     CREATE OR REPLACE VIEW stock_venue_information AS
     {_get_stock_venue_information_query()}
     '''
-    SESSION.execute(query_view)
-    SESSION.commit()
+    db.session.execute(query_view)
+    db.session.commit()
 
 
 def create_stocks_booking_view() -> None:
@@ -116,7 +116,7 @@ def create_stocks_booking_view() -> None:
         CREATE OR REPLACE VIEW stock_booking_information AS
         {_get_stocks_booking_information_query()}
         '''
-    SESSION.execute(query)
-    SESSION.commit()
+    db.session.execute(query)
+    db.session.commit()
 
 

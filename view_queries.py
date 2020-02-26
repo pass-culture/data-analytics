@@ -1,4 +1,4 @@
-from db import SESSION
+from db import db
 
 
 def create_enriched_stock_view() -> None:
@@ -14,5 +14,5 @@ def create_enriched_stock_view() -> None:
          LEFT JOIN stock_venue_information ON stock_offer_information.stock_id = stock_venue_information.stock_id
          LEFT JOIN stock_booking_information ON stock_venue_information.stock_id = stock_booking_information.stock_id);
         '''
-    SESSION.execute(query)
-    SESSION.commit()
+    db.session.execute(query)
+    db.session.commit()
