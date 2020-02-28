@@ -187,7 +187,6 @@ def clean_database(app):
         DELETE FROM "offerer";
         DELETE FROM "user";
         DROP TABLE IF EXISTS enriched_offerer_data;
-        DROP TABLE IF EXISTS enriched_user_data;
         ''')
         db.session.commit()
 

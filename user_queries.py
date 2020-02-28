@@ -1,52 +1,12 @@
 from datetime import datetime
-
 import pandas
-from pandas import Int64Index
-from sqlalchemy.engine import Connection
-
-recommendation_dates_query = '''
-    WITH recommendation_dates AS (
-     SELECT
-      MIN(recommendation."dateCreated") AS first_recommendation_date,
-      MAX(recommendation."dateCreated") AS last_recommendation_date,
-      "user".id AS user_id,
-      "user"."canBookFreeOffers"
-     FROM "user"
-     LEFT JOIN recommendation ON recommendation."userId" = "user".id
-     GROUP BY "user".id, "user"."canBookFreeOffers"
-    )
-    '''
+from db import db
 
 
-def get_beneficiary_users_details(connection: Connection):
-    activation_dates = get_activation_dates(connection)
-    user_details = [
-        get_experimentation_sessions(connection),
-        get_departments(connection),
-        activation_dates,
-        get_typeform_filling_dates(connection),
-        get_first_connection_dates(connection),
-        get_date_of_first_bookings(connection),
-        get_date_of_second_bookings(connection),
-        get_date_of_bookings_on_third_product_type(connection),
-        get_last_recommendation_dates(connection),
-        get_number_of_bookings(connection),
-        get_number_of_non_cancelled_bookings(connection),
-        get_users_seniority(activation_dates),
-        get_actual_amount_spent(connection),
-        get_theoric_amount_spent(connection),
-        get_theoric_amount_spent_in_digital_goods(connection),
-        get_theoric_amount_spent_in_physical_goods(connection)]
-    beneficiary_users_details = pandas.concat(
-        user_details,
-        axis=1
-    )
-    return beneficiary_users_details.reset_index(drop=True)
-
-
-def get_experimentation_sessions(connection: Connection):
-    query = '''
-    WITH experimentation_session AS (
+def _get_experimentation_sessions_query() -> str:
+    return '''
+    (WITH experimentation_session AS 
+    (
         SELECT
         DISTINCT ON (user_id)
          "isUsed" AS is_used,
@@ -67,26 +27,13 @@ def get_experimentation_sessions(connection: Connection):
      "user".id AS user_id
     FROM "user"
     LEFT JOIN experimentation_session ON experimentation_session.user_id = "user".id
-    WHERE "user"."canBookFreeOffers"
-
+    WHERE "user"."canBookFreeOffers")
     '''
-    return pandas.read_sql_query(query, connection, index_col="user_id")
 
 
-def get_departments(connection: Connection):
-    query = '''
-    SELECT
-     "user"."departementCode" AS "Département",
-     "user".id AS user_id
-    FROM "user"
-    WHERE "user"."canBookFreeOffers"
-    '''
-    return pandas.read_sql(query, connection, index_col="user_id")
-
-
-def get_activation_dates(connection: Connection):
-    query = '''
-    WITH validated_activation_booking AS (
+def _get_activation_dates_query() -> str:
+    return '''
+    (WITH validated_activation_booking AS (
      SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
      FROM booking
      JOIN stock
@@ -106,37 +53,33 @@ def get_activation_dates(connection: Connection):
     FROM "user"
     LEFT JOIN validated_activation_booking
      ON validated_activation_booking."userId" = "user".id
-    WHERE "user"."canBookFreeOffers"
+    WHERE "user"."canBookFreeOffers")
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_typeform_filling_dates(connection: Connection):
-    query = '''
+def _get_first_connection_dates_query() -> str:
+    return '''
+    (WITH recommendation_dates AS (
+     SELECT
+      MIN(recommendation."dateCreated") AS first_recommendation_date,
+      MAX(recommendation."dateCreated") AS last_recommendation_date,
+      "user".id AS user_id,
+      "user"."canBookFreeOffers"
+     FROM "user"
+     LEFT JOIN recommendation ON recommendation."userId" = "user".id
+     GROUP BY "user".id, "user"."canBookFreeOffers"
+    )
+    
     SELECT
-     "culturalSurveyFilledDate" AS "Date de remplissage du typeform",
-     id AS user_id
-    FROM "user"
-    WHERE "user"."canBookFreeOffers"
+     recommendation_dates.first_recommendation_date AS "Date de première connexion",
+     recommendation_dates.user_id AS user_id
+    FROM recommendation_dates
+    WHERE recommendation_dates."canBookFreeOffers")
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_first_connection_dates(connection: Connection):
-    query = recommendation_dates_query + \
-            '''
-                SELECT
-                 recommendation_dates.first_recommendation_date AS "Date de première connexion",
-                 recommendation_dates.user_id AS user_id
-                FROM recommendation_dates
-                WHERE recommendation_dates."canBookFreeOffers"
-                '''
-
-    return pandas.read_sql(query, connection, index_col='user_id')
-
-
-def get_date_of_first_bookings(connection: Connection):
-    query = '''
+def _get_date_of_first_bookings_query() -> str:
+    return '''
     WITH bookings_grouped_by_user AS (
     SELECT
      MIN(booking."dateCreated") AS date,
@@ -155,11 +98,9 @@ def get_date_of_first_bookings(connection: Connection):
     WHERE "user"."canBookFreeOffers"
     '''
 
-    return pandas.read_sql(query, connection, index_col='user_id')
 
-
-def get_date_of_second_bookings(connection: Connection):
-    query = '''
+def _get_date_of_second_bookings_query() -> str:
+    return '''
      WITH second_booking_dates AS (
      SELECT
       ordered_dates."dateCreated" AS date,
@@ -186,11 +127,9 @@ def get_date_of_second_bookings(connection: Connection):
     WHERE "user"."canBookFreeOffers"
     '''
 
-    return pandas.read_sql(query, connection, index_col='user_id')
 
-
-def get_date_of_bookings_on_third_product_type(connection: Connection):
-    query = '''
+def _get_date_of_bookings_on_third_product_type_query() -> str:
+    return '''
     WITH
      bookings_on_distinct_types AS (
       SELECT DISTINCT ON (offer.type, booking."userId") offer.type, booking."userId", booking."dateCreated"
@@ -224,24 +163,32 @@ def get_date_of_bookings_on_third_product_type(connection: Connection):
       LEFT JOIN first_booking_on_third_category ON first_booking_on_third_category."userId" = "user".id
       WHERE "user"."canBookFreeOffers"
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_last_recommendation_dates(connection: Connection):
-    query = recommendation_dates_query + \
-            '''
-                SELECT
-                 recommendation_dates.last_recommendation_date AS "Date de dernière recommandation",
-                 recommendation_dates.user_id AS user_id
-                FROM recommendation_dates
-                WHERE recommendation_dates."canBookFreeOffers"
-                '''
-    return pandas.read_sql(query, connection, index_col='user_id')
+def _get_last_recommendation_dates_query() -> str:
+    return '''
+    (WITH recommendation_dates AS (
+     SELECT
+      MIN(recommendation."dateCreated") AS first_recommendation_date,
+      MAX(recommendation."dateCreated") AS last_recommendation_date,
+      "user".id AS user_id,
+      "user"."canBookFreeOffers"
+     FROM "user"
+     LEFT JOIN recommendation ON recommendation."userId" = "user".id
+     GROUP BY "user".id, "user"."canBookFreeOffers"
+    )
+    
+    SELECT
+     recommendation_dates.last_recommendation_date AS "Date de dernière recommandation",
+     recommendation_dates.user_id AS user_id
+    FROM recommendation_dates
+    WHERE recommendation_dates."canBookFreeOffers")
+    '''
 
 
-def get_number_of_bookings(connection: Connection):
-    query = '''
-    WITH bookings_grouped_by_user AS (
+def _get_number_of_bookings_query() -> str:
+    return '''
+    (WITH bookings_grouped_by_user AS (
      SELECT
       MIN(booking."dateCreated") AS date,
       SUM(booking.quantity) AS number_of_bookings,
@@ -261,14 +208,13 @@ def get_number_of_bookings(connection: Connection):
      "user".id AS user_id
     FROM "user"
     LEFT JOIN bookings_grouped_by_user ON "user".id = bookings_grouped_by_user.user_id
-    WHERE "user"."canBookFreeOffers"
+    WHERE "user"."canBookFreeOffers")
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_number_of_non_cancelled_bookings(connection: Connection):
-    query = '''
-    WITH non_cancelled_bookings_grouped_by_user AS(
+def _get_number_of_non_cancelled_bookings_query() -> str:
+    return '''
+    (WITH non_cancelled_bookings_grouped_by_user AS(
     SELECT
      SUM(booking.quantity) AS number_of_bookings,
      "userId" AS user_id
@@ -279,6 +225,7 @@ def get_number_of_non_cancelled_bookings(connection: Connection):
      booking."isCancelled" IS FALSE
     GROUP BY user_id
     )
+    
     SELECT
      CASE
       WHEN non_cancelled_bookings_grouped_by_user.number_of_bookings IS NULL THEN 0
@@ -287,81 +234,212 @@ def get_number_of_non_cancelled_bookings(connection: Connection):
      "user".id AS user_id
     FROM "user"
     LEFT JOIN non_cancelled_bookings_grouped_by_user ON non_cancelled_bookings_grouped_by_user.user_id = "user".id
-    WHERE "user"."canBookFreeOffers"
+    WHERE "user"."canBookFreeOffers")
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_users_seniority(activation_dates: pandas.DataFrame) -> pandas.Series:
-    now = datetime.now()
+def _get_users_seniority_query() -> str:
+    return '''
+    (WITH validated_activation_booking AS 
+    ( SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
+     FROM booking
+     JOIN stock
+      ON stock.id = booking."stockId"
+     JOIN offer
+      ON stock."offerId" = offer.id
+      AND offer.type = 'ThingType.ACTIVATION'
+     WHERE booking."isUsed" 
+    ),
+    
+    activation_date AS
+    ( SELECT
+     CASE
+      WHEN validated_activation_booking.is_used THEN validated_activation_booking.date_used
+      ELSE "user"."dateCreated"
+     END AS "Date d'activation",
+     "user".id as user_id
+    FROM "user"
+    LEFT JOIN validated_activation_booking
+     ON validated_activation_booking."userId" = "user".id
+    WHERE "user"."canBookFreeOffers")
+    
+    SELECT 
+     DATE_PART('day', CURRENT_DATE - activation_date."Date d'activation") AS "Ancienneté en jours",
+     "user".id as user_id
+    FROM "user"
+    LEFT JOIN activation_date ON "user".id = activation_date.user_id
+    )
+    '''
 
-    time_since_activation = (now - activation_dates)
-    users_seniority = time_since_activation["Date d'activation"].apply(lambda date: date.days)
-    users_seniority.name = "Ancienneté en jours"
-    return users_seniority
 
-
-def get_actual_amount_spent(connection: Connection) -> pandas.DataFrame:
-    query = '''
-    SELECT "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
+def _get_actual_amount_spent_query() -> str:
+    return '''
+    (SELECT 
+     "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isUsed" IS TRUE AND booking."isCancelled" IS FALSE
     WHERE "user"."canBookFreeOffers"
-    GROUP BY "user".id
+    GROUP BY "user".id)
     '''
 
-    sql = pandas.read_sql(query, connection, index_col='user_id')
-    return sql
 
-def get_theoric_amount_spent(connection: Connection) -> pandas.DataFrame:
-    query = '''
-        SELECT "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
-        FROM "user"
-        LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
-        WHERE "user"."canBookFreeOffers"
-        GROUP BY "user".id
-        '''
-
-    sql = pandas.read_sql(query, connection, index_col='user_id')
-    return sql
+def _get_theoric_amount_spent_query() -> str:
+    return '''
+    (SELECT 
+     "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
+    FROM "user"
+    LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
+    WHERE "user"."canBookFreeOffers"
+    GROUP BY "user".id)
+    '''
 
 
-def get_theoric_amount_spent_in_digital_goods(connection: Connection) -> pandas.DataFrame:
-    query = '''
-    WITH eligible_booking AS (
-    SELECT * FROM booking
-    LEFT JOIN stock ON booking."stockId" = stock.id
-    LEFT JOIN offer ON stock."offerId" = offer.id
-    WHERE offer.type IN ('ThingType.AUDIOVISUEL', 'ThingType.JEUX_VIDEO', 'ThingType.JEUX_VIDEO_ABO', 
-    'ThingType.LIVRE_AUDIO', 'ThingType.LIVRE_EDITION', 'ThingType.MUSIQUE', 'ThingType.PRESSE_ABO')
-    AND offer.url IS NOT NULL
-    AND booking."isCancelled" IS NOT TRUE
-    )
+def _get_theoric_amount_spent_in_digital_goods_query() -> str:
+    return '''
+    (WITH eligible_booking AS (
+     SELECT * FROM booking
+     LEFT JOIN stock ON booking."stockId" = stock.id
+     LEFT JOIN offer ON stock."offerId" = offer.id
+     WHERE offer.type IN ('ThingType.AUDIOVISUEL', 'ThingType.JEUX_VIDEO', 'ThingType.JEUX_VIDEO_ABO', 
+     'ThingType.LIVRE_AUDIO', 'ThingType.LIVRE_EDITION', 'ThingType.MUSIQUE', 'ThingType.PRESSE_ABO')
+     AND offer.url IS NOT NULL
+     AND booking."isCancelled" IS NOT TRUE
+     )
 
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses numériques"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
     WHERE "user"."canBookFreeOffers" IS TRUE
-    GROUP BY "user".id 
+    GROUP BY "user".id)
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
 
 
-def get_theoric_amount_spent_in_physical_goods(connection: Connection) -> pandas.DataFrame:
-    query = '''
-    WITH eligible_booking AS (
-    SELECT * FROM booking
-    LEFT JOIN stock ON booking."stockId" = stock.id
-    LEFT JOIN offer ON stock."offerId" = offer.id
-    WHERE offer.type IN ('ThingType.INSTRUMENT','ThingType.JEUX','ThingType.LIVRE_EDITION','ThingType.MUSIQUE','ThingType.OEUVRE_ART','ThingType.AUDIOVISUEL')
-    AND offer.url IS NULL
-    AND booking."isCancelled" IS NOT TRUE
+def _get_theoric_amount_spent_in_physical_goods_query() -> str:
+    return '''
+    (WITH eligible_booking AS (
+     SELECT * FROM booking
+     LEFT JOIN stock ON booking."stockId" = stock.id
+     LEFT JOIN offer ON stock."offerId" = offer.id
+     WHERE offer.type IN ('ThingType.INSTRUMENT','ThingType.JEUX','ThingType.LIVRE_EDITION','ThingType.MUSIQUE','ThingType.OEUVRE_ART','ThingType.AUDIOVISUEL')
+     AND offer.url IS NULL
+     AND booking."isCancelled" IS NOT TRUE
     )
 
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses physiques"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
     WHERE "user"."canBookFreeOffers" IS TRUE
-    GROUP BY "user".id 
+    GROUP BY "user".id)
     '''
-    return pandas.read_sql(query, connection, index_col='user_id')
+
+
+def create_experimentation_sessions_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW experimentation_sessions AS {_get_experimentation_sessions_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_activation_dates_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW activation_dates AS {_get_activation_dates_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_first_connection_dates_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW first_connection_dates AS {_get_first_connection_dates_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_date_of_first_bookings_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW date_of_first_bookings AS {_get_date_of_first_bookings_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_date_of_second_bookings_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW date_of_second_bookings AS {_get_date_of_second_bookings_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_date_of_bookings_on_third_product_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW date_of_bookings_on_third_product AS {_get_date_of_bookings_on_third_product_type_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_last_recommendation_dates_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW last_recommendation_dates AS {_get_last_recommendation_dates_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_number_of_bookings_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW number_of_bookings AS {_get_number_of_bookings_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_number_of_non_cancelled_bookings_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW number_of_non_cancelled_bookings AS {_get_number_of_non_cancelled_bookings_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_users_seniority_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW users_seniority AS {_get_users_seniority_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_actual_amount_spent_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW actual_amount_spent AS {_get_actual_amount_spent_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_theoric_amount_spent_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW theoric_amount_spent AS {_get_theoric_amount_spent_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_theoric_amount_spent_in_digital_goods_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW theoric_amount_spent_in_digital_goods AS {_get_theoric_amount_spent_in_digital_goods_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
+def create_theoric_amount_spent_in_physical_goods_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW theoric_amount_spent_in_physical_goods AS {_get_theoric_amount_spent_in_physical_goods_query()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
