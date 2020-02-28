@@ -1,9 +1,11 @@
 import os
+from pprint import pprint
 
 from flask import Flask, request
 
 from db import DATABASE_URL, db
 from create_enriched_data_views import create_enriched_data_views
+from repository.health_check_repository import is_enriched_offerer_data_exists
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET', '+%+3Q23!zbc+!Dd@')
@@ -18,6 +20,14 @@ db.init_app(app)
 @app.route('/')
 def ping():
     return '', 200
+
+
+@app.route('/health')
+def health_check():
+    pprint('HEALTH')
+    is_enriched_offerer_data_exists()
+    return '', 200
+
 
 @app.route('/', methods=['POST'])
 def write_enriched_data():
