@@ -8,7 +8,7 @@ services:
       - .:/opt/pass-culture-metabase
     command: >
       bash -c "pip install -r /opt/pass-culture-metabase/requirements.txt;
-               python /opt/pass-culture-metabase/run_server.py;
+               python /opt/pass-culture-metabase/app.py;
                "
     ports:
       - 5000:5000
