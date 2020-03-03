@@ -37,7 +37,7 @@ services:
       - postgres-product
 
   postgres-product:
-    image: postgres:10.10-alpine
+    image: circleci/postgres:11.6-postgis
     container_name: pcm-postgres-product
     env_file:
       - env_file
