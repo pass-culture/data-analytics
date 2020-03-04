@@ -114,6 +114,17 @@ class IsEnrichedOffererSourceContainsDataTest:
         assert result is True
 
 
+    def test_should_return_false_when_table_exists_and_contains_no_offerer(self, app):
+        # Given
+        create_enriched_offerer_data(CONNECTION)
+
+        # When
+        result = is_enriched_offerer_contains_data()
+
+        # Then
+        assert result is False
+
+
 class IsEnrichedUserSourceContainsDataTest:
     @pytest.fixture(autouse=True)
     def setup_class(self, app):
@@ -136,6 +147,16 @@ class IsEnrichedUserSourceContainsDataTest:
 
         # Then
         assert result is True
+
+    def test_should_return_false_when_table_exists_and_contains_no_least_a_user(self, app):
+        # Given
+        create_enriched_user_data(CONNECTION)
+
+        # When
+        result = is_enriched_users_contains_data()
+
+        # Then
+        assert result is False
 
 
 class IsEnrichedStocksSourceContainsDataTest:
@@ -166,3 +187,14 @@ class IsEnrichedStocksSourceContainsDataTest:
 
         # Then
         assert result is True
+
+    def test_should_return_false_when_table_exists_and_contains_no_data(self, app):
+        # Given
+        with app.app_context():
+            create_enriched_stock_view()
+
+        # When
+        result = is_enriched_stocks_contains_data()
+
+        # Then
+        assert result is False

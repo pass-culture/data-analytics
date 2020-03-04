@@ -11,7 +11,7 @@ def is_enriched_offerer_data_exists():
 def is_enriched_offerer_contains_data():
 
     if is_enriched_offerer_data_exists():
-        query = 'SELECT COUNT(*) FROM enriched_offerer_data'
+        query = 'SELECT * FROM enriched_offerer_data'
         results = db.session.execute(query)
         return results.rowcount > 0
 
@@ -28,7 +28,7 @@ def is_enriched_user_data_exists():
 def is_enriched_users_contains_data():
 
     if is_enriched_user_data_exists():
-        query = 'SELECT COUNT(*) FROM enriched_user_data'
+        query = 'SELECT * FROM enriched_user_data'
         results = db.session.execute(query)
         return results.rowcount > 0
 
