@@ -40,3 +40,9 @@ Après avoir lancé les conteneurs, taper :
 
 ## Exécution des tests
 `pytest`
+
+# Accès à la base
+docker exec -it pcm-postgres-product psql -U pass_culture
+
+# Exécution de code python dans le container
+ docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase && PYTHONPATH=. python"
