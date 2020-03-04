@@ -67,4 +67,3 @@ def create_enriched_user_view() -> None:
         WHERE "user"."canBookFreeOffers");
         '''
     db.session.execute(query)
-    db.session.commit()
