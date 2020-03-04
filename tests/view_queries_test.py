@@ -11,13 +11,7 @@ from stock_queries import create_stocks_booking_view
 from tests.utils import clean_database, create_user, create_product, create_offerer, create_venue, create_offer, \
     create_stock, create_booking, create_payment, create_payment_status, create_recommendation, create_deposit, \
     update_table_column
-from user_queries import create_experimentation_sessions_view, create_activation_dates_view, \
-    create_first_connection_dates_view, create_date_of_first_bookings_view, create_date_of_second_bookings_view, \
-    create_date_of_bookings_on_third_product_view, create_last_recommendation_dates_view, \
-    create_number_of_bookings_view, create_number_of_non_cancelled_bookings_view, create_users_seniority_view, \
-    create_actual_amount_spent_view, create_theoric_amount_spent_view, \
-    create_theoric_amount_spent_in_digital_goods_view, create_theoric_amount_spent_in_physical_goods_view
-from view_queries import create_enriched_stock_view, create_enriched_user_view
+from view_queries import create_enriched_stock_view
 
 
 class ViewQueriesTest:
