@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from db import db
 
 
@@ -14,7 +12,6 @@ def is_enriched_user_data_exists():
     query = '''select * from information_schema.tables WHERE table_name = 'enriched_user_data';'''
     results = db.session.execute(query).fetchall()
 
-    pprint(len(results))
     return len(results) == 1
 
 

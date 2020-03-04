@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 
 from flask import Flask, request
 
@@ -24,7 +23,6 @@ def ping():
 
 @app.route('/health')
 def health_check():
-    pprint('HEALTH')
     is_enriched_offerer_data_exists()
     return '', 200
 
