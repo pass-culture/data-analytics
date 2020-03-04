@@ -6,10 +6,17 @@ from freezegun import freeze_time
 
 from db import CONNECTION
 from db import db
+from query_enriched_data_tables import create_enriched_user_data
 from stock_queries import create_stocks_booking_view
 from tests.utils import clean_database, create_user, create_product, create_offerer, create_venue, create_offer, \
     create_stock, create_booking, create_payment, create_payment_status, create_recommendation, create_deposit, \
     update_table_column
+from user_queries import create_experimentation_sessions_view, create_activation_dates_view, \
+    create_first_connection_dates_view, create_date_of_first_bookings_view, create_date_of_second_bookings_view, \
+    create_date_of_bookings_on_third_product_view, create_last_recommendation_dates_view, \
+    create_number_of_bookings_view, create_number_of_non_cancelled_bookings_view, create_users_seniority_view, \
+    create_actual_amount_spent_view, create_theoric_amount_spent_view, \
+    create_theoric_amount_spent_in_digital_goods_view, create_theoric_amount_spent_in_physical_goods_view
 from view_queries import create_enriched_stock_view, create_enriched_user_view
 
 
@@ -79,7 +86,7 @@ class ViewQueriesTest:
 
             # When
             with app.app_context():
-                create_enriched_user_view()
+                create_enriched_user_data()
 
             # Then
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
@@ -135,6 +142,7 @@ class ViewQueriesTest:
                        "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
                        "Dépenses physiques"]
 
+
             expected_beneficiary_users_details = pandas.DataFrame(
                 index=pandas.RangeIndex(start=0, stop=2, step=1),
                 data=[
@@ -151,7 +159,7 @@ class ViewQueriesTest:
 
             # When
             with app.app_context():
-                create_enriched_user_view()
+                create_enriched_user_data()
 
             # Then
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
