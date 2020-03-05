@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 import pandas
 import pytest
 from freezegun import freeze_time
@@ -114,14 +112,14 @@ class UserQueriesTest:
             create_product(app, id=1, product_type='ThingType.ACTIVATION')
             create_offer(app, venue_id=1, product_id=1, id=1, product_type='ThingType.ACTIVATION')
             create_stock(app, offer_id=1)
-            create_booking(app, user_id=1, stock_id=1, is_used=True)
+            create_booking(app, user_id=1, stock_id=1, is_used=True,  date_used='2020-01-22')
 
             # When
             query = _get_users_seniority_query()
 
             # Then
             user_seniority = pandas.read_sql(query, CONNECTION, index_col='user_id')
-            pandas.testing.assert_series_equal(user_seniority, pandas.Series([0], name="Ancienneté en jours",
+            pandas.testing.assert_frame_equal(user_seniority, pandas.DataFrame([0.], columns=["Ancienneté en jours"],
                                                                              index=Int64Index([1], name="user_id")))
 
         def test_if_activation_dates_is_empty_return_empty_series(self, app):

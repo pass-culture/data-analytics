@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import pandas
 from db import db
 
@@ -239,7 +240,7 @@ def _get_number_of_non_cancelled_bookings_query() -> str:
 
 
 def _get_users_seniority_query() -> str:
-    return '''
+    return f'''
     (WITH validated_activation_booking AS 
     ( SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
      FROM booking
@@ -264,7 +265,7 @@ def _get_users_seniority_query() -> str:
     WHERE "user"."canBookFreeOffers")
     
     SELECT 
-     DATE_PART('day', CURRENT_DATE - activation_date."Date d'activation") AS "Ancienneté en jours",
+     DATE_PART('day', '{datetime.now()}' - activation_date."Date d'activation") AS "Ancienneté en jours",
      "user".id as user_id
     FROM "user"
     LEFT JOIN activation_date ON "user".id = activation_date.user_id
