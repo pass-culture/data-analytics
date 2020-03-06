@@ -36,11 +36,6 @@ def create_enriched_user_data():
     create_theoric_amount_spent_in_physical_goods_view()
     create_enriched_user_view()
 
-# TODO delete this function
-def temp_func():
-    from app import app
-    with app.app_context():
-        create_enriched_user_data()
 
 def create_enriched_stock_data():
     create_stocks_booking_view()
