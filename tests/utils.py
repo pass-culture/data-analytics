@@ -191,4 +191,25 @@ def clean_database(app):
         db.session.commit()
 
 
-
+def clean_views(app):
+    with app.app_context():
+        db.session.execute('DROP VIEW IF EXISTS enriched_stock_data;')
+        db.session.execute('DROP VIEW IF EXISTS activation_dates CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS actual_amount_spent CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS date_of_bookings_on_third_product CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS date_of_first_bookings CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS date_of_second_bookings CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS enriched_stock_data CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS enriched_user_data CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS experimentation_sessions CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS first_connection_dates CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS last_recommendation_dates CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS number_of_bookings CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS number_of_non_cancelled_bookings CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS stock_booking_information CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_digital_goods CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS users_seniority CASCADE;')
+        db.session.execute('DROP VIEW IF EXISTS enriched_user_data;')
+        db.session.commit()

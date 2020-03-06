@@ -33,10 +33,10 @@ def create_enriched_user_view() -> None:
         CREATE OR REPLACE VIEW enriched_user_data AS
         (SELECT
          "user".id AS user_id,
-         "user"."departementCode" AS "Département",
-         "user"."culturalSurveyFilledDate" AS "Date de remplissage du typeform",
          experimentation_sessions."Vague d'expérimentation",
+         "user"."departementCode" AS "Département",
          activation_dates."Date d'activation",
+         "user"."culturalSurveyFilledDate" AS "Date de remplissage du typeform",
          first_connection_dates."Date de première connexion",
          date_of_first_bookings."Date de première réservation",
          date_of_second_bookings."Date de deuxième réservation",
@@ -67,3 +67,4 @@ def create_enriched_user_view() -> None:
         WHERE "user"."canBookFreeOffers");
         '''
     db.session.execute(query)
+    db.session.commit()

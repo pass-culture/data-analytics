@@ -1,6 +1,5 @@
 from sqlalchemy.engine import Connection
 
-from db import db
 from offerer_queries import get_offerers_details
 from stock_queries import create_stocks_booking_view
 from user_queries import create_experimentation_sessions_view, \
@@ -36,8 +35,12 @@ def create_enriched_user_data():
     create_theoric_amount_spent_in_digital_goods_view()
     create_theoric_amount_spent_in_physical_goods_view()
     create_enriched_user_view()
-    db.session.commit()
 
+# TODO delete this function
+def temp_func():
+    from app import app
+    with app.app_context():
+        create_enriched_user_data()
 
 def create_enriched_stock_data():
     create_stocks_booking_view()
