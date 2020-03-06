@@ -3,7 +3,7 @@ import os
 from flask import Flask, request
 
 from db import DATABASE_URL, db
-from create_enriched_data_tables import create_enriched_data_tables
+from create_enriched_data_views import create_enriched_data_views
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET', '+%+3Q23!zbc+!Dd@')
@@ -24,7 +24,7 @@ def write_enriched_data():
     token = request.args.get('token')
     bastion_token = os.environ.get('BASTION_TOKEN')
     if token == bastion_token:
-        create_enriched_data_tables()
+        create_enriched_data_views()
         return '', 200
     return '', 401
 

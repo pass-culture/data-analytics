@@ -186,10 +186,8 @@ def clean_database(app):
         DELETE FROM "mediation";
         DELETE FROM "offerer";
         DELETE FROM "user";
-        DROP TABLE IF EXISTS enriched_offerer_data;
         ''')
         db.session.commit()
-
 
 def clean_views(app):
     with app.app_context():
@@ -212,4 +210,9 @@ def clean_views(app):
         db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;')
         db.session.execute('DROP VIEW IF EXISTS users_seniority CASCADE;')
         db.session.execute('DROP VIEW IF EXISTS enriched_user_data;')
+        db.session.execute('DROP VIEW IF EXISTS first_stock_creation_dates;')
+        db.session.execute('DROP VIEW IF EXISTS first_booking_creation_date;')
+        db.session.execute('DROP VIEW IF EXISTS number_of_offers;')
+        db.session.execute('DROP VIEW IF EXISTS number_of_bookings_not_cancelled;')
+        db.session.execute('DROP VIEW IF EXISTS enriched_offerer_data;')
         db.session.commit()

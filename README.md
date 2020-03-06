@@ -24,10 +24,10 @@ Pour configurer Metabase, il suffit de créer un compte admin, puis de se connec
 - Database username : pass_culture
 - Database password : passq
 
-## Créer les tables de données enrichies
+## Créer les vues de données enrichies
 Après avoir lancé les conteneurs, taper :
 
-`docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase; python create_enriched_data_tables.py"`
+`docker exec -it pcm-enriched-data bash -c "cd /opt/pass-culture-metabase; python create_enriched_data_views.py"`
 
 ## Configurer son IDE
 - Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `pip install virtualenv`
