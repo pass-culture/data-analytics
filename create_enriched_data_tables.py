@@ -11,7 +11,8 @@ def create_enriched_data_tables():
 
     create_enriched_offerer_data(CONNECTION)
     logger.info('[ENRICHED DATA] Created enriched offerer data')
-    create_enriched_user_data(CONNECTION)
+    with app.app_context():
+        create_enriched_user_data()
     logger.info('[ENRICHED DATA] Created enriched beneficiary user data')
     with app.app_context():
         create_enriched_stock_data()

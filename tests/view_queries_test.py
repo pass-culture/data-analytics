@@ -5,20 +5,22 @@ import pytest
 
 from db import CONNECTION
 from db import db
+from query_enriched_data_tables import create_enriched_user_data
 from stock_queries import create_stocks_booking_view
 from tests.utils import clean_database, create_user, create_product, create_offerer, create_venue, create_offer, \
-    create_stock, create_booking, create_payment, create_payment_status
+    create_stock, create_booking, create_payment, create_payment_status, clean_views
 from view_queries import create_enriched_stock_view
 
 
 class ViewQueriesTest:
+
     @pytest.fixture(autouse=True)
     def setup_class(self, app):
         clean_database(app)
 
     @pytest.fixture(scope='session')
     def drop_view(self, app):
-        db.session.execute('DROP VIEW enriched_stock_data;')
+        clean_views(app)
         db.session.commit()
 
     class CreateEnrichedStockViewTest:
@@ -57,7 +59,6 @@ class ViewQueriesTest:
                       "Nombre total de réservations": [2, 0],
                       "Nombre de réservations annulées": [0, 0],
                       "Nombre de réservations ayant un paiement": [2, 0]
-
                       }
             )
 
@@ -68,3 +69,24 @@ class ViewQueriesTest:
             # Then
             stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
+
+    class CreateEnrichedUserViewTest:
+        def test_should_create_enriched_user_data_view_with_columns(self, app):
+            # When
+            with app.app_context():
+                create_enriched_user_data()
+
+            # Then
+            expected_columns = ["Vague d'expérimentation", "Département", "Date d'activation",
+                       "Date de remplissage du typeform",
+                       "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
+                       "Date de première réservation dans 3 catégories différentes",
+                       "Date de dernière recommandation",
+                       "Nombre de réservations totales", "Nombre de réservations non annulées",
+                       "Ancienneté en jours",
+                       "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
+                       "Dépenses physiques"]
+
+            beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
+            for expected_column_in_view in expected_columns:
+                assert expected_column_in_view in beneficiary_users_details.columns
