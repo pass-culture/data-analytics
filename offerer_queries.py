@@ -1,30 +1,8 @@
-import pandas
-from sqlalchemy.engine import Connection
+from db import db
 
 
-def get_offerers_details(connection: Connection) -> pandas.DataFrame:
-    return pandas.concat(
-        [get_creation_dates(connection),
-         get_first_stock_creation_dates(connection),
-         get_first_booking_creation_dates(connection),
-         get_number_of_offers(connection),
-         get_number_of_bookings_not_cancelled(connection)],
-        axis=1
-    )
-
-
-def get_creation_dates(connection: Connection) -> pandas.DataFrame:
-    query = '''
-    SELECT
-     id AS offerer_id,
-     "dateCreated" AS "Date de création"
-    FROM offerer
-    '''
-    return pandas.read_sql(query, connection, index_col="offerer_id")
-
-
-def get_first_stock_creation_dates(connection: Connection) -> pandas.DataFrame:
-    query = '''
+def _get_first_stock_creation_dates_query() -> str:
+    return '''
     SELECT 
      offerer.id AS offerer_id, 
      MIN(stock."dateCreated") AS "Date de création du premier stock"
@@ -35,11 +13,8 @@ def get_first_stock_creation_dates(connection: Connection) -> pandas.DataFrame:
     GROUP BY offerer_id
     '''
 
-    return pandas.read_sql(query, connection, index_col='offerer_id')
-
-
-def get_first_booking_creation_dates(connection: Connection) -> pandas.DataFrame:
-    query = '''
+def _get_first_booking_creation_dates_query() -> str:
+    return '''
     SELECT 
      offerer.id AS offerer_id, 
      MIN(booking."dateCreated") AS "Date de première réservation"
@@ -51,11 +26,8 @@ def get_first_booking_creation_dates(connection: Connection) -> pandas.DataFrame
     GROUP BY offerer_id
     '''
 
-    return pandas.read_sql(query, connection, index_col='offerer_id')
-
-
-def get_number_of_offers(connection: Connection) -> pandas.DataFrame:
-    query = '''
+def _get_number_of_offers_query() -> str:
+    return '''
     SELECT 
      offerer.id AS offerer_id, 
      COUNT(offer.id) AS "Nombre d’offres"
@@ -65,11 +37,8 @@ def get_number_of_offers(connection: Connection) -> pandas.DataFrame:
     GROUP BY offerer_id
     '''
 
-    return pandas.read_sql(query, connection, index_col='offerer_id')
-
-
-def get_number_of_bookings_not_cancelled(connection: Connection) -> pandas.DataFrame:
-    query = '''
+def _get_number_of_bookings_not_cancelled_query() -> str:
+    return '''
     SELECT 
      offerer.id AS offerer_id, 
      COUNT(booking.id) AS "Nombre de réservations non annulées"
@@ -81,4 +50,34 @@ def get_number_of_bookings_not_cancelled(connection: Connection) -> pandas.DataF
     GROUP BY offerer_id
     '''
 
-    return pandas.read_sql(query, connection, index_col='offerer_id')
+def create_first_stock_creation_dates_view() -> None:
+    query = f'''
+        CREATE OR REPLACE VIEW related_stocks AS
+        {_get_first_stock_creation_dates_query()}
+        '''
+    db.session.execute(query)
+    db.session.commit()
+
+def create_first_booking_creation_dates_view() -> None:
+    query = f'''
+        CREATE OR REPLACE VIEW related_bookings AS
+        {_get_first_booking_creation_dates_query()}
+        '''
+    db.session.execute(query)
+    db.session.commit()
+
+def create_number_of_offers_view() -> None:
+    query = f'''
+        CREATE OR REPLACE VIEW related_offers AS
+        {_get_number_of_offers_query()}
+        '''
+    db.session.execute(query)
+    db.session.commit()
+
+def create_number_of_bookings_not_cancelled_view() -> None:
+    query = f'''
+        CREATE OR REPLACE VIEW related_non_cancelled_bookings AS
+        {_get_number_of_bookings_not_cancelled_query()}
+        '''
+    db.session.execute(query)
+    db.session.commit()

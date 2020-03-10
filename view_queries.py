@@ -68,3 +68,23 @@ def create_enriched_user_view() -> None:
         '''
     db.session.execute(query)
     db.session.commit()
+
+
+def create_enriched_offerer_view() -> str:
+    query = '''
+    CREATE OR REPLACE VIEW enriched_offerer_data AS
+    (SELECT
+     offerer.id AS offerer_id,
+     offerer."dateCreated" AS "Date de création",
+     related_stocks."Date de création du premier stock",
+     related_bookings."Date de première réservation",
+     related_offers."Nombre d’offres",
+     related_non_cancelled_bookings."Nombre de réservations non annulées"
+    FROM offerer
+    LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
+    LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
+    LEFT JOIN related_offers ON related_offers.offerer_id = offerer.id
+    LEFT JOIN related_non_cancelled_bookings ON related_non_cancelled_bookings.offerer_id = offerer.id);
+    '''
+    db.session.execute(query)
+    db.session.commit()

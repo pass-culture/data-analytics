@@ -5,7 +5,7 @@ import pytest
 
 from db import CONNECTION
 from db import db
-from query_enriched_data_tables import create_enriched_user_data
+from query_enriched_data_views import create_enriched_user_data, create_enriched_offerer_data
 from stock_queries import create_stocks_booking_view
 from tests.utils import clean_database, create_user, create_product, create_offerer, create_venue, create_offer, \
     create_stock, create_booking, create_payment, create_payment_status, clean_views
@@ -70,6 +70,7 @@ class ViewQueriesTest:
             stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
 
+
     class CreateEnrichedUserViewTest:
         def test_should_create_enriched_user_data_view_with_columns(self, app):
             # When
@@ -82,11 +83,25 @@ class ViewQueriesTest:
                        "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
                        "Date de première réservation dans 3 catégories différentes",
                        "Date de dernière recommandation",
-                       "Nombre de réservations totales", "Nombre de réservations non annulées",
-                       "Ancienneté en jours",
+                       "Nombre de réservations totales", "Nombre de réservations non annulées", "Ancienneté en jours",
                        "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
                        "Dépenses physiques"]
 
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
             for expected_column_in_view in expected_columns:
                 assert expected_column_in_view in beneficiary_users_details.columns
+
+
+    class CreateEnrichedOffererViewTest:
+        def test_should_create_enriched_offerer_data_view_with_columns(self, app):
+            # When
+            with app.app_context():
+                create_enriched_offerer_data()
+
+            # Then
+            expected_columns = ["Date de création", "Date de création du premier stock",
+                                "Date de première réservation", "Nombre d’offres", "Nombre de réservations non annulées"]
+
+            offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
+            for expected_column_in_view in expected_columns:
+                assert expected_column_in_view in offerers_details.columns
