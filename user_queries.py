@@ -275,7 +275,8 @@ def _get_users_seniority_query() -> str:
 def _get_actual_amount_spent_query() -> str:
     return '''
     (SELECT 
-     "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
+     "user".id AS user_id, 
+     COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isUsed" IS TRUE AND booking."isCancelled" IS FALSE
     WHERE "user"."canBookFreeOffers"
@@ -286,7 +287,8 @@ def _get_actual_amount_spent_query() -> str:
 def _get_theoric_amount_spent_query() -> str:
     return '''
     (SELECT 
-     "user".id AS user_id, COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
+     "user".id AS user_id, 
+     COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
     WHERE "user"."canBookFreeOffers"
@@ -297,16 +299,19 @@ def _get_theoric_amount_spent_query() -> str:
 def _get_theoric_amount_spent_in_digital_goods_query() -> str:
     return '''
     (WITH eligible_booking AS (
-     SELECT * FROM booking
+     SELECT booking."userId", booking.amount, booking.quantity
+     FROM booking
      LEFT JOIN stock ON booking."stockId" = stock.id
      LEFT JOIN offer ON stock."offerId" = offer.id
      WHERE offer.type IN ('ThingType.AUDIOVISUEL', 'ThingType.JEUX_VIDEO', 'ThingType.JEUX_VIDEO_ABO', 
      'ThingType.LIVRE_AUDIO', 'ThingType.LIVRE_EDITION', 'ThingType.MUSIQUE', 'ThingType.PRESSE_ABO')
      AND offer.url IS NOT NULL
-     AND booking."isCancelled" IS NOT TRUE
+     AND booking."isCancelled" IS FALSE
      )
 
-    SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses numériques"
+    SELECT 
+    "user".id AS user_id, 
+    COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses numériques"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
     WHERE "user"."canBookFreeOffers" IS TRUE
@@ -317,12 +322,13 @@ def _get_theoric_amount_spent_in_digital_goods_query() -> str:
 def _get_theoric_amount_spent_in_physical_goods_query() -> str:
     return '''
     (WITH eligible_booking AS (
-     SELECT * FROM booking
+     SELECT booking."userId", booking.amount, booking.quantity
+     FROM booking
      LEFT JOIN stock ON booking."stockId" = stock.id
      LEFT JOIN offer ON stock."offerId" = offer.id
      WHERE offer.type IN ('ThingType.INSTRUMENT','ThingType.JEUX','ThingType.LIVRE_EDITION','ThingType.MUSIQUE','ThingType.OEUVRE_ART','ThingType.AUDIOVISUEL')
      AND offer.url IS NULL
-     AND booking."isCancelled" IS NOT TRUE
+     AND booking."isCancelled" IS FALSE
     )
 
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses physiques"
