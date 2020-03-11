@@ -1,7 +1,6 @@
 import pytest
 
 from db import CONNECTION, db
-from query_enriched_data_tables import create_enriched_offerer_data, create_enriched_user_data
 from repository.health_check_repository import does_enriched_stock_data_exists, does_enriched_offerer_data_exists, \
     does_enriched_user_data_exists, does_enriched_offerer_contains_data, does_enriched_users_contains_data, \
     does_enriched_stocks_contains_data
