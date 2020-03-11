@@ -2,11 +2,11 @@ import pytest
 
 from db import CONNECTION, db
 from query_enriched_data_tables import create_enriched_offerer_data, create_enriched_user_data
-from repository.health_check_repository import is_enriched_stock_data_exists, is_enriched_offerer_data_exists, \
-    is_enriched_user_data_exists, is_enriched_offerer_contains_data, is_enriched_users_contains_data, \
-    is_enriched_stocks_contains_data
+from repository.health_check_repository import does_enriched_stock_data_exists, does_enriched_offerer_data_exists, \
+    does_enriched_user_data_exists, does_enriched_offerer_contains_data, does_enriched_users_contains_data, \
+    does_enriched_stocks_contains_data
 from tests.utils import clean_database, create_offerer, create_user, create_venue, create_product, create_offer, \
-    create_stock
+    create_stock, clean_views
 from view_queries import create_enriched_stock_view
 
 
@@ -14,10 +14,11 @@ class IsEnrichedOffererDataExistsTest:
     @pytest.fixture(autouse=True)
     def setup_class(self, app):
         clean_database(app)
+        clean_views(app)
 
     def test_should_return_false_when_no_table_exists(self, app):
         # When
-        result = is_enriched_offerer_data_exists()
+        result = does_enriched_offerer_data_exists()
 
         # Then
         assert result is False
@@ -28,7 +29,7 @@ class IsEnrichedOffererDataExistsTest:
         create_enriched_offerer_data(CONNECTION)
 
         # When
-        result = is_enriched_offerer_data_exists()
+        result = does_enriched_offerer_data_exists()
 
         # Then
         assert result is True
@@ -41,7 +42,7 @@ class IsEnrichedUserDataExistsTest:
 
     def test_should_return_false_when_no_table_exists(self, app):
         # When
-        result = is_enriched_user_data_exists()
+        result = does_enriched_user_data_exists()
 
         # Then
         assert result is False
@@ -49,10 +50,10 @@ class IsEnrichedUserDataExistsTest:
 
     def test_should_return_true_when_table_exists(self, app):
         # Given
-        create_enriched_user_data(CONNECTION)
+        create_enriched_user_data()
 
         # When
-        result = is_enriched_user_data_exists()
+        result = does_enriched_user_data_exists()
 
         # Then
         assert result is True
@@ -70,7 +71,7 @@ class IsEnrichedStockDataExistsTest:
 
     def test_should_return_false_when_no_table_exists(self, app):
         # When
-        result = is_enriched_stock_data_exists()
+        result = does_enriched_stock_data_exists()
 
         # Then
         assert result is False
@@ -82,7 +83,7 @@ class IsEnrichedStockDataExistsTest:
             create_enriched_stock_view()
 
         # When
-        result = is_enriched_stock_data_exists()
+        result = does_enriched_stock_data_exists()
 
         # Then
         assert result is True
@@ -95,7 +96,7 @@ class IsEnrichedOffererSourceContainsDataTest:
 
     def test_should_return_false_when_contains_no_data(self, app):
         # When
-        result = is_enriched_offerer_contains_data()
+        result = does_enriched_offerer_contains_data()
 
         # Then
         assert result is False
@@ -106,7 +107,7 @@ class IsEnrichedOffererSourceContainsDataTest:
         create_enriched_offerer_data(CONNECTION)
 
         # When
-        result = is_enriched_offerer_contains_data()
+        result = does_enriched_offerer_contains_data()
 
         # Then
         assert result is True
@@ -117,7 +118,7 @@ class IsEnrichedOffererSourceContainsDataTest:
         create_enriched_offerer_data(CONNECTION)
 
         # When
-        result = is_enriched_offerer_contains_data()
+        result = does_enriched_offerer_contains_data()
 
         # Then
         assert result is False
@@ -130,7 +131,7 @@ class IsEnrichedUserSourceContainsDataTest:
 
     def test_should_return_false_when_contains_no_data(self, app):
         # When
-        result = is_enriched_users_contains_data()
+        result = does_enriched_users_contains_data()
 
         # Then
         assert result is False
@@ -138,20 +139,20 @@ class IsEnrichedUserSourceContainsDataTest:
     def test_should_return_true_when_table_exists_and_contains_at_least_a_user(self, app):
         # Given
         create_user(app, id=1)
-        create_enriched_user_data(CONNECTION)
+        create_enriched_user_data()
 
         # When
-        result = is_enriched_users_contains_data()
+        result = does_enriched_users_contains_data()
 
         # Then
         assert result is True
 
     def test_should_return_false_when_table_exists_and_contains_no_least_a_user(self, app):
         # Given
-        create_enriched_user_data(CONNECTION)
+        create_enriched_user_data()
 
         # When
-        result = is_enriched_users_contains_data()
+        result = does_enriched_users_contains_data()
 
         # Then
         assert result is False
@@ -165,7 +166,7 @@ class IsEnrichedStocksSourceContainsDataTest:
 
     def test_should_return_false_when_contains_no_data(self, app):
         # When
-        result = is_enriched_stocks_contains_data()
+        result = does_enriched_stocks_contains_data()
 
         # Then
         assert result is False
@@ -181,7 +182,7 @@ class IsEnrichedStocksSourceContainsDataTest:
             create_enriched_stock_view()
 
         # When
-        result = is_enriched_stocks_contains_data()
+        result = does_enriched_stocks_contains_data()
 
         # Then
         assert result is True
@@ -192,7 +193,7 @@ class IsEnrichedStocksSourceContainsDataTest:
             create_enriched_stock_view()
 
         # When
-        result = is_enriched_stocks_contains_data()
+        result = does_enriched_stocks_contains_data()
 
         # Then
         assert result is False

@@ -5,9 +5,9 @@ from flask import Flask, request, jsonify
 from application.get_enriched_data_status import get_enriched_data_status
 from db import DATABASE_URL, db
 from create_enriched_data_views import create_enriched_data_views
-from repository.health_check_repository import is_enriched_offerer_data_exists, is_enriched_user_data_exists, \
-    is_enriched_offerer_contains_data, is_enriched_users_contains_data, is_enriched_stocks_contains_data, \
-    is_enriched_stock_data_exists
+from repository.health_check_repository import does_enriched_offerer_data_exists, does_enriched_user_data_exists, \
+    does_enriched_offerer_contains_data, does_enriched_users_contains_data, does_enriched_stocks_contains_data, \
+    does_enriched_stock_data_exists
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET', '+%+3Q23!zbc+!Dd@')
@@ -26,12 +26,12 @@ def ping():
 @app.route('/health')
 def health_check():
     table_status = get_enriched_data_status(
-        is_enriched_offerer_data_exists=is_enriched_offerer_data_exists,
-        is_enriched_offerer_contains_data=is_enriched_offerer_contains_data,
-        is_enriched_stock_data_exists=is_enriched_stock_data_exists,
-        is_enriched_stocks_contains_data=is_enriched_stocks_contains_data,
-        is_enriched_user_data_exists=is_enriched_user_data_exists,
-        is_enriched_users_contains_data=is_enriched_users_contains_data,
+        is_enriched_offerer_data_exists=does_enriched_offerer_data_exists,
+        is_enriched_offerer_contains_data=does_enriched_offerer_contains_data,
+        is_enriched_stock_data_exists=does_enriched_stock_data_exists,
+        is_enriched_stocks_contains_data=does_enriched_stocks_contains_data,
+        is_enriched_user_data_exists=does_enriched_user_data_exists,
+        is_enriched_users_contains_data=does_enriched_users_contains_data,
     )
 
     return jsonify(table_status), 200
