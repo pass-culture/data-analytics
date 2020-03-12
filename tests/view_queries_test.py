@@ -1,27 +1,24 @@
 from datetime import datetime
+from functools import wraps
+from pprint import pprint
 
 import pandas
 import pytest
 
-from db import CONNECTION
-from db import db
+from db import CONNECTION, db
 from query_enriched_data_views import create_enriched_user_data, create_enriched_offerer_data
 from stock_queries import create_stocks_booking_view
-from tests.utils import clean_database, create_user, create_product, create_offerer, create_venue, create_offer, \
-    create_stock, create_booking, create_payment, create_payment_status, clean_views
+from tests.utils import create_user, create_product, create_offerer, create_venue, create_offer, \
+    create_stock, create_booking, create_payment, create_payment_status, clean_views, clean_database
 from view_queries import create_enriched_stock_view
 
 
 class ViewQueriesTest:
-
     @pytest.fixture(autouse=True)
-    def setup_class(self, app):
+    def setup_method(self, app):
+        yield
         clean_database(app)
-
-    @pytest.fixture(scope='session')
-    def drop_view(self, app):
-        clean_views(app)
-        db.session.commit()
+        clean_views()
 
     class CreateEnrichedStockViewTest:
         def test_should_return_all_values(self, app):
@@ -70,7 +67,6 @@ class ViewQueriesTest:
             stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
 
-
     class CreateEnrichedUserViewTest:
         def test_should_create_enriched_user_data_view_with_columns(self, app):
             # When
@@ -79,18 +75,19 @@ class ViewQueriesTest:
 
             # Then
             expected_columns = ["Vague d'expérimentation", "Département", "Date d'activation",
-                       "Date de remplissage du typeform",
-                       "Date de première connexion", "Date de première réservation", "Date de deuxième réservation",
-                       "Date de première réservation dans 3 catégories différentes",
-                       "Date de dernière recommandation",
-                       "Nombre de réservations totales", "Nombre de réservations non annulées", "Ancienneté en jours",
-                       "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
-                       "Dépenses physiques"]
+                                "Date de remplissage du typeform",
+                                "Date de première connexion", "Date de première réservation",
+                                "Date de deuxième réservation",
+                                "Date de première réservation dans 3 catégories différentes",
+                                "Date de dernière recommandation",
+                                "Nombre de réservations totales", "Nombre de réservations non annulées",
+                                "Ancienneté en jours",
+                                "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
+                                "Dépenses physiques"]
 
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
             for expected_column_in_view in expected_columns:
                 assert expected_column_in_view in beneficiary_users_details.columns
-
 
     class CreateEnrichedOffererViewTest:
         def test_should_create_enriched_offerer_data_view_with_columns(self, app):
@@ -100,7 +97,8 @@ class ViewQueriesTest:
 
             # Then
             expected_columns = ["Date de création", "Date de création du premier stock",
-                                "Date de première réservation", "Nombre d’offres", "Nombre de réservations non annulées"]
+                                "Date de première réservation", "Nombre d’offres",
+                                "Nombre de réservations non annulées"]
 
             offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
             for expected_column_in_view in expected_columns:

@@ -1,4 +1,6 @@
-from db import db
+from pprint import pprint
+
+from db import db, CONNECTION
 
 
 def create_user(app, id=1, email='test@email.com', can_book_free_offers=True, is_admin=False, postal_code='93100',
@@ -189,30 +191,24 @@ def clean_database(app):
         ''')
         db.session.commit()
 
-def clean_views(app):
-    with app.app_context():
-        db.session.execute('DROP VIEW IF EXISTS enriched_stock_data;')
-        db.session.execute('DROP VIEW IF EXISTS activation_dates CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS actual_amount_spent CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS date_of_bookings_on_third_product CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS date_of_first_bookings CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS date_of_second_bookings CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS enriched_stock_data CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS enriched_user_data CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS experimentation_sessions CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS first_connection_dates CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS last_recommendation_dates CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS number_of_bookings CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS number_of_non_cancelled_bookings CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS stock_booking_information CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_digital_goods CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS users_seniority CASCADE;')
-        db.session.execute('DROP VIEW IF EXISTS enriched_user_data;')
-        db.session.execute('DROP VIEW IF EXISTS first_stock_creation_dates;')
-        db.session.execute('DROP VIEW IF EXISTS first_booking_creation_date;')
-        db.session.execute('DROP VIEW IF EXISTS number_of_offers;')
-        db.session.execute('DROP VIEW IF EXISTS number_of_bookings_not_cancelled;')
-        db.session.execute('DROP VIEW IF EXISTS enriched_offerer_data;')
-        db.session.commit()
+def clean_views():
+    CONNECTION.execute('DROP VIEW IF EXISTS stock_booking_information CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS enriched_offerer_data CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS related_stocks CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS related_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS related_offers CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS related_non_cancelled_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS experimentation_sessions CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS activation_dates CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS first_connection_dates CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS date_of_first_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS date_of_second_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS date_of_bookings_on_third_product CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS last_recommendation_dates CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS number_of_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS number_of_non_cancelled_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS users_seniority CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS actual_amount_spent CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_digital_goods CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;')
