@@ -12,14 +12,10 @@ from tests.utils import clean_database, create_offerer, create_user, create_venu
 
 class IsEnrichedOffererDataExistsTest:
     @pytest.fixture(autouse=True)
-    def setup_class(self, app):
+    def setup_method(self, app):
+        yield
         clean_database(app)
         clean_views()
-
-    @pytest.fixture(scope='session')
-    def drop_view(self, app):
-        clean_views()
-        db.session.commit()
 
     def test_should_return_false_when_no_table_exists(self, app):
         # When
@@ -27,7 +23,6 @@ class IsEnrichedOffererDataExistsTest:
 
         # Then
         assert result is False
-
 
     def test_should_return_true_when_table_exists(self, app):
         # Given
