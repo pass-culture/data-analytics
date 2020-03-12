@@ -4,8 +4,8 @@ import pandas
 import pytest
 
 from db import CONNECTION, db
-from offerer_queries import _get_first_stock_creation_dates_query, _get_number_of_offers_query, \
-    _get_number_of_bookings_not_cancelled_query, _get_first_booking_creation_dates_query
+from repository.offerer_queries import _get_first_stock_creation_dates_query, _get_first_booking_creation_dates_query, \
+    _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
     create_booking, create_product, clean_database, clean_views
 

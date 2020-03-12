@@ -1,5 +1,6 @@
 from db import db
-from stock_queries import STOCK_COLUMNS
+from repository.stock_queries import STOCK_COLUMNS
+
 
 def create_all_bookable_offers_view() -> None:
     with_mediation_bool = True
