@@ -18,5 +18,6 @@ def app():
     app.config['TESTING'] = True
 
     db.init_app(app)
+    app.app_context().push()
 
     return app

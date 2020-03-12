@@ -4,13 +4,15 @@ import pytest
 from db import CONNECTION
 from stock_queries import _get_stocks_booking_information_query
 from tests.utils import create_stock, create_offer, create_venue, create_offerer, create_product, create_booking, \
-    create_user, create_payment, create_payment_status, clean_database
+    create_user, create_payment, create_payment_status, clean_database, clean_views
 
 
 class StockQueriesTest:
     @pytest.fixture(autouse=True)
-    def setup_class(self, app):
+    def setup_method(self, app):
+        yield
         clean_database(app)
+        clean_views()
 
     class GetStocksBookingInformationQueryTest:
         def test_should_return_column_with_total_number_of_bookings_cancelled_and_not(self, app):

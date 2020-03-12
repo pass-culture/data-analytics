@@ -5,7 +5,7 @@ from pandas import Int64Index
 
 from db import CONNECTION
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product, clean_database, create_deposit
+    create_booking, create_product, clean_database, create_deposit, clean_views
 from user_queries import _get_experimentation_sessions_query, _get_actual_amount_spent_query, \
     _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
     _get_theoric_amount_spent_in_physical_goods_query, _get_users_seniority_query
@@ -13,8 +13,10 @@ from user_queries import _get_experimentation_sessions_query, _get_actual_amount
 
 class UserQueriesTest:
     @pytest.fixture(autouse=True)
-    def setup_class(self, app):
+    def setup_method(self, app):
+        yield
         clean_database(app)
+        clean_views()
 
     class GetExperimentationSessionsTest:
         def test_should_return_1_when_user_has_used_activation_booking(self, app):

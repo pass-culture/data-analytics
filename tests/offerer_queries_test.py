@@ -12,13 +12,10 @@ from tests.utils import create_user, create_offerer, create_venue, create_offer,
 
 class OffererQueriesTest:
     @pytest.fixture(autouse=True)
-    def setup_class(self, app):
+    def setup_method(self, app):
+        yield
         clean_database(app)
-
-    @pytest.fixture(scope='session')
-    def drop_view(self, app):
-        clean_views(app)
-        db.session.commit()
+        clean_views()
 
     class GetFirstStockCreationDatesQueryTest:
         def test_should_return_the_creation_date_of_the_offer_s_first_stock(self, app):
