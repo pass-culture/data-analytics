@@ -28,9 +28,9 @@ def create_enriched_stock_view() -> None:
     db.session.commit()
 
 
-def create_enriched_user_view() -> None:
+def create_materialized_enriched_user_view() -> None:
     query = '''
-        CREATE OR REPLACE VIEW enriched_user_data AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_user_data AS
         (SELECT
          "user".id AS user_id,
          experimentation_sessions."Vague d'expérimentation",
@@ -70,9 +70,9 @@ def create_enriched_user_view() -> None:
     db.session.commit()
 
 
-def create_enriched_offerer_view() -> str:
+def create_materialized_enriched_offerer_view() -> str:
     query = '''
-    CREATE OR REPLACE VIEW enriched_offerer_data AS
+    CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offerer_data AS
     (SELECT
      offerer.id AS offerer_id,
      offerer."dateCreated" AS "Date de création",

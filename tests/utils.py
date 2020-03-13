@@ -193,11 +193,12 @@ def clean_database(app):
 
 def clean_views():
     CONNECTION.execute('DROP VIEW IF EXISTS stock_booking_information CASCADE;')
-    CONNECTION.execute('DROP VIEW IF EXISTS enriched_offerer_data CASCADE;')
+    CONNECTION.execute('DROP MATERIALIZED VIEW IF EXISTS enriched_offerer_data CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS related_stocks CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS related_bookings CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS related_offers CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS related_non_cancelled_bookings CASCADE;')
+    CONNECTION.execute('DROP MATERIALIZED VIEW IF EXISTS enriched_user_data CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS experimentation_sessions CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS activation_dates CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS first_connection_dates CASCADE;')
