@@ -2,7 +2,7 @@ from db import db
 
 
 def does_enriched_offerer_data_exists():
-    query = '''SELECT * FROM information_schema.tables WHERE table_name = 'enriched_offerer_data';'''
+    query = '''SELECT * FROM pg_matviews WHERE matviewname = 'enriched_offerer_data';'''
     results = db.session.execute(query).fetchall()
 
     return len(results) == 1
@@ -18,7 +18,7 @@ def does_enriched_offerer_contains_data():
 
 
 def does_enriched_user_data_exists():
-    query = '''SELECT * FROM information_schema.tables WHERE table_name = 'enriched_user_data';'''
+    query = '''SELECT * FROM pg_matviews WHERE matviewname = 'enriched_user_data';'''
     results = db.session.execute(query).fetchall()
 
     return len(results) == 1
