@@ -5,10 +5,10 @@ services:
     image: python:3.6-stretch
     container_name: pcm-enriched-data
     volumes:
-      - .:/opt/pass-culture-metabase
+      - .:/opt/pass-culture-data-analytics
     command: >
-      bash -c "pip install -r /opt/pass-culture-metabase/requirements.txt;
-               python /opt/pass-culture-metabase/app.py;
+      bash -c "pip install -r /opt/pass-culture-data-analytics/requirements.txt;
+               python /opt/pass-culture-data-analytics/app.py;
                "
     ports:
       - 5000:5000
