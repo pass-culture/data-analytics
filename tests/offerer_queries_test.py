@@ -1,9 +1,10 @@
 from datetime import datetime
+
 import pandas
 
 import pytest
 
-from db import CONNECTION, db
+from db import CONNECTION
 from repository.offerer_queries import _get_first_stock_creation_dates_query, _get_first_booking_creation_dates_query, \
     _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query, create_siren_dataframe
 from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
@@ -150,9 +151,12 @@ class OffererQueriesTest:
             # Given
             create_offerer(app, id=1, siren='345678123')
             create_offerer(app, id=2, siren=None)
+            create_offerer(app, id=3, siren='123456789')
+            expected_siren_dataframe = pandas.DataFrame(index=pandas.Index(data=[1, 3], name='id'),
+                                                        data={"siren": ['345678123', '123456789']})
 
             # When
-            df = create_siren_dataframe()
+            siren_dataframe = create_siren_dataframe()
 
             # Then
-            assert df.empty
+            pandas.testing.assert_frame_equal(siren_dataframe, expected_siren_dataframe)
