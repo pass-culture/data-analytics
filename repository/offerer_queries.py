@@ -1,3 +1,6 @@
+import pandas
+from pandas import DataFrame
+
 from db import db
 
 
@@ -81,3 +84,8 @@ def create_number_of_bookings_not_cancelled_view() -> None:
         '''
     db.session.execute(query)
     db.session.commit()
+
+def create_siren_dataframe() -> DataFrame:
+    query = ''''''
+    df = pandas.DataFrame()
+    return df
