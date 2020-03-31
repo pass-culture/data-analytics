@@ -9,6 +9,7 @@ STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "booking_limit_datetime": "Date limite de réservation",
                  "beginning_datetime": "Date de début de l'évènement",
                  "available": "Stock disponible brut de réservations",
+                 "remaining": "Stock disponible réel",
                  "booking_quantity": "Nombre total de réservations",
                  "bookings_cancelled": "Nombre de réservations annulées",
                  "bookings_paid": "Nombre de réservations ayant un paiement"}

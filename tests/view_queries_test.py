@@ -51,6 +51,7 @@ class ViewQueriesTest:
                       "Date limite de réservation": [datetime(2019, 11, 23), pandas.NaT],
                       "Date de début de l'évènement": [datetime(2019, 11, 24), pandas.NaT],
                       "Stock disponible brut de réservations": [10, 12],
+                      "Stock disponible réel": [8, 12],
                       "Nombre total de réservations": [2, 0],
                       "Nombre de réservations annulées": [0, 0],
                       "Nombre de réservations ayant un paiement": [2, 0]

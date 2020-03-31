@@ -16,6 +16,7 @@ def create_enriched_stock_view() -> None:
          stock."bookingLimitDatetime" AS "{STOCK_COLUMNS["booking_limit_datetime"]}",
          stock."beginningDatetime" AS "{STOCK_COLUMNS["beginning_datetime"]}",
          stock.available AS "{STOCK_COLUMNS["available"]}",
+         stock.remaining AS "{STOCK_COLUMNS["remaining"]}",
          stock_booking_information."{STOCK_COLUMNS["booking_quantity"]}",
          stock_booking_information."{STOCK_COLUMNS["bookings_cancelled"]}",
          stock_booking_information."{STOCK_COLUMNS["bookings_paid"]}" 
