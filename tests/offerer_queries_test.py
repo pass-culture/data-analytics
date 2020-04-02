@@ -1,4 +1,5 @@
 from datetime import datetime
+from pprint import pprint
 
 import pandas
 
@@ -71,6 +72,7 @@ class OffererQueriesTest:
         def test_should_return_None_if_the_offerer_has_no_booking(self, app):
             # Given
             create_offerer(app)
+            pprint()
 
             # When
             query = _get_first_booking_creation_dates_query()

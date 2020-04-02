@@ -28,4 +28,4 @@ def test_should_return_label_when_given_APE_code_exists_in_mapping_table():
     label = get_label_from_given_ape_naf(ape_code)
 
     # Then
-    assert label == 'Autres activités de poste et de '
+    assert label == 'Autres activités de poste et de courrier'
