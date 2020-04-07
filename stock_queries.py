@@ -58,18 +58,15 @@ def _get_available_stock_query() -> str:
      SUM(booking.quantity) as "number_of_booking"
     FROM booking
     LEFT JOIN stock ON booking."stockId" = stock.id
-    WHERE 
-    ( booking."isCancelled" = 'false' AND booking."isUsed" = 'false' )
-    OR 
-    ( booking."isUsed" = 'true' AND booking."dateUsed" IS NOT NULL AND booking."dateUsed" > stock."dateModified" )
+    WHERE booking."isCancelled" = 'false' 
     GROUP BY booking."stockId" 
     )
     
     SELECT
      stock.id AS stock_id,
     CASE 
-	    WHEN bookings_grouped_by_stock."number_of_booking" IS NULL THEN stock."quantity"
-	    ELSE GREATEST(stock."quantity" - bookings_grouped_by_stock."number_of_booking", 0)
+	    WHEN stock."quantity" IS NULL THEN NULL
+	    ELSE GREATEST(stock."quantity" - COALESCE(bookings_grouped_by_stock."number_of_booking", 0), 0)
     END AS "Stock disponible réel"
     FROM stock
     LEFT JOIN bookings_grouped_by_stock 
