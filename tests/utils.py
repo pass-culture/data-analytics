@@ -88,11 +88,7 @@ def create_offer(app, venue_id, product_id, id=1, is_active=True, product_type='
 
 
 def create_stock(app, offer_id, id=1, is_soft_deleted=False, date_modified='2019-11-20', date_created='2019-11-20',
-<<<<<<< HEAD
                  price=0, quantity=10, booking_limit_datetime=None, beginning_datetime=None,
-=======
-                 price=0, available=10, booking_limit_datetime=None, beginning_datetime=None,
->>>>>>> (PC-3113) Create SIREN dataframe from offerer table
                  fields_updated='{}'):
     if not booking_limit_datetime:
         booking_limit_datetime = 'NULL'
@@ -106,13 +102,8 @@ def create_stock(app, offer_id, id=1, is_soft_deleted=False, date_modified='2019
 
     with app.app_context():
         db.session.execute(f'''
-<<<<<<< HEAD
             INSERT INTO stock (id, "isSoftDeleted", "dateModified", "dateCreated", "offerId", "price", "quantity", "beginningDatetime", "bookingLimitDatetime", "fieldsUpdated")
             VALUES ({id}, {is_soft_deleted}, '{date_modified}', '{date_created}', {offer_id}, {price}, {quantity}, {beginning_datetime}, {booking_limit_datetime}, '{fields_updated}')
-=======
-            INSERT INTO stock (id, "isSoftDeleted", "dateModified", "dateCreated", "offerId", price, available, "beginningDatetime", "bookingLimitDatetime", "fieldsUpdated")
-            VALUES ({id}, {is_soft_deleted}, '{date_modified}', '{date_created}', {offer_id}, {price}, {available}, {beginning_datetime}, {booking_limit_datetime}, '{fields_updated}')
->>>>>>> (PC-3113) Create SIREN dataframe from offerer table
             ''')
         db.session.commit()
 
