@@ -193,6 +193,9 @@ def clean_database(app):
         ''')
         db.session.commit()
 
+def clean_tables():
+    CONNECTION.execute('DROP TABLE IF EXISTS offerer_cultural_activity;')
+
 def clean_views():
     CONNECTION.execute('DROP VIEW IF EXISTS enriched_stock_data CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS stock_booking_information CASCADE;')
