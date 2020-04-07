@@ -1,10 +1,6 @@
 from datetime import datetime
-from pprint import pprint
-
 import pandas
-
 import pytest
-
 from db import CONNECTION
 from repository.offerer_queries import _get_first_stock_creation_dates_query, _get_first_booking_creation_dates_query, \
     _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query, create_siren_dataframe
@@ -72,7 +68,6 @@ class OffererQueriesTest:
         def test_should_return_None_if_the_offerer_has_no_booking(self, app):
             # Given
             create_offerer(app)
-            pprint()
 
             # When
             query = _get_first_booking_creation_dates_query()

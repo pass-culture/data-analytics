@@ -1,7 +1,5 @@
 import pandas
 from pandas import DataFrame
-import pprint
-
 from db import db, CONNECTION
 
 

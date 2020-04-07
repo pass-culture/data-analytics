@@ -2,10 +2,9 @@ import pandas
 from create_offerer_cultural_activity import create_offerer_cultural_activity_dataframe
 from repository.offerer_queries import create_siren_dataframe
 from tests.utils import create_offerer
-from pprint import pprint
-
 import pytest
 from tests.utils import clean_database, clean_views
+
 
 class CreateOffererCulturalActivityTest:
     @pytest.fixture(autouse=True)
@@ -36,7 +35,4 @@ class CreateOffererCulturalActivityTest:
         result = create_offerer_cultural_activity_dataframe(siren_dataframe)
 
         # Then
-        pprint(expected_dataframe)
-        
-        pprint(result)
         pandas.testing.assert_frame_equal(expected_dataframe, result)
