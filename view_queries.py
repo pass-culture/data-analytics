@@ -15,14 +15,16 @@ def create_enriched_stock_view() -> None:
          stock."dateCreated" AS "{STOCK_COLUMNS["stock_issued_at"]}",
          stock."bookingLimitDatetime" AS "{STOCK_COLUMNS["booking_limit_datetime"]}",
          stock."beginningDatetime" AS "{STOCK_COLUMNS["beginning_datetime"]}",
-         stock.available AS "{STOCK_COLUMNS["available"]}",
+         available_stock_information."Stock disponible réel",
+         stock.quantity AS "{STOCK_COLUMNS["quantity"]}",
          stock_booking_information."{STOCK_COLUMNS["booking_quantity"]}",
          stock_booking_information."{STOCK_COLUMNS["bookings_cancelled"]}",
-         stock_booking_information."{STOCK_COLUMNS["bookings_paid"]}" 
+         stock_booking_information."{STOCK_COLUMNS["bookings_paid"]}"
          FROM stock
          LEFT JOIN offer ON stock."offerId" = offer.id
          LEFT JOIN venue ON venue.id = offer."venueId"
-         LEFT JOIN stock_booking_information ON stock.id = stock_booking_information.stock_id);
+         LEFT JOIN stock_booking_information ON stock.id = stock_booking_information.stock_id
+         LEFT JOIN available_stock_information ON stock_booking_information.stock_id = available_stock_information.stock_id);
         '''
     db.session.execute(query)
     db.session.commit()

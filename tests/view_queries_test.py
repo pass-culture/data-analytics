@@ -5,7 +5,7 @@ import pytest
 
 from db import CONNECTION, db
 from query_enriched_data_views import create_enriched_user_data, create_enriched_offerer_data
-from stock_queries import create_stocks_booking_view
+from stock_queries import create_stocks_booking_view, create_available_stocks_view
 from tests.utils import create_user, create_product, create_offerer, create_venue, create_offer, \
     create_stock, create_booking, create_payment, create_payment_status, clean_views, clean_database
 from view_queries import create_enriched_stock_view
@@ -29,16 +29,17 @@ class ViewQueriesTest:
             create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
             create_offer(app, venue_id=1, product_id=1, id=3, product_type='EventType.CINEMA', name="Test")
-            create_stock(app, offer_id=3, id=1, date_created='2019-11-01', available=10,
+            create_stock(app, offer_id=3, id=1, date_created='2019-11-01', quantity=10,
                          booking_limit_datetime='2019-11-23', beginning_datetime='2019-11-24')
             create_offer(app, venue_id=1, product_id=2, id=2, product_type='ThingType.LIVRE_EDITION', name="Test bis")
-            create_stock(app, offer_id=2, id=2, date_created='2019-10-01', available=12)
+            create_stock(app, offer_id=2, id=2, date_created='2019-10-01', quantity=12)
             create_booking(app, user_id=1, stock_id=1, id=4, quantity=2)
             create_payment(app, booking_id=4, id=1)
             create_payment_status(app, payment_id=1, id=1, date='2019-01-01', status='PENDING')
 
             with app.app_context():
                 create_stocks_booking_view()
+                create_available_stocks_view()
 
             expected_stocks_details = pandas.DataFrame(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -50,6 +51,7 @@ class ViewQueriesTest:
                       "Date de création du stock": [datetime(2019, 11, 1), datetime(2019, 10, 1)],
                       "Date limite de réservation": [datetime(2019, 11, 23), pandas.NaT],
                       "Date de début de l'évènement": [datetime(2019, 11, 24), pandas.NaT],
+                      "Stock disponible réel": [8, 12],
                       "Stock disponible brut de réservations": [10, 12],
                       "Nombre total de réservations": [2, 0],
                       "Nombre de réservations annulées": [0, 0],
