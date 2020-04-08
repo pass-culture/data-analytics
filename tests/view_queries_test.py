@@ -8,7 +8,7 @@ from query_enriched_data_views import create_enriched_user_data, create_enriched
 from stock_queries import create_stocks_booking_view, create_available_stocks_view
 from tests.utils import create_user, create_product, create_offerer, create_venue, create_offer, \
     create_stock, create_booking, create_payment, create_payment_status, clean_views, clean_database
-from view_queries import create_enriched_stock_view
+from view_queries import create_enriched_stock_view, create_all_bookable_offers_view
 
 
 class ViewQueriesTest:
@@ -103,3 +103,16 @@ class ViewQueriesTest:
             offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
             for expected_column_in_view in expected_columns:
                 assert expected_column_in_view in offerers_details.columns
+
+    class CreateBookableOffersTest:
+        def test_should_create_a_view(self, app):
+            # given
+            # when
+            with app.app_context():
+                create_all_bookable_offers_view()
+
+            # then
+            query = '''SELECT * FROM pg_views WHERE viewname = 'all_bookable_offers';'''
+            results = db.session.execute(query).fetchall()
+
+            assert len(results) == 1

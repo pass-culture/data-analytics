@@ -1,6 +1,9 @@
 from db import db
 from stock_queries import STOCK_COLUMNS
 
+def create_all_bookable_offers_view() -> None:
+    # get_active_offers_ids
+    pass
 
 def create_enriched_stock_view() -> None:
     query = f'''
