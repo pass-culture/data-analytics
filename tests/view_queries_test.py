@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from pprint import pprint
 import pandas
 import pytest
 
@@ -105,14 +105,17 @@ class ViewQueriesTest:
                 assert expected_column_in_view in offerers_details.columns
 
     class CreateBookableOffersTest:
-        def test_should_create_a_view(self, app):
-            # given
+        def test_should_create_all_bookable_offers_view(self, app):
             # when
             with app.app_context():
                 create_all_bookable_offers_view()
 
             # then
-            query = '''SELECT * FROM pg_views WHERE viewname = 'all_bookable_offers';'''
-            results = db.session.execute(query).fetchall()
+            expected_columns = ["idAtProviders", "dateModifiedAtLastProvider", "dateCreated", "productId", 
+            "venueId", "lastProviderId", "bookingEmail", "isActive", "type", "name", "description", "conditions", "ageMin",
+            "ageMax", "url", "mediaUrls", "durationMinutes", "isNational", "extraData", "isDuo", "fieldsUpdated"]
 
-            assert len(results) == 1
+            bookable_offers_df = pandas.read_sql_table('all_bookable_offers', CONNECTION, index_col='id')
+            for expected_column_in_view in expected_columns:
+                assert expected_column_in_view in bookable_offers_df.columns
+        
