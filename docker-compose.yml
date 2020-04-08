@@ -1,21 +1,21 @@
 version: "3.7"
 
 services:
-  enriched-data:
+  datasource-application:
     image: python:3.6-stretch
-    container_name: pcm-enriched-data
+    container_name: analytics-datasource-application
     volumes:
-      - .:/opt/pass-culture-data-analytics
+      - .:/opt/data-analytics
     command: >
-      bash -c "pip install -r /opt/pass-culture-data-analytics/requirements.txt;
-               python /opt/pass-culture-data-analytics/app.py;
+      bash -c "pip install -r /opt/data-analytics/requirements.txt;
+               python /opt/data-analytics/app.py;
                "
     ports:
       - 5000:5000
     env_file:
       - env_file
     depends_on:
-      - postgres-product
+      - datasource-postgres
 
   install-models:
     image: python:3.6-stretch
@@ -34,11 +34,11 @@ services:
     env_file:
       - env_file
     depends_on:
-      - postgres-product
+      - datasource-postgres
 
-  postgres-product:
+  datasource-postgres:
     image: circleci/postgres:11.6-postgis
-    container_name: pcm-postgres-product
+    container_name: analytics-datasource-postgres
     env_file:
       - env_file
     ports:
