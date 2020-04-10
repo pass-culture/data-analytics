@@ -1,6 +1,0 @@
-{
-    "python.pythonPath": "anaconda3/bin/python",
-    "liveshare.allowGuestDebugControl": true,
-    "liveshare.allowGuestTaskControl": true,
-    "liveshare.anonymousGuestApproval": "accept"
-}

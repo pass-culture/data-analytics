@@ -27,12 +27,12 @@ Pour configurer Metabase, il suffit de créer un compte admin, puis de se connec
 ## Créer les vues de données enrichies
 Après avoir lancé les conteneurs, taper :
 
-`docker exec -it analytics-datasource bash -c "cd /opt/pass-culture-metabase; python create_enriched_data_views.py"`
+`docker exec -it analytics-datasource bash -c "cd /opt/data-analytics ; python create_enriched_data_views.py"`
 
 ## Configurer son IDE
 - Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `pip install virtualenv`
 - exécuter les commandes suivantes :
-1. `cd pass-culture-metabase`
+1. `cd pass-culture-data-analytics`
 2. `virtualenv venv -p python3` (si vous n'avez pas python3). 
 3. Sinon faire `python3 -m venv venv`
 4. `source venv/bin/activate`
@@ -42,7 +42,9 @@ Après avoir lancé les conteneurs, taper :
 `pytest`
 
 # Accès à la base
-`docker exec -it analytics-datasource-postgres psql -U pass_culture`
+1. `cd pass-culture-data-analytics`
+2. `docker exec -it analytics-datasource-postgres psql -U pass_culture`
 
 # Exécution de code python dans le container
- `docker exec -it analytics-datasource bash -c "cd /opt/pass-culture-metabase && PYTHONPATH=. python"`
+1. `cd pass-culture-data-analytics`
+2. `docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && PYTHONPATH=. python"`

@@ -1,4 +1,4 @@
-from models.install import install_models, install_database_extensions
+from models.install import install_models, install_database_extensions, install_materialized_views
 from models.db import db
 from flask import Flask
 from utils.logger import logger
@@ -12,5 +12,6 @@ db.init_app(app)
 with app.app_context():
     install_database_extensions()
     install_models()
+    install_materialized_views()
 
 logger.info('[INSTALL MODELS] Installation completed')
