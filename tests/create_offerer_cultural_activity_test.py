@@ -32,11 +32,23 @@ class CreateOffererCulturalActivityTest:
         # Given
         create_offerer(app, id=1, siren='345678123')
         siren_dataframe = create_siren_dataframe()
-        expected_result = '1610B'
+        get_api_siren_mock = {
+            "unite_legale": {
+                "id": 20493806,
+                "siren": "853318459",
+                "etablissement_siege": {
+                    "id": 48863654,
+                    "siren": "853318459",
+                    "siret": "85331845900015",
+                    "activite_principale": "70.21ZX"
+                },
+            }
+        }
+        expected_ape_code = '7021ZX'
         response_return_value = MagicMock(status_code=200)
-        response_return_value.json = MagicMock(return_value=expected_result)
+        response_return_value.json = MagicMock(return_value=get_api_siren_mock)
         request_get.return_value = response_return_value
-        expected_label = get_label_from_given_ape_code(expected_result)
+        expected_label = get_label_from_given_ape_code(expected_ape_code)
         expected_dataframe = pandas.DataFrame(columns=['APE_label'], data=[expected_label], index=pandas.Index(data=[1], name='id'))
 
         # When

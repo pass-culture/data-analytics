@@ -1,4 +1,4 @@
-from parse_ape_naf_from_offerer_details import parse_ape_naf_from_offerer_details
+from parse_ape_code_from_offerer_details import parse_ape_code_from_offerer_details
 
 
 class ParseApeNafFromOffererDetailsTest:
@@ -7,7 +7,7 @@ class ParseApeNafFromOffererDetailsTest:
         offerer_details = {}
 
         # When
-        results = parse_ape_naf_from_offerer_details(offerer_details)
+        results = parse_ape_code_from_offerer_details(offerer_details)
 
         # Then
         assert results == ''
@@ -37,10 +37,10 @@ class ParseApeNafFromOffererDetailsTest:
         }
 
         # When
-        results = parse_ape_naf_from_offerer_details(offerer_details)
+        results = parse_ape_code_from_offerer_details(offerer_details)
 
         # Then
-        assert results == "70.21Z"
+        assert results == "7021Z"
 
     def test_should_return_empty_when_APE_is_not_given(self):
         # Given
@@ -66,7 +66,7 @@ class ParseApeNafFromOffererDetailsTest:
         }
 
         # When
-        results = parse_ape_naf_from_offerer_details(offerer_details)
+        results = parse_ape_code_from_offerer_details(offerer_details)
 
         # Then
         assert results == ""
