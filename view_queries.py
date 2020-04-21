@@ -1,6 +1,21 @@
 from db import db
 from stock_queries import STOCK_COLUMNS
 
+def create_all_bookable_offers_view() -> None:
+    with_mediation_bool = True
+
+    query = f'''
+        CREATE OR REPLACE VIEW all_bookable_offers AS
+        (SELECT * 
+        FROM offer 
+        WHERE offer.id IN (
+            SELECT * 
+            FROM get_active_offers_ids({with_mediation_bool})
+            ) 
+        );
+        '''
+    db.session.execute(query)
+    db.session.commit()
 
 def create_enriched_stock_view() -> None:
     query = f'''
