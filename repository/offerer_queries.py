@@ -1,6 +1,6 @@
 import pandas
 from pandas import DataFrame
-from db import db, CONNECTION
+from models.db import db, CONNECTION
 
 
 def _get_first_stock_creation_dates_query() -> str:
@@ -92,5 +92,5 @@ def create_siren_dataframe() -> DataFrame:
     FROM offerer
     WHERE siren IS NOT NULL 
     '''
-    siren_df = pandas.read_sql(query, CONNECTION, index_col='id')
+    siren_df = pandas.read_sql(query, CONNECTION)
     return siren_df

@@ -1,12 +1,9 @@
 import pytest
-
-from query_enriched_data_views import create_enriched_user_data, create_enriched_offerer_data, \
-    create_enriched_stock_data
-from repository.health_check_repository import does_enriched_stock_data_exists, does_enriched_offerer_data_exists, \
-    does_enriched_user_data_exists, does_enriched_offerer_contains_data, does_enriched_users_contains_data, \
-    does_enriched_stocks_contains_data
-from tests.utils import clean_database, create_offerer, create_user, create_venue, create_product, create_offer, \
-    create_stock, clean_views
+from repository.health_check_queries import does_enriched_offerer_data_exists, does_enriched_user_data_exists, does_enriched_stock_data_exists, \
+    does_enriched_offerer_contains_data, does_enriched_stocks_contains_data, does_enriched_users_contains_data
+from tests.repository.utils import clean_database, clean_views, create_offerer, create_user, create_venue, create_product, create_offer, \
+    create_stock
+from repository.query_enriched_data_views import create_enriched_offerer_data, create_enriched_stock_data, create_enriched_user_data
 
 
 class IsEnrichedOffererDataExistsTest:
@@ -18,7 +15,7 @@ class IsEnrichedOffererDataExistsTest:
 
     def test_should_return_false_when_no_table_exists(self, app):
         # When
-        result = does_enriched_offerer_data_exists()
+        result = does_enriched_offerer_data_exists() 
 
         # Then
         assert result is False

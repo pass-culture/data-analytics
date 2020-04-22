@@ -1,7 +1,8 @@
 from flask import current_app as app
+from utils.logger import logger
 
-from logger import logger
-from query_enriched_data_views import create_enriched_offerer_data, create_enriched_user_data, \
+
+from repository.query_enriched_data_views import create_enriched_offerer_data, create_enriched_user_data, \
     create_enriched_stock_data
 
 def create_enriched_data_views():

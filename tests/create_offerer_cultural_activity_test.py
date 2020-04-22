@@ -1,14 +1,11 @@
 import pandas
-from create_offerer_cultural_activity import create_offerer_cultural_activity_dataframe
+from models.create_offerer_cultural_activity import create_offerer_cultural_activity_dataframe, create_table_offerer_cultural_activity
 from repository.offerer_queries import create_siren_dataframe
-from tests.utils import create_offerer
 import pytest
-from tests.utils import clean_database, clean_views, clean_tables
 from unittest.mock import patch, MagicMock
-import api_sirene_connector 
 from get_label_from_given_ape_code import get_label_from_given_ape_code
-from create_offerer_cultural_activity import create_table_offerer_cultural_activity
-from db import db
+from models.db import db
+from tests.repository.utils import create_offerer, clean_database, clean_tables
 
 class CreateOffererCulturalActivityTest:
     @pytest.fixture(autouse=True)
@@ -19,7 +16,7 @@ class CreateOffererCulturalActivityTest:
     def test_should_return_empty_dataframe_when_given_empty_dataframe(self):
         # Given
         siren_dataframe = create_siren_dataframe()
-        expected_dataframe = pandas.DataFrame(columns=['APE_label'], index=pandas.Index(data=[], name='id'))
+        expected_dataframe = pandas.DataFrame(columns=['id', 'APE_label'])
 
         # When
         result = create_offerer_cultural_activity_dataframe(siren_dataframe)
@@ -27,8 +24,9 @@ class CreateOffererCulturalActivityTest:
         # Then
         pandas.testing.assert_frame_equal(expected_dataframe, result)
     
-    @patch('api_sirene_connector.requests.get')
+    @patch('connectors.api_sirene_connector.requests.get')
     def test_should_return_dataframe_with_activity_label(self, request_get, app):
+        # TO DO : revoir ce test
         # Given
         create_offerer(app, id=1, siren='345678123')
         siren_dataframe = create_siren_dataframe()
@@ -49,11 +47,15 @@ class CreateOffererCulturalActivityTest:
         response_return_value.json = MagicMock(return_value=get_api_siren_mock)
         request_get.return_value = response_return_value
         expected_label = get_label_from_given_ape_code(expected_ape_code)
-        expected_dataframe = pandas.DataFrame(columns=['APE_label'], data=[expected_label], index=pandas.Index(data=[1], name='id'))
+        expected_dataframe = pandas.DataFrame(data={'id': [1], 'APE_label': [expected_label]})
 
         # When
         result = create_offerer_cultural_activity_dataframe(siren_dataframe)
 
+        from pprint import pprint
+        pprint (expected_dataframe)
+        pprint('******')
+        pprint(result)
         # Then
         pandas.testing.assert_frame_equal(expected_dataframe, result)
 
@@ -62,7 +64,7 @@ class CreateTableOffererCulturalActivityTest:
     def setup_method(self, app):
         yield
         clean_database(app)
-        clean_tables
+        clean_tables()
 
     def test_should_create_table(self, app):
         # Given

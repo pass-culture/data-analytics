@@ -1,5 +1,6 @@
 import pandas as pds
-from api_sirene_connector import get_offerer_details_by_siren
+from connectors.api_sirene_connector import get_offerer_details_by_siren
+
 
 def parse_ape_code_from_offerer_details(offerer_details: dict) -> str:
     try:

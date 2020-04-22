@@ -1,4 +1,4 @@
-from db import db
+from models.db import db
 
 STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "offer_name": "Nom de l'offre",

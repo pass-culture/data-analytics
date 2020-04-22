@@ -1,5 +1,6 @@
 from get_label_from_given_ape_code import get_label_from_given_ape_code
 
+
 def test_should_return_empty_string_when_no_APE_code_is_given():
     # Given
     ape_code = ''

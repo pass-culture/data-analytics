@@ -1,6 +1,5 @@
 import requests
-
-from logger import logger
+from utils.logger import logger
 
 
 def get_offerer_details_by_siren(siren: str) -> dict:

@@ -1,4 +1,4 @@
-from db import db, CONNECTION
+from models.db import db, CONNECTION
 
 
 def create_user(app, id=1, email='test@email.com', can_book_free_offers=True, is_admin=False, postal_code='93100',

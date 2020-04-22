@@ -1,4 +1,4 @@
-from parse_ape_code_from_offerer_details import parse_ape_code_from_offerer_details
+from parse_ape_code_from_offerer_details  import parse_ape_code_from_offerer_details
 
 
 class ParseApeNafFromOffererDetailsTest:

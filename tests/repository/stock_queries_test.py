@@ -1,9 +1,9 @@
 import pandas
 import pytest
 
-from db import CONNECTION
+from models.db import CONNECTION
 from repository.stock_queries import _get_stocks_booking_information_query
-from tests.utils import create_stock, create_offer, create_venue, create_offerer, create_product, create_booking, \
+from tests.repository.utils import create_stock, create_offer, create_venue, create_offerer, create_product, create_booking, \
     create_user, create_payment, create_payment_status, clean_database, clean_views
 
 

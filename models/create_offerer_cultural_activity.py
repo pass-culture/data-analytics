@@ -1,8 +1,9 @@
 import pandas 
 from parse_ape_code_from_offerer_details import get_ape_code_by_siren
 from get_label_from_given_ape_code import get_label_from_given_ape_code
-from db import ENGINE
+from models.db import ENGINE
 from repository.offerer_queries import create_siren_dataframe
+
 
 def create_offerer_cultural_activity_dataframe(siren_dataframe: pandas.DataFrame) -> pandas.DataFrame:
     offerer_cultural_activity_dataframe = siren_dataframe.copy()

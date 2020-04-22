@@ -1,4 +1,4 @@
-from db import db
+from models.db import db
 from repository.stock_queries import STOCK_COLUMNS
 
 

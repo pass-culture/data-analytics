@@ -2,12 +2,12 @@ from datetime import datetime
 import pandas
 import pytest
 
-from db import CONNECTION
-from query_enriched_data_views import create_enriched_user_data, create_enriched_offerer_data
-from repository.stock_queries import create_stocks_booking_view
-from tests.utils import create_user, create_product, create_offerer, create_venue, create_offer, \
-    create_stock, create_booking, create_payment, create_payment_status, clean_views, clean_database
-from view_queries import create_enriched_stock_view, create_all_bookable_offers_view
+from models.db import CONNECTION
+from repository.query_enriched_data_views import create_enriched_user_data, create_enriched_offerer_data
+from repository.stock_queries import create_stocks_booking_view, create_available_stocks_view
+from repository.view_queries import create_enriched_stock_view, create_all_bookable_offers_view
+from tests.repository.utils import clean_database, clean_views, create_user, create_product, create_offerer, create_venue, \
+    create_offer, create_stock, create_booking, create_payment_status, create_payment
 
 
 class ViewQueriesTest:
