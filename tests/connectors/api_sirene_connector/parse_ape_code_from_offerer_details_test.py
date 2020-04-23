@@ -1,4 +1,4 @@
-from parse_ape_code_from_offerer_details  import parse_ape_code_from_offerer_details
+from connectors.api_sirene_connector.parse_ape_code_from_offerer_details  import parse_ape_code_from_offerer_details
 
 
 class ParseApeNafFromOffererDetailsTest:
