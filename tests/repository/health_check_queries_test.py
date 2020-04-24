@@ -12,7 +12,7 @@ class IsEnrichedOffererDataExistsTest:
         yield
         clean_database(app)
         clean_views()
-        clean_tables
+        clean_tables()
 
     def test_should_return_false_when_no_table_exists(self, app):
         # When
