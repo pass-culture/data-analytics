@@ -1,13 +1,11 @@
 from datetime import datetime
 import pandas
-
 import pytest
-
-from db import CONNECTION, db
-from offerer_queries import _get_first_stock_creation_dates_query, _get_number_of_offers_query, \
-    _get_number_of_bookings_not_cancelled_query, _get_first_booking_creation_dates_query
-from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product, clean_database, clean_views
+from models.db import CONNECTION
+from repository.offerer_queries import _get_first_stock_creation_dates_query, _get_first_booking_creation_dates_query, \
+    _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query, create_siren_dataframe
+from tests.repository.utils import clean_database, clean_views, create_offerer, create_venue, create_product, \
+    create_offer, create_stock, create_booking, create_user
 
 
 class OffererQueriesTest:
@@ -137,3 +135,24 @@ class OffererQueriesTest:
             # Then
             number_of_bookings_not_cancelled = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 0
+
+    class CreateSirenDataFrameTest:
+        def test_should_return_empty_dataframe_if_no_offerer(self, app):
+            # When
+            df = create_siren_dataframe()
+
+            # Then
+            assert df.empty
+
+        def test_should_return_siren_related_to_existing_offerers(self, app):
+            # Given
+            create_offerer(app, id=1, siren='345678123')
+            create_offerer(app, id=2, siren=None)
+            create_offerer(app, id=3, siren='123456789')
+            expected_siren_dataframe = pandas.DataFrame(data={"id": [1, 3], "siren": ['345678123', '123456789']})
+
+            # When
+            siren_dataframe = create_siren_dataframe()
+
+            # Then
+            pandas.testing.assert_frame_equal(siren_dataframe, expected_siren_dataframe)

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from db import db
+from models.db import db
 
 
 def _get_experimentation_sessions_query() -> str:

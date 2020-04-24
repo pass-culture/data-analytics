@@ -3,12 +3,12 @@ import pytest
 from freezegun import freeze_time
 from pandas import Int64Index
 
-from db import CONNECTION
-from tests.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
+from models.db import CONNECTION
+from repository.user_queries import _get_experimentation_sessions_query, _get_users_seniority_query, \
+    _get_actual_amount_spent_query, _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
+    _get_theoric_amount_spent_in_physical_goods_query
+from tests.repository.utils import create_user, create_offerer, create_venue, create_offer, create_stock, \
     create_booking, create_product, clean_database, create_deposit, clean_views
-from user_queries import _get_experimentation_sessions_query, _get_actual_amount_spent_query, \
-    _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
-    _get_theoric_amount_spent_in_physical_goods_query, _get_users_seniority_query
 
 
 class UserQueriesTest:

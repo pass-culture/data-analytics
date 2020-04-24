@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 from application.get_offerer_enriched_data_status import get_offerer_enriched_data_status
 
+
 class GetEnrichedDataStatusTest:
     class OffererStatusTest:
         def test_should_return_a_dict_with_offerer_table_status(self):

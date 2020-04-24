@@ -5,9 +5,9 @@ from flask import Flask, request, jsonify
 from application.get_offerer_enriched_data_status import get_offerer_enriched_data_status
 from application.get_stock_enriched_data_status import get_stock_enriched_data_status
 from application.get_user_enriched_data_status import get_user_enriched_data_status
-from db import DATABASE_URL, db
-from create_enriched_data_views import create_enriched_data_views
-from repository.health_check_repository import does_enriched_offerer_data_exists, does_enriched_user_data_exists, \
+from models.db import DATABASE_URL, db
+from models.create_enriched_data_views import create_enriched_data_views
+from repository.health_check_queries import does_enriched_offerer_data_exists, does_enriched_user_data_exists, \
     does_enriched_offerer_contains_data, does_enriched_users_contains_data, does_enriched_stocks_contains_data, \
     does_enriched_stock_data_exists
 

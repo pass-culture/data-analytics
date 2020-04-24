@@ -1,4 +1,4 @@
-from db import db, CONNECTION
+from models.db import db, CONNECTION
 
 
 def create_user(app, id=1, email='test@email.com', can_book_free_offers=True, is_admin=False, postal_code='93100',
@@ -22,10 +22,14 @@ def create_user(app, id=1, email='test@email.com', can_book_free_offers=True, is
 
 def create_offerer(app, id=1, thumb_count=0, is_active=True, postal_code='93100', city='Montreuil',
                    date_created='2019-11-20', name='Test Offerer', siren='123456789', fields_updated='{}'):
+    if siren is None:
+        siren = 'NULL'
+    else:
+        siren = f"'{siren}'"
     with app.app_context():
         db.session.execute(f'''
         INSERT INTO offerer (id, "thumbCount", "isActive", "postalCode", city, "dateCreated", name, siren, "fieldsUpdated")
-        VALUES ({id}, {thumb_count}, {is_active}, '{postal_code}', '{city}', '{date_created}', '{name}', '{siren}', '{fields_updated}')
+        VALUES ({id}, {thumb_count}, {is_active}, '{postal_code}', '{city}', '{date_created}', '{name}', {siren}, '{fields_updated}')
         ''')
         db.session.commit()
 
@@ -188,6 +192,9 @@ def clean_database(app):
         DELETE FROM "user";
         ''')
         db.session.commit()
+
+def clean_tables():
+    CONNECTION.execute('DROP TABLE IF EXISTS offerer_cultural_activity;')
 
 def clean_views():
     CONNECTION.execute('DROP VIEW IF EXISTS enriched_stock_data CASCADE;')

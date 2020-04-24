@@ -1,4 +1,6 @@
-from db import db
+import pandas
+from pandas import DataFrame
+from models.db import db, CONNECTION
 
 
 def _get_first_stock_creation_dates_query() -> str:
@@ -81,3 +83,14 @@ def create_number_of_bookings_not_cancelled_view() -> None:
         '''
     db.session.execute(query)
     db.session.commit()
+
+def create_siren_dataframe() -> DataFrame:
+    query = '''
+    SELECT
+        id
+        ,siren
+    FROM offerer
+    WHERE siren IS NOT NULL 
+    '''
+    siren_df = pandas.read_sql(query, CONNECTION)
+    return siren_df
