@@ -9,7 +9,6 @@ from repository.user_queries import create_experimentation_sessions_view, create
     create_theoric_amount_spent_in_digital_goods_view, create_theoric_amount_spent_in_physical_goods_view
 from repository.view_queries import create_enriched_stock_view, create_materialized_enriched_user_view, \
     create_materialized_enriched_offerer_view
-from models.create_offerer_cultural_activity import create_offerer_cultural_activity_data
 
 
 def create_enriched_offerer_data():
@@ -17,7 +16,6 @@ def create_enriched_offerer_data():
     create_first_booking_creation_dates_view()
     create_number_of_offers_view()
     create_number_of_bookings_not_cancelled_view()
-    create_offerer_cultural_activity_data()
     create_materialized_enriched_offerer_view()
 
 def create_enriched_user_data():
