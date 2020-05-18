@@ -27,14 +27,18 @@ class ViewQueriesTest:
             create_offerer(app, id=3)
             create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(app, venue_id=1, product_id=1, id=3, product_type='EventType.CINEMA', name="Test")
+            create_offer(app, venue_id=1, product_id=1, id=3,
+                         product_type='EventType.CINEMA', name="Test")
             create_stock(app, offer_id=3, id=1, date_created='2019-11-01', quantity=10,
                          booking_limit_datetime='2019-11-23', beginning_datetime='2019-11-24')
-            create_offer(app, venue_id=1, product_id=2, id=2, product_type='ThingType.LIVRE_EDITION', name="Test bis")
-            create_stock(app, offer_id=2, id=2, date_created='2019-10-01', quantity=12)
+            create_offer(app, venue_id=1, product_id=2, id=2,
+                         product_type='ThingType.LIVRE_EDITION', name="Test bis")
+            create_stock(app, offer_id=2, id=2,
+                         date_created='2019-10-01', quantity=12)
             create_booking(app, user_id=1, stock_id=1, id=4, quantity=2)
             create_payment(app, booking_id=4, id=1)
-            create_payment_status(app, payment_id=1, id=1, date='2019-01-01', status='PENDING')
+            create_payment_status(app, payment_id=1, id=1,
+                                  date='2019-01-01', status='PENDING')
 
             with app.app_context():
                 create_stocks_booking_view()
@@ -63,8 +67,10 @@ class ViewQueriesTest:
                 create_enriched_stock_view()
 
             # Then
-            stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
-            pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
+            stocks_details = pandas.read_sql_table(
+                'enriched_stock_data', CONNECTION, index_col='stock_id')
+            pandas.testing.assert_frame_equal(
+                stocks_details, expected_stocks_details)
 
     class CreateEnrichedUserViewTest:
         def test_should_create_enriched_user_data_view_with_columns(self, app):
@@ -84,9 +90,10 @@ class ViewQueriesTest:
                                 "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
                                 "Dépenses physiques"]
 
-            beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
-            assert sorted(expected_columns) == sorted(beneficiary_users_details.columns)
-            
+            beneficiary_users_details = pandas.read_sql_table(
+                'enriched_user_data', CONNECTION, index_col='user_id')
+            assert sorted(expected_columns) == sorted(
+                beneficiary_users_details.columns)
 
     class CreateEnrichedOffererViewTest:
         def test_should_create_enriched_offerer_data_view_with_columns(self, app):
@@ -99,9 +106,9 @@ class ViewQueriesTest:
                                 "Date de première réservation", "Nombre d’offres",
                                 "Nombre de réservations non annulées"]
 
-            offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
+            offerers_details = pandas.read_sql_table(
+                'enriched_offerer_data', CONNECTION, index_col='offerer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
-
 
     class CreateBookableOffersTest:
         def test_should_create_all_bookable_offers_view(self, app):
@@ -110,10 +117,12 @@ class ViewQueriesTest:
                 create_all_bookable_offers_view()
 
             # then
-            expected_columns = ["idAtProviders", "dateModifiedAtLastProvider", "dateCreated", "productId", 
-                                "venueId", "lastProviderId", "bookingEmail", "isActive", "type", "name", "description", 
-                                "conditions", "ageMin", "ageMax", "url", "mediaUrls", "durationMinutes", "isNational", 
-                                "extraData", "isDuo", "fieldsUpdated"]
+            expected_columns = ["idAtProviders", "dateModifiedAtLastProvider", "dateCreated", "productId",
+                                "venueId", "lastProviderId", "bookingEmail", "isActive", "type", "name", "description",
+                                "conditions", "ageMin", "ageMax", "url", "mediaUrls", "durationMinutes", "isNational",
+                                "extraData", "isDuo", "fieldsUpdated", "withdrawalDetails"]
 
-            bookable_offers_df = pandas.read_sql_table('all_bookable_offers', CONNECTION, index_col='id')            
-            assert sorted(expected_columns) == sorted(bookable_offers_df.columns)
+            bookable_offers_df = pandas.read_sql_table(
+                'all_bookable_offers', CONNECTION, index_col='id')
+            assert sorted(expected_columns) == sorted(
+                bookable_offers_df.columns)
