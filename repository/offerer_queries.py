@@ -1,7 +1,6 @@
 import pandas
 from models.db import CONNECTION, db
 from pandas import DataFrame
-from repository.offerer_queries import add_department_column_in_offerer_table
 
 
 def _get_first_stock_creation_dates_query() -> str:
