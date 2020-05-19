@@ -2,6 +2,8 @@ import pandas
 from use_case.get_department_code_from_postal_code import get_departement_code
 import sqlalchemy 
 from models.db import ENGINE
+from repository.offerer_queries import create_postal_code_dataframe
+
 
 
 def create_offerer_with_departement_code_dataframe(postal_code_dataframe: pandas.DataFrame) -> pandas.DataFrame:
