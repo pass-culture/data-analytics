@@ -79,7 +79,7 @@ class ViewQueriesTest:
                 create_enriched_user_data()
 
             # Then
-            expected_columns = ["Vague d'expérimentation", "Département", "Date d'activation",
+            expected_columns = ["Vague d'expérimentation", "Département", "Statut","Date d'activation",
                                 "Date de remplissage du typeform",
                                 "Date de première connexion", "Date de première réservation",
                                 "Date de deuxième réservation",
