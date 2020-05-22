@@ -1,6 +1,5 @@
 import logging
 import os
-import logging
 from logging import INFO as LOG_LEVEL_INFO
 
 LOG_LEVEL = int(os.environ.get('LOG_LEVEL', LOG_LEVEL_INFO))
