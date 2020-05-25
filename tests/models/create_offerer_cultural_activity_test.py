@@ -40,6 +40,7 @@ class CreateOffererCulturalActivityTest:
         # Then
         pandas.testing.assert_frame_equal(expected_dataframe, result)
 
+
 class CreateTableOffererCulturalActivityTest:
     @pytest.fixture(autouse=True)
     def setup_method(self, app):

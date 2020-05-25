@@ -98,12 +98,14 @@ def create_materialized_enriched_offerer_view() -> str:
      related_stocks."Date de création du premier stock",
      related_bookings."Date de première réservation",
      related_offers."Nombre d’offres",
-     related_non_cancelled_bookings."Nombre de réservations non annulées"
+     related_non_cancelled_bookings."Nombre de réservations non annulées",
+     offerer_departement_code.department_code AS "Département"
     FROM offerer
     LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
     LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
     LEFT JOIN related_offers ON related_offers.offerer_id = offerer.id
     LEFT JOIN related_non_cancelled_bookings ON related_non_cancelled_bookings.offerer_id = offerer.id
+    LEFT JOIN offerer_departement_code ON offerer_departement_code.id = offerer.id
     )
     ;
     '''

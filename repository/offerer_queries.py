@@ -94,3 +94,15 @@ def create_siren_dataframe() -> DataFrame:
     '''
     siren_df = pandas.read_sql(query, CONNECTION)
     return siren_df
+
+
+def create_postal_code_dataframe() -> DataFrame:
+    query = '''
+    SELECT
+        id
+        ,"postalCode"
+    FROM offerer
+    WHERE "postalCode" is not NULL 
+    '''
+    postalcode_df = pandas.read_sql(query, CONNECTION)
+    return postalcode_df
