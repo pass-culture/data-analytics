@@ -95,7 +95,7 @@ class ViewQueriesTest:
                 create_enriched_offerer_data()
 
             # Then
-            expected_columns = ["Date de création", "Date de création du premier stock",
+            expected_columns = ["Nom", "Date de création", "Date de création du premier stock",
                                 "Date de première réservation", "Nombre d’offres",
                                 "Nombre de réservations non annulées", "Activité principale", "Département"]
 
