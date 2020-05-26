@@ -95,6 +95,7 @@ def create_materialized_enriched_offerer_view() -> str:
     CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offerer_data AS
     (SELECT
      offerer.id AS offerer_id,
+     offerer.name AS "Nom",
      offerer."dateCreated" AS "Date de création",
      related_stocks."Date de création du premier stock",
      related_bookings."Date de première réservation",
@@ -102,7 +103,6 @@ def create_materialized_enriched_offerer_view() -> str:
      related_non_cancelled_bookings."Nombre de réservations non annulées",
      offerer_cultural_activity."APE_label" AS "Activité principale",
      offerer_departement_code.department_code AS "Département"
-
     FROM offerer
     LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
     LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
@@ -110,7 +110,6 @@ def create_materialized_enriched_offerer_view() -> str:
     LEFT JOIN related_non_cancelled_bookings ON related_non_cancelled_bookings.offerer_id = offerer.id
     LEFT JOIN offerer_cultural_activity ON offerer_cultural_activity.id = offerer.id
     LEFT JOIN offerer_departement_code ON offerer_departement_code.id = offerer.id
-
     )
     ;
     '''
