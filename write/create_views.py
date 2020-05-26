@@ -7,7 +7,7 @@ from write.create_intermediate_views_for_user import create_experimentation_sess
     create_number_of_bookings_view, create_number_of_non_cancelled_bookings_view, create_users_seniority_view, \
     create_actual_amount_spent_view, create_theoric_amount_spent_view, \
     create_theoric_amount_spent_in_digital_goods_view, create_theoric_amount_spent_in_physical_goods_view, \
-    create_materialized_enriched_user_view
+    create_theoric_amount_spent_in_outings_view, create_materialized_enriched_user_view
 from write.offerer_view.create_intermediate_views_for_offerer import create_first_stock_creation_dates_view, create_first_booking_creation_dates_view, create_number_of_offers_view, \
     create_number_of_bookings_not_cancelled_view, create_materialized_enriched_offerer_view
 from write.offerer_view.create_cultural_activity import create_offerer_cultural_activity_data
@@ -37,6 +37,7 @@ def create_enriched_user_data():
     create_theoric_amount_spent_view()
     create_theoric_amount_spent_in_digital_goods_view()
     create_theoric_amount_spent_in_physical_goods_view()
+    create_theoric_amount_spent_in_outings_view()
     create_materialized_enriched_user_view()
 
 def create_enriched_stock_data():
