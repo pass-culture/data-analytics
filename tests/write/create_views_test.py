@@ -68,12 +68,8 @@ class ViewQueriesTest:
 
     class CreateEnrichedUserViewTest:
         def test_should_create_enriched_user_data_view_with_columns(self, app):
-            # When
-            with app.app_context():
-                create_enriched_user_data()
-
-            # Then
-            expected_columns = ["Vague d'expérimentation", "Département", "Statut","Date d'activation",
+            # Given
+            expected_columns = ["Vague d'expérimentation", "Département", "Statut", "Date d'activation",
                                 "Date de remplissage du typeform",
                                 "Date de première connexion", "Date de première réservation",
                                 "Date de deuxième réservation",
@@ -84,9 +80,13 @@ class ViewQueriesTest:
                                 "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
                                 "Dépenses physiques"]
 
+            # When
+            with app.app_context():
+                create_enriched_user_data()
+
+            # Then
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
             assert sorted(expected_columns) == sorted(beneficiary_users_details.columns)
-            
 
     class CreateEnrichedOffererViewTest:
         def test_should_create_enriched_offerer_data_view_with_columns(self, app):
@@ -101,5 +101,3 @@ class ViewQueriesTest:
 
             offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
-
-
