@@ -7,7 +7,8 @@ from db import CONNECTION
 from tests.data_creators import clean_database, clean_views, create_offerer, create_venue, create_product, \
     create_offer, create_stock, create_user, create_booking
 from write.offerer_view.create_intermediate_views_for_offerer import _get_first_stock_creation_dates_query, \
-    _get_first_booking_creation_dates_query, _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query
+    _get_first_booking_creation_dates_query, _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query, \
+    _get_number_of_venues_per_offerer_query, _get_number_of_venues_with_offer_per_offerer_query
 
 
 class OffererQueriesTest:
@@ -137,3 +138,66 @@ class OffererQueriesTest:
             # Then
             number_of_bookings_not_cancelled = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 0
+
+    class GetNumberOfVenuePerOffererQueryTest:
+        def test_should_return_the_number_of_venue(self, app):
+            # Given
+            create_offerer(app, id=1)
+            create_venue(app, offerer_id=1, id=1)
+
+            # When
+            query = _get_number_of_venues_per_offerer_query()
+
+            # Then
+            number_of_venue = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            assert number_of_venue.loc[1, "Nombre de lieux"] == 1
+
+        def test_should_return_zero_if_the_offerer_has_no_venue(self, app):
+            # Given
+            create_offerer(app)
+
+            # When
+            query = _get_number_of_venues_per_offerer_query()
+
+            # Then
+            number_of_venue = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            assert number_of_venue.loc[1, "Nombre de lieux"] == 0
+
+    class GetNumberOfVenueWithOfferPerOffererQueryTest:
+        def test_should_return_the_number_of_venue_with_at_least_one_offer(self, app):
+            # Given
+            create_offerer(app, id=1)
+            create_venue(app, offerer_id=1, id=1)
+            create_product(app, id=1)
+            create_offer(app, venue_id=1, product_id=1, id=1)
+            create_offer(app, venue_id=1, product_id=1, id=2)
+
+            # When
+            query = _get_number_of_venues_with_offer_per_offerer_query()
+
+            # Then
+            number_of_venue_with_offer = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 1
+
+        def test_should_return_zero_if_the_offerer_has_no_venue(self, app):
+            # Given
+            create_offerer(app)
+
+            # When
+            query = _get_number_of_venues_with_offer_per_offerer_query()
+
+            # Then
+            number_of_venue_with_offer = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 0
+
+        def test_should_return_zero_if_the_offerer_s_venue_has_no_offer(self, app):
+            # Given
+            create_offerer(app)
+            create_venue(app, offerer_id=1, id=1)
+
+            # When
+            query = _get_number_of_venues_with_offer_per_offerer_query()
+
+            # Then
+            number_of_venue_with_offer = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 0
