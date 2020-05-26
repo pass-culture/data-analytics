@@ -6,7 +6,7 @@ from pandas import Int64Index
 from db import CONNECTION
 from write.create_intermediate_views_for_user import _get_experimentation_sessions_query, _get_users_seniority_query, \
     _get_actual_amount_spent_query, _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
-    _get_theoric_amount_spent_in_physical_goods_query
+    _get_theoric_amount_spent_in_physical_goods_query, _get_theoric_amount_spent_in_outings_query
 from tests.data_creators import create_user, create_offerer, create_venue, create_offer, create_stock, \
     create_booking, create_product, clean_database, create_deposit, clean_views
 
@@ -591,4 +591,89 @@ class UserQueriesTest:
             theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
+                                                               index=Int64Index([1], name="user_id")))
+
+    class GetTheoricAmountSpentInOuting:
+        def test_if_user_has_no_booking_return_0(self, app):
+            # Given
+            create_user(app, id=1)
+
+            # When
+            query = _get_theoric_amount_spent_in_outings_query()
+
+            # Then
+            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
+                                              pandas.DataFrame([0.], columns=["Dépenses sorties"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self, app):
+            # Given
+            create_user(app, id=1, can_book_free_offers=False)
+
+            # When
+            query = _get_theoric_amount_spent_in_outings_query()
+
+            # Then
+            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            assert theoric_amount_spent_in_outings.empty
+
+        def test_if_booking_on_outings_return_amount(self, app):
+            # Given
+            create_user(app, id=1)
+            create_deposit(app, amount=500)
+            create_offerer(app, id=10)
+            create_product(app, id=1, product_type='ThingType.MUSEES_PATRIMOINE_ABO')
+            create_venue(app, id=15, offerer_id=10)
+            create_offer(app, id=30, venue_id=15, product_type='ThingType.MUSEES_PATRIMOINE_ABO', product_id=1)
+            create_stock(app, id=20, offer_id=30)
+            create_booking(app, user_id=1, amount=10, quantity=2, stock_id=20)
+
+            # When
+            query = _get_theoric_amount_spent_in_outings_query()
+
+            # Then
+            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
+                                              pandas.DataFrame([20.], columns=["Dépenses sorties"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_not_on_outings_type_return_0(self, app):
+            # Given
+            create_user(app, id=1)
+            create_deposit(app, amount=500)
+            create_offerer(app, id=10)
+            create_product(app, id=1, product_type='ThingType.JEUX_VIDEO_ABO')
+            create_venue(app, id=15, offerer_id=10)
+            create_offer(app, id=30, venue_id=15, product_type='ThingType.JEUX_VIDEO_ABO', url='u.rl', product_id=1)
+            create_stock(app, id=20, offer_id=30)
+            create_booking(app, user_id=1, amount=10, quantity=1, stock_id=20)
+
+            # When
+            query = _get_theoric_amount_spent_in_outings_query()
+
+            # Then
+            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
+                                              pandas.DataFrame([0.], columns=["Dépenses sorties"],
+                                                               index=Int64Index([1], name="user_id")))
+
+        def test_if_booking_on_outings_is_cancelled_return_0(self, app):
+            # Given
+            create_user(app, id=1)
+            create_deposit(app, amount=500)
+            create_offerer(app, id=10)
+            create_product(app, id=1, product_type='ThingType.SPECTACLE_VIVANT_ABO')
+            create_venue(app, id=15, offerer_id=10)
+            create_offer(app, id=30, venue_id=15, product_type='ThingType.SPECTACLE_VIVANT_ABO', url=None, product_id=1)
+            create_stock(app, id=20, offer_id=30)
+            create_booking(app, user_id=1, is_cancelled=True, amount=10, quantity=1, stock_id=20)
+
+            # When
+            query = _get_theoric_amount_spent_in_outings_query()
+
+            # Then
+            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
+                                              pandas.DataFrame([0.], columns=["Dépenses sorties"],
                                                                index=Int64Index([1], name="user_id")))

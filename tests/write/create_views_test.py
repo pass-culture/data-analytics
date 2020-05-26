@@ -78,7 +78,7 @@ class ViewQueriesTest:
                                 "Nombre de réservations totales", "Nombre de réservations non annulées",
                                 "Ancienneté en jours",
                                 "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
-                                "Dépenses physiques"]
+                                "Dépenses physiques", "Dépenses sorties"]
 
             # When
             with app.app_context():

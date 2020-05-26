@@ -339,6 +339,36 @@ def _get_theoric_amount_spent_in_physical_goods_query() -> str:
     '''
 
 
+def _get_theoric_amount_spent_in_outings_query() -> str:
+    return '''
+    (WITH eligible_booking AS (
+     SELECT booking."userId", booking.amount, booking.quantity
+     FROM booking
+     LEFT JOIN stock ON booking."stockId" = stock.id
+     LEFT JOIN offer ON stock."offerId" = offer.id
+     WHERE offer.type IN ('EventType.SPECTACLE_VIVANT'
+                             ,'EventType.CINEMA'
+                             ,'EventType.JEUX'
+                             ,'ThingType.SPECTACLE_VIVANT_ABO'
+                             ,'EventType.MUSIQUE'
+                             ,'ThingType.MUSEES_PATRIMOINE_ABO'
+                             ,'ThingType.CINEMA_CARD'
+                             ,'ThingType.PRATIQUE_ARTISTIQUE_ABO'
+                             ,'ThingType.CINEMA_ABO'
+                             ,'EventType.MUSEES_PATRIMOINE'
+                             ,'EventType.PRATIQUE_ARTISTIQUE'
+                             ,'EventType.CONFERENCE_DEBAT_DEDICACE')
+     AND booking."isCancelled" IS FALSE
+    )
+    
+    SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses sorties"
+    FROM "user"
+    LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
+    WHERE "user"."canBookFreeOffers" IS TRUE
+    GROUP BY "user".id)
+    '''
+
+
 def create_experimentation_sessions_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW experimentation_sessions AS {_get_experimentation_sessions_query()}
@@ -451,6 +481,14 @@ def create_theoric_amount_spent_in_physical_goods_view() -> None:
     db.session.commit()
 
 
+def create_theoric_amount_spent_in_outings_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW theoric_amount_spent_in_outings AS {_get_theoric_amount_spent_in_outings_query()} 
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
 def create_materialized_enriched_user_view() -> None:
     query = '''
         CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_user_data AS
@@ -473,7 +511,8 @@ def create_materialized_enriched_user_view() -> None:
          actual_amount_spent."Montant réél dépensé",
          theoric_amount_spent."Montant théorique dépensé",
          theoric_amount_spent_in_digital_goods."Dépenses numériques",
-         theoric_amount_spent_in_physical_goods."Dépenses physiques"
+         theoric_amount_spent_in_physical_goods."Dépenses physiques",
+         theoric_amount_spent_in_outings."Dépenses sorties"
         FROM "user"
         LEFT JOIN experimentation_sessions ON "user".id = experimentation_sessions."user_id"
         LEFT JOIN activation_dates ON experimentation_sessions.user_id = activation_dates.user_id
@@ -489,6 +528,7 @@ def create_materialized_enriched_user_view() -> None:
         LEFT JOIN theoric_amount_spent ON actual_amount_spent.user_id = theoric_amount_spent.user_id
         LEFT JOIN theoric_amount_spent_in_digital_goods ON theoric_amount_spent.user_id = theoric_amount_spent_in_digital_goods.user_id
         LEFT JOIN theoric_amount_spent_in_physical_goods ON theoric_amount_spent_in_digital_goods.user_id = theoric_amount_spent_in_physical_goods.user_id
+        LEFT JOIN theoric_amount_spent_in_outings ON theoric_amount_spent_in_physical_goods.user_id = theoric_amount_spent_in_outings.user_id
         WHERE "user"."canBookFreeOffers");
         '''
     db.session.execute(query)
