@@ -47,3 +47,19 @@ def does_enriched_stocks_contains_data():
         return results.rowcount > 0
 
     return False
+
+
+def does_enriched_offer_data_exists():
+    query = '''SELECT * FROM information_schema.tables WHERE table_name = 'enriched_offer_data';'''
+    results = db.session.execute(query).fetchall()
+
+    return len(results) == 1
+
+
+def does_enriched_offer_contains_data():
+    if does_enriched_offer_data_exists():
+        query = '''SELECT * FROM enriched_offer_data;'''
+        results = db.session.execute(query)
+        return results.rowcount > 0
+
+    return False

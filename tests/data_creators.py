@@ -222,3 +222,4 @@ def clean_views():
     CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_digital_goods CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS enriched_offer_data CASCADE;')

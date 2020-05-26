@@ -12,6 +12,7 @@ from write.offerer_view.create_intermediate_views_for_offerer import create_firs
     create_first_booking_creation_dates_view, create_number_of_offers_view, \
     create_number_of_bookings_not_cancelled_view, create_number_of_venues_view, create_number_of_venues_without_offer_view, \
     create_materialized_enriched_offerer_view
+from write.create_intermediate_views_for_offer import create_enriched_offer_view
 
 
 def create_enriched_offerer_data():
@@ -46,3 +47,6 @@ def create_enriched_stock_data():
     create_stocks_booking_view()
     create_available_stocks_view()
     create_enriched_stock_view()
+
+def create_enriched_offer_data():
+    create_enriched_offer_view()
