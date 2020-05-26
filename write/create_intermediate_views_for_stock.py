@@ -1,4 +1,6 @@
 from db import db
+from sqlalchemy.exc import SQLAlchemyError
+
 
 STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "offer_name": "Nom de l'offre",
@@ -114,5 +116,11 @@ def create_enriched_stock_view() -> None:
          LEFT JOIN stock_booking_information ON stock.id = stock_booking_information.stock_id
          LEFT JOIN available_stock_information ON stock_booking_information.stock_id = available_stock_information.stock_id);
         '''
-    db.session.execute(query)
-    db.session.commit()
+
+    try:
+        db.session.execute(query)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+    finally:
+        db.session.close()

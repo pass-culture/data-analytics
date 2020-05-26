@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from db import db
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def _get_experimentation_sessions_query() -> str:
@@ -531,5 +532,11 @@ def create_materialized_enriched_user_view() -> None:
         LEFT JOIN theoric_amount_spent_in_outings ON theoric_amount_spent_in_physical_goods.user_id = theoric_amount_spent_in_outings.user_id
         WHERE "user"."canBookFreeOffers");
         '''
-    db.session.execute(query)
-    db.session.commit()
+
+    try:
+        db.session.execute(query)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+    finally:
+        db.session.close()

@@ -1,4 +1,5 @@
 from db import db
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def _get_first_stock_creation_dates_query() -> str:
@@ -111,5 +112,11 @@ def create_materialized_enriched_offerer_view() -> str:
     )
     ;
     '''
-    db.session.execute(query)
-    db.session.commit()
+
+    try:
+        db.session.execute(query)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+    finally:
+        db.session.close()
