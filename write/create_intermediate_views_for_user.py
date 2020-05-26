@@ -1,6 +1,9 @@
 from datetime import datetime
 
 from db import db
+from sqlalchemy import exc
+
+import flask
 
 
 def _get_experimentation_sessions_query() -> str:
@@ -491,5 +494,20 @@ def create_materialized_enriched_user_view() -> None:
         LEFT JOIN theoric_amount_spent_in_physical_goods ON theoric_amount_spent_in_digital_goods.user_id = theoric_amount_spent_in_physical_goods.user_id
         WHERE "user"."canBookFreeOffers");
         '''
-    db.session.execute(query)
-    db.session.commit()
+
+    #from sqlalchemy.exc import SQLAlchemyError
+
+    # except exc.SQLAlchemyError:
+    #     raise Error(db.error)
+    #except SQLAlchemyError as e:
+    #  error = str(e.__dict__['orig'])
+    #  return error
+
+    try:
+        db.session.execute(query)
+        db.session.commit()
+    except Exception as err:
+        db.session.rollback()
+        flask.abort(500, err)
+    finally:
+        db.session.close()
