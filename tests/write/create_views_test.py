@@ -69,7 +69,7 @@ class ViewQueriesTest:
     class CreateEnrichedUserViewTest:
         def test_should_create_enriched_user_data_view_with_columns(self, app):
             # Given
-            expected_columns = ["Vague d'expérimentation", "Département", "Statut", "Date d'activation",
+            expected_columns = ["Vague d'expérimentation", "Département", "Code postal", "Statut", "Date d'activation",
                                 "Date de remplissage du typeform",
                                 "Date de première connexion", "Date de première réservation",
                                 "Date de deuxième réservation",

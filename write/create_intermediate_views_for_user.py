@@ -458,6 +458,7 @@ def create_materialized_enriched_user_view() -> None:
          "user".id AS user_id,
          experimentation_sessions."Vague d'expérimentation",
          "user"."departementCode" AS "Département",
+         "user"."postalCode" AS "Code postal",
          "user".activity AS "Statut",
          activation_dates."Date d'activation",
          "user"."culturalSurveyFilledDate" AS "Date de remplissage du typeform",
