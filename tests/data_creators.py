@@ -205,6 +205,8 @@ def clean_views():
     CONNECTION.execute('DROP VIEW IF EXISTS related_bookings CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS related_offers CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS related_non_cancelled_bookings CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS related_venues CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS related_venues_with_offer CASCADE;')
     CONNECTION.execute('DROP MATERIALIZED VIEW IF EXISTS enriched_user_data CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS experimentation_sessions CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS activation_dates CASCADE;')
