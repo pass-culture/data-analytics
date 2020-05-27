@@ -139,7 +139,7 @@ class OffererQueriesTest:
             number_of_bookings_not_cancelled = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 0
 
-    class GetNumberOfVenuePerOffererQueryTest:
+    class GetNumberOfVenuesPerOffererQueryTest:
         def test_should_return_the_number_of_venue(self, app):
             # Given
             create_offerer(app, id=1)
@@ -168,6 +168,7 @@ class OffererQueriesTest:
             # Given
             create_offerer(app, id=1)
             create_venue(app, offerer_id=1, id=1)
+            create_venue(app, offerer_id=1, id=2, siret='12345678998765')
             create_product(app, id=1)
             create_offer(app, venue_id=1, product_id=1, id=1)
             create_offer(app, venue_id=1, product_id=1, id=2)
