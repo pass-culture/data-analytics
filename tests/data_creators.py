@@ -165,6 +165,15 @@ def create_deposit(app, id=1, amount=500, user_id=1, source='string', date_creat
         db.session.commit()
 
 
+def create_favorite(app, id=1, offer_id=1, user_id=1):
+    with app.app_context():
+        db.session.execute(f'''
+                    INSERT INTO favorite (id, "offerId", "userId")
+                    VALUES ({id}, {offer_id}, {user_id})
+                    ''')
+        db.session.commit()
+
+
 def update_table_column(app, id, table_name, column, value):
     with app.app_context():
         db.session.execute(f'''
@@ -179,6 +188,7 @@ def clean_database(app):
     with app.app_context():
         db.session.execute('''
         DELETE FROM "deposit";
+        DELETE FROM "favorite";
         DELETE FROM "recommendation";
         DELETE FROM payment_status;
         DELETE FROM payment;
@@ -223,3 +233,7 @@ def clean_views():
     CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_digital_goods CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;')
     CONNECTION.execute('DROP VIEW IF EXISTS enriched_offer_data CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS is_physical_view CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS is_outing_view CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS offer_booking_information_view CASCADE;')
+    CONNECTION.execute('DROP VIEW IF EXISTS count_favorites_view CASCADE;')

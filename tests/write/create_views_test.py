@@ -11,14 +11,13 @@ from tests.data_creators import clean_database, clean_views, create_user, create
 
 
 class ViewQueriesTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
-        clean_views()
-
-
     class CreateEnrichedStockViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_return_all_values(self, app):
             # Given
             create_user(app, id=1)
@@ -69,6 +68,12 @@ class ViewQueriesTest:
 
 
     class CreateEnrichedUserViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_create_enriched_user_data_view_with_columns(self, app):
             # Given
             expected_columns = ["Vague d'expérimentation", "Département", "Code postal", "Statut", "Date d'activation",
@@ -92,6 +97,12 @@ class ViewQueriesTest:
 
 
     class CreateEnrichedOffererViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_create_enriched_offerer_data_view_with_columns(self, app):
             # When
             with app.app_context():
@@ -108,13 +119,24 @@ class ViewQueriesTest:
 
 
     class CreateEnrichedOfferViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_create_enriched_offer_data_view_with_columns(self, app):
             # When
             with app.app_context():
                 create_enriched_offer_data()
 
             # Then
-            expected_columns = ["Catégorie de l'offre", "Date de création de l'offre", "Identifiant de l'offre", "Nom de l'offe"]
+            expected_columns = ["Identifiant de la structure", "Nom de la structure", "Identifiant du lieu",
+                                "Nom du lieu", "Département du lieu",
+                                "Nom de l'offe", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
+                                "Date de début de l'évènement", "Prix", "Offre numérique", "Stock",
+                                "Bien physique", "Sorties", "Nombre de réservations", "Nombre de réservations annulées",
+                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris"]
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
