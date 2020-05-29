@@ -1,7 +1,7 @@
 from models.install import install_materialized_views
 from install_database_extensions import install_database_extensions
 
-from models.db import db
+from models import db, models
 from flask import Flask
 from utils.logger import logger
 import os
@@ -17,7 +17,7 @@ with app.app_context():
     install_database_extensions(app)
 
     orm.configure_mappers()
-    for db_model in models.models:
+    for db_model in models:
          model_to_create = db_model.__table__
          model_to_create.create(bind=db.engine, checkfirst=True)
     db.session.commit()
