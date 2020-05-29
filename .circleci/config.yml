@@ -29,7 +29,7 @@ jobs:
            pip install -r requirements.txt;
            python -m nltk.downloader punkt stopwords;
            cp ../install_models.py install_models.py;
-           PYTHONPATH=. python install_models.py;
+           PYTHONPATH=. python install_database_extensions.py; python install_models.py;
      - run:
          name: Running tests
          command: |
