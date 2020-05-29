@@ -8,7 +8,7 @@ from db import DATABASE_URL, db
 from write.create_enriched_data_views import create_enriched_data_views
 from read.postgresql_database.health_check_queries import does_enriched_offerer_data_exists, does_enriched_user_data_exists, \
     does_enriched_offerer_contains_data, does_enriched_users_contains_data, does_enriched_stocks_contains_data, \
-    does_enriched_stock_data_exists
+    does_enriched_stock_data_exists, does_enriched_offer_data_exists, does_enriched_offer_data_exists, does_enriched_offer_contains_data
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET', '+%+3Q23!zbc+!Dd@')
@@ -33,6 +33,7 @@ def health_check_offerer_status():
 
     return jsonify(table_status), 200
 
+
 @app.route('/health/user')
 def health_check_user_status():
     table_status = get_user_enriched_data_status(
@@ -48,6 +49,16 @@ def health_check_stock_status():
     table_status = get_stock_enriched_data_status(
         is_enriched_stock_data_exists=does_enriched_stock_data_exists,
         is_enriched_stocks_contains_data=does_enriched_stocks_contains_data,
+    )
+
+    return jsonify(table_status), 200
+
+
+@app.route('/health/offerer')
+def health_check_offer_status():
+    table_status = get_offer_enriched_data_status(
+        is_enriched_offer_present=does_enriched_offer_data_exists,
+        is_enriched_offer_contains_data=does_enriched_offer_contains_data
     )
 
     return jsonify(table_status), 200

@@ -8,6 +8,8 @@ from write.create_intermediate_views_for_user import create_experimentation_sess
     create_actual_amount_spent_view, create_theoric_amount_spent_view, \
     create_theoric_amount_spent_in_digital_goods_view, create_theoric_amount_spent_in_physical_goods_view, \
     create_theoric_amount_spent_in_outings_view, create_materialized_enriched_user_view
+from write.create_intermediate_views_for_offer import create_is_physical_view, create_is_outing_view, \
+    create_booking_information_view, create_count_favorites_view, create_enriched_offer_view
 from write.offerer_view.create_intermediate_views_for_offerer import create_first_stock_creation_dates_view, \
     create_first_booking_creation_dates_view, create_number_of_offers_view, \
     create_number_of_bookings_not_cancelled_view, create_number_of_venues_view, create_number_of_venues_without_offer_view, \
@@ -46,3 +48,10 @@ def create_enriched_stock_data():
     create_stocks_booking_view()
     create_available_stocks_view()
     create_enriched_stock_view()
+
+def create_enriched_offer_data():
+    create_is_physical_view()
+    create_is_outing_view()
+    create_booking_information_view()
+    create_count_favorites_view()
+    create_enriched_offer_view()

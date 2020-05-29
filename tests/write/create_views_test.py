@@ -3,7 +3,7 @@ import pandas
 import pytest
 
 from db import CONNECTION
-from write.create_views import create_enriched_user_data, create_enriched_offerer_data
+from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data
 from write.create_intermediate_views_for_stock import create_stocks_booking_view, create_available_stocks_view, \
     create_enriched_stock_view
 from tests.data_creators import clean_database, clean_views, create_user, create_product, create_offerer, create_venue, \
@@ -11,13 +11,13 @@ from tests.data_creators import clean_database, clean_views, create_user, create
 
 
 class ViewQueriesTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
-        clean_views()
-
     class CreateEnrichedStockViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_return_all_values(self, app):
             # Given
             create_user(app, id=1)
@@ -66,7 +66,14 @@ class ViewQueriesTest:
             stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
 
+
     class CreateEnrichedUserViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_create_enriched_user_data_view_with_columns(self, app):
             # Given
             expected_columns = ["Vague d'expérimentation", "Département", "Code postal", "Statut", "Date d'activation",
@@ -88,7 +95,14 @@ class ViewQueriesTest:
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
             assert sorted(expected_columns) == sorted(beneficiary_users_details.columns)
 
+
     class CreateEnrichedOffererViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
         def test_should_create_enriched_offerer_data_view_with_columns(self, app):
             # When
             with app.app_context():
@@ -101,4 +115,28 @@ class ViewQueriesTest:
                                 "Nombre de lieux avec offres"]
 
             offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
+            assert sorted(expected_columns) == sorted(offerers_details.columns)
+
+
+    class CreateEnrichedOfferViewTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
+        def test_should_create_enriched_offer_data_view_with_columns(self, app):
+            # When
+            with app.app_context():
+                create_enriched_offer_data()
+
+            # Then
+            expected_columns = ["Identifiant de la structure", "Nom de la structure", "Identifiant du lieu",
+                                "Nom du lieu", "Département du lieu",
+                                "Nom de l'offe", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
+                                "Date de début de l'évènement", "Prix", "Offre numérique", "Stock",
+                                "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
+                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris"]
+
+            offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
