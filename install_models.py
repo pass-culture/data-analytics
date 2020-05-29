@@ -1,4 +1,4 @@
-from models.install import install_materialized_views
+from models.install import install_materialized_views, install_activity
 from install_database_extensions import install_database_extensions
 
 from models import models
@@ -16,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 with app.app_context():
+    install_activity()
     install_database_extensions(app)
 
     orm.configure_mappers()
