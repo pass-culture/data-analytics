@@ -7,7 +7,7 @@ from tests.data_creators import clean_database, clean_views, clean_tables, creat
 from write.create_views import create_enriched_offerer_data, create_enriched_stock_data, create_enriched_user_data, create_enriched_offer_data
 
 
-class DoesEnrichedOffererDataExistsTest:
+class DoesEnrichedOffererDataExistTest:
     @pytest.fixture(autouse=True)
     def setup_method(self, app):
         yield
@@ -253,7 +253,7 @@ class DoesEnrichedOfferSourceContainsDataTest:
         # Then
         assert result is True
 
-    def test_should_return_false_when_table_exists_and_contains_no_data(self, app):
+    def test_should_return_false_when_table_does_not_exist(self, app):
         # Given
         with app.app_context():
             create_enriched_offer_data()

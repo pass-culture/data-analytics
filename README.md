@@ -11,7 +11,6 @@ C'est l'outil de visualisation de données du pass Culture.
 1. `cd pass-culture-data-analytics`
 2. `docker-compose up`
 
-
 ### Configurer Metabase
 L'url pour accéder à Metabase en local est : http://localhost:3002/
 

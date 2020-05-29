@@ -135,7 +135,7 @@ class ViewQueriesTest:
                                 "Nom du lieu", "Département du lieu",
                                 "Nom de l'offe", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
                                 "Date de début de l'évènement", "Prix", "Offre numérique", "Stock",
-                                "Bien physique", "Sorties", "Nombre de réservations", "Nombre de réservations annulées",
+                                "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
                                 "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris"]
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')

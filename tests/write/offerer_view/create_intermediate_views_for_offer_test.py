@@ -18,14 +18,22 @@ class OfferQueriesTest:
             clean_database(app)
             clean_views()
 
-        def test_should_return_physical_product_column_with_true_if_relevant_product_type(self, app):
+        @pytest.mark.parametrize('offer_type', [
+            'ThingType.INSTRUMENT',
+            'ThingType.JEUX',
+            'ThingType.LIVRE_EDITION',
+            'ThingType.MUSIQUE',
+            'ThingType.OEUVRE_ART',
+            'ThingType.AUDIOVISUEL'
+        ])
+        def test_should_return_physical_product_column_with_true_if_relevant_product_type(self, app, offer_type):
             # Given
             create_user(app, id=1)
             create_product(app, id=1)
             create_offerer(app, id=1)
             create_venue(app, offerer_id=1, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(app, venue_id=1, product_id=1, id=1, product_type='ThingType.LIVRE_EDITION')
+            create_offer(app, venue_id=1, product_id=1, id=1, product_type=offer_type)
 
             expected_is_physical_information = pandas.Series(
                 index=pandas.Index(data=[1], name='offer_id'),
@@ -68,26 +76,39 @@ class OfferQueriesTest:
             clean_database(app)
             clean_views()
 
-        def test_should_return_outings_column_with_true_if_relevant_product_type(self, app):
+        @pytest.mark.parametrize('offer_type', [
+            'EventType.CINEMA'
+            , 'EventType.JEUX'
+            , 'ThingType.SPECTACLE_VIVANT_ABO'
+            , 'EventType.MUSIQUE'
+            , 'ThingType.MUSEES_PATRIMOINE_ABO'
+            , 'ThingType.CINEMA_CARD'
+            , 'ThingType.PRATIQUE_ARTISTIQUE_ABO'
+            , 'ThingType.CINEMA_ABO'
+            , 'EventType.MUSEES_PATRIMOINE'
+            , 'EventType.PRATIQUE_ARTISTIQUE'
+            , 'EventType.CONFERENCE_DEBAT_DEDICACE'
+        ])
+        def test_should_return_outings_column_with_true_if_relevant_product_type(self, app, offer_type):
             # Given
             create_user(app, id=1)
             create_product(app, id=1)
             create_offerer(app, id=1)
             create_venue(app, offerer_id=1, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(app, venue_id=1, product_id=1, id=1, product_type='EventType.MUSIQUE')
+            create_offer(app, venue_id=1, product_id=1, id=1, product_type=offer_type)
 
             expected_is_outing_information = pandas.Series(
                 index=pandas.Index(data=[1], name='offer_id'),
                 data=[True],
-                name="Sorties")
+                name="Sortie")
 
             # When
             query = _get_is_outing_information_query()
 
             # Then
             is_outing_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
-            pandas.testing.assert_series_equal(is_outing_information["Sorties"], expected_is_outing_information)
+            pandas.testing.assert_series_equal(is_outing_information["Sortie"], expected_is_outing_information)
 
         def test_should_return_outings_column_with_false_if_not_relevant_product_type(self, app):
             # Given
@@ -101,14 +122,14 @@ class OfferQueriesTest:
             expected_is_outing_information = pandas.Series(
                 index=pandas.Index(data=[1], name='offer_id'),
                 data=[False],
-                name="Sorties")
+                name="Sortie")
 
             # When
             query = _get_is_outing_information_query()
 
             # Then
             is_outing_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
-            pandas.testing.assert_series_equal(is_outing_information["Sorties"], expected_is_outing_information)
+            pandas.testing.assert_series_equal(is_outing_information["Sortie"], expected_is_outing_information)
 
 
     class GetOfferBookingInformationQueryTest:
@@ -118,7 +139,7 @@ class OfferQueriesTest:
             clean_database(app)
             clean_views()
 
-        def test_should_return_booking_cancled_booking_and_used_booking_number_columns(self, app):
+        def test_should_return_booking_cancelled_booking_and_used_booking_number_columns(self, app):
             # Given
             create_user(app, id=1)
             create_deposit(app, amount=500)
@@ -163,7 +184,7 @@ class OfferQueriesTest:
             clean_database(app)
             clean_views()
 
-        def test_(self, app):
+        def test_should_return_how_many_time_in_favorite_columns(self, app):
             # Given
             create_user(app, id=1)
             create_product(app, id=1)

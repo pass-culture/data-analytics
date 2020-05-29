@@ -32,7 +32,7 @@ def _get_is_outing_information_query() -> str:
                          ,'EventType.MUSEES_PATRIMOINE'
                          ,'EventType.PRATIQUE_ARTISTIQUE'
                          ,'EventType.CONFERENCE_DEBAT_DEDICACE')
-        then true else false end as "Sorties"
+        then true else false end as "Sortie"
     FROM offer
 '''
 
@@ -105,7 +105,7 @@ def create_enriched_offer_view() -> None:
             ,stock."price" AS "Prix"
             ,stock."quantity" AS "Stock"
             ,is_physical_view."Bien physique"
-            ,is_outing_view."Sorties"
+            ,is_outing_view."Sortie"
             ,offer_booking_information_view."Nombre de réservations"
             ,offer_booking_information_view."Nombre de réservations annulées"
             ,offer_booking_information_view."Nombre de réservations validées"
