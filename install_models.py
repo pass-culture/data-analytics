@@ -1,7 +1,8 @@
 from models.install import install_materialized_views
 from install_database_extensions import install_database_extensions
 
-from models import db, models
+from models import models
+from models.db import db
 from flask import Flask
 from utils.logger import logger
 import os
@@ -11,6 +12,7 @@ from sqlalchemy import orm
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db.init_app(app)
 
 with app.app_context():
