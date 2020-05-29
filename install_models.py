@@ -15,7 +15,13 @@ db.init_app(app)
 
 with app.app_context():
     install_database_extensions(app)
+
     orm.configure_mappers()
+    for db_model in models.models:
+         model_to_create = db_model.__table__
+         model_to_create.create(bind=db.engine, checkfirst=True)
+    db.session.commit()
+
     install_materialized_views()
 
 logger.info('[INSTALL MODELS] Installation completed')
