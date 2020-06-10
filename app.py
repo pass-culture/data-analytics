@@ -7,7 +7,7 @@ from db import DATABASE_URL, db
 from read.postgresql_database.health_check_queries import is_enriched_materialized_view_queryable, \
     does_enriched_offerer_contain_data, does_enriched_users_contains_data, does_enriched_stock_contain_data, \
     does_enriched_offer_contain_data, \
-    does_view_exist, is_enriched_view_queryable
+    is_enriched_view_queryable
 from utils.health_check.get_offer_enriched_data_status import get_offer_enriched_data_status
 from utils.health_check.get_offerer_enriched_data_status import get_offerer_enriched_data_status
 from utils.health_check.get_stock_enriched_data_status import get_stock_enriched_data_status

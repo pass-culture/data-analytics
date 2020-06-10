@@ -2,6 +2,8 @@ import os
 
 import pytest
 from flask import Flask
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 from db import db
 from db import DATABASE_URL
@@ -19,5 +21,8 @@ def app():
 
     db.init_app(app)
     app.app_context().push()
+    engine = create_engine(DATABASE_URL)
+    TestSession = sessionmaker(bind=engine)
+    app.session = scoped_session(TestSession)
 
     return app
