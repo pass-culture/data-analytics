@@ -2,6 +2,7 @@ from app import app
 
 app.testing = True
 
+
 class HealthCheckTest:
     def test_health_check_on_offerer(self):
         with app.test_client() as client:
@@ -12,7 +13,6 @@ class HealthCheckTest:
             assert response.status_code == 200
             assert response.json == {'is_enriched_offerer_datasource_exists': False, 'is_offerer_ok': False}
 
-
     def test_health_check_on_user(self):
         with app.test_client() as client:
             # When
@@ -22,7 +22,6 @@ class HealthCheckTest:
             assert response.status_code == 200
             assert response.json == {'is_enriched_user_datasource_exists': False, 'is_user_ok': False}
 
-
     def test_health_check_on_stock(self):
         with app.test_client() as client:
             # When
@@ -31,7 +30,6 @@ class HealthCheckTest:
             # Then
             assert response.status_code == 200
             assert response.json == {'is_enriched_stock_datasource_exists': False, 'is_stock_ok': False}
-
 
     def test_health_check_on_offer(self):
         with app.test_client() as client:

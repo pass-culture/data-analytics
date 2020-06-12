@@ -9,7 +9,7 @@ from db import db
 from read.postgresql_database.health_check_queries import is_enriched_materialized_view_queryable, \
     does_enriched_offerer_contain_data, does_enriched_stock_contain_data, \
     does_enriched_users_contains_data, \
-    does_enriched_offer_contain_data, HealthCheckSession, does_materialize_view_exist, does_view_exist, \
+    does_enriched_offer_contain_data, does_materialize_view_exist, does_view_exist, \
     does_view_have_data
 from tests.data_creators import clean_database, clean_views, clean_tables, create_offerer, create_venue, \
     create_product, create_offer, \
@@ -32,22 +32,24 @@ class DoesMaterializeViewExistTest:
         clean_views()
         clean_tables()
 
-    def test_should_return_false_if_materialized_view_does_not_exist(self):
-        result = does_materialize_view_exist(HealthCheckSession(), 'enriched_offerer_data')
+    def test_should_return_false_if_materialized_view_does_not_exist(self, app):
+        with app.app_context():
 
-        # Then
-        assert result is False
+            result = does_materialize_view_exist(db.session, 'enriched_offerer_data')
+
+            # Then
+            assert result is False
 
     def test_should_return_true_if_materialized_view_exists(self, app):
         # Given
         with app.app_context():
             create_enriched_offerer_data()
 
-        # When
-        result = does_materialize_view_exist(HealthCheckSession(), 'enriched_offerer_data')
+            # When
+            result = does_materialize_view_exist(db.session, 'enriched_offerer_data')
 
-        # Then
-        assert result is True
+            # Then
+            assert result is True
 
 
 class DoesViewExistTest:
@@ -58,22 +60,24 @@ class DoesViewExistTest:
         clean_views()
         clean_tables()
 
-    def test_should_return_false_if_view_does_not_exist(self):
-        result = does_view_exist(HealthCheckSession(), 'enriched_stock_data')
+    def test_should_return_false_if_view_does_not_exist(self, app):
+        with app.app_context():
 
-        # Then
-        assert result is False
+            result = does_view_exist(db.session, 'enriched_stock_data')
+
+            # Then
+            assert result is False
 
     def test_should_return_true_if_view_exists(self, app):
         # Given
         with app.app_context():
             create_enriched_stock_data()
 
-        # When
-        result = does_view_exist(HealthCheckSession(), 'enriched_stock_data')
+            # When
+            result = does_view_exist(db.session, 'enriched_stock_data')
 
-        # Then
-        assert result is True
+            # Then
+            assert result is True
 
 
 class IsEnrichedMaterializedViewQueryableTest:
@@ -85,7 +89,7 @@ class IsEnrichedMaterializedViewQueryableTest:
         clean_tables()
 
     @patch('read.postgresql_database.health_check_queries.does_materialize_view_exist')
-    def test_should_commit_then_close_session_if_query_did_not_end_on_an_exception(self,
+    def test_should_close_session_if_query_did_not_end_on_an_exception(self,
                                                                                    does_materialize_view_exist_mock):
         # Given
         does_materialize_view_exist_mock.return_value = True
@@ -96,7 +100,6 @@ class IsEnrichedMaterializedViewQueryableTest:
 
         # Then
         assert result is True
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
 
     @patch('read.postgresql_database.health_check_queries.does_materialize_view_exist')
@@ -125,7 +128,6 @@ class IsEnrichedMaterializedViewQueryableTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_not_called()
         local_session.close.assert_called_once()
         logger_mock.error.assert_called_once()
 
@@ -142,7 +144,6 @@ class IsEnrichedMaterializedViewQueryableTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_not_called()
         local_session.close.assert_called_once()
         logger_mock.error.assert_called_once()
 
@@ -159,7 +160,6 @@ class IsEnrichedMaterializedViewQueryableTest:
             is_enriched_materialized_view_queryable(Session, 'enriched_offerer_data')
 
         # Then
-        local_session.commit.assert_not_called()
         local_session.close.assert_not_called()
         logger_mock.error.assert_not_called()
 
@@ -236,7 +236,6 @@ class DoesEnrichedOffererSourceContainDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_materialized_view_queryable_mock.assert_called_once_with(Session, 'enriched_offerer_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_offerer_data')
@@ -255,7 +254,6 @@ class DoesEnrichedOffererSourceContainDataTest:
 
         # Then
         assert result is True
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_materialized_view_queryable_mock.assert_called_once_with(Session, 'enriched_offerer_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_offerer_data')
@@ -275,7 +273,6 @@ class DoesEnrichedOffererSourceContainDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_not_called()
         local_session.close.assert_called_once()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable')
@@ -290,10 +287,9 @@ class DoesEnrichedOffererSourceContainDataTest:
         # When
         with pytest.raises(Exception):
             result = does_enriched_offerer_contain_data(Session)
+            # Then
             assert result is None
 
-        # Then
-        local_session.commit.assert_not_called()
         local_session.close.assert_not_called()
 
 
@@ -333,7 +329,6 @@ class DoesEnrichedUserSourceContainsDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_materialized_view_queryable_mock.assert_called_once_with(Session, 'enriched_user_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_user_data')
@@ -352,7 +347,6 @@ class DoesEnrichedUserSourceContainsDataTest:
 
         # Then
         assert result is True
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_materialized_view_queryable_mock.assert_called_once_with(Session, 'enriched_user_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_user_data')
@@ -372,7 +366,6 @@ class DoesEnrichedUserSourceContainsDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_not_called()
         local_session.close.assert_called_once()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable')
@@ -387,10 +380,9 @@ class DoesEnrichedUserSourceContainsDataTest:
         # When
         with pytest.raises(Exception):
             result = does_enriched_users_contains_data(Session)
+            # Then
             assert result is None
 
-        # Then
-        local_session.commit.assert_not_called()
         local_session.close.assert_not_called()
 
 
@@ -430,7 +422,6 @@ class DoesEnrichedStocksSourceContainsDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_view_queryable_mock.assert_called_once_with(Session, 'enriched_stock_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_stock_data')
@@ -449,7 +440,6 @@ class DoesEnrichedStocksSourceContainsDataTest:
 
         # Then
         assert result is True
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_view_queryable_mock.assert_called_once_with(Session, 'enriched_stock_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_stock_data')
@@ -469,7 +459,6 @@ class DoesEnrichedStocksSourceContainsDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_not_called()
         local_session.close.assert_called_once()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_view_queryable')
@@ -484,10 +473,9 @@ class DoesEnrichedStocksSourceContainsDataTest:
         # When
         with pytest.raises(Exception):
             result = does_enriched_stock_contain_data(Session)
+            # Then
             assert result is None
 
-        # Then
-        local_session.commit.assert_not_called()
         local_session.close.assert_not_called()
 
 
@@ -527,7 +515,6 @@ class DoesEnrichedOfferSourceContainsDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_view_queryable_mock.assert_called_once_with(Session, 'enriched_offer_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_offer_data')
@@ -546,7 +533,6 @@ class DoesEnrichedOfferSourceContainsDataTest:
 
         # Then
         assert result is True
-        local_session.commit.assert_called_once()
         local_session.close.assert_called_once()
         is_enriched_view_queryable_mock.assert_called_once_with(Session, 'enriched_offer_data')
         does_view_have_data_mock.assert_called_once_with(local_session, 'enriched_offer_data')
@@ -566,7 +552,6 @@ class DoesEnrichedOfferSourceContainsDataTest:
 
         # Then
         assert result is False
-        local_session.commit.assert_not_called()
         local_session.close.assert_called_once()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_view_queryable')
@@ -581,8 +566,7 @@ class DoesEnrichedOfferSourceContainsDataTest:
         # When
         with pytest.raises(Exception):
             result = does_enriched_offer_contain_data(Session)
+            # Then
             assert result is None
 
-        # Then
-        local_session.commit.assert_not_called()
         local_session.close.assert_not_called()
