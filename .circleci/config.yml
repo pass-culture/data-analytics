@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Initialize environment
           command: |
-            git clone https://github.com/betagouv/pass-culture-api.git;
+            git clone --single-branch --branch $CIRCLE_BRANCH https://github.com/betagouv/pass-culture-api.git || git clone https://github.com/betagouv/pass-culture-api.git;
             cd pass-culture-api;
             sh ./prepare-database.sh;
       - run:
