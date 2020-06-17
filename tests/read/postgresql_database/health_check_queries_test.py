@@ -10,7 +10,7 @@ from read.postgresql_database.health_check_queries import is_enriched_materializ
     does_enriched_offerer_contain_data, does_enriched_stock_contain_data, \
     does_enriched_users_contains_data, \
     does_enriched_offer_contain_data, does_materialize_view_exist, does_view_exist, \
-    does_view_have_data
+    does_view_have_data, is_enriched_view_queryable
 from tests.data_creators import clean_database, clean_views, clean_tables, create_offerer, create_venue, \
     create_product, create_offer, \
     create_stock
@@ -34,7 +34,6 @@ class DoesMaterializeViewExistTest:
 
     def test_should_return_false_if_materialized_view_does_not_exist(self, app):
         with app.app_context():
-
             result = does_materialize_view_exist(db.session, 'enriched_offerer_data')
 
             # Then
@@ -62,7 +61,6 @@ class DoesViewExistTest:
 
     def test_should_return_false_if_view_does_not_exist(self, app):
         with app.app_context():
-
             result = does_view_exist(db.session, 'enriched_stock_data')
 
             # Then
@@ -90,7 +88,7 @@ class IsEnrichedMaterializedViewQueryableTest:
 
     @patch('read.postgresql_database.health_check_queries.does_materialize_view_exist')
     def test_should_close_session_if_query_did_not_end_on_an_exception(self,
-                                                                                   does_materialize_view_exist_mock):
+                                                                       does_materialize_view_exist_mock):
         # Given
         does_materialize_view_exist_mock.return_value = True
         Session, local_session = _get_mocked_session()
@@ -158,6 +156,82 @@ class IsEnrichedMaterializedViewQueryableTest:
         # When
         with pytest.raises(Exception):
             is_enriched_materialized_view_queryable(Session, 'enriched_offerer_data')
+
+        # Then
+        local_session.close.assert_not_called()
+        logger_mock.error.assert_not_called()
+
+
+class IsEnrichedViewQueryableTest:
+    @patch('read.postgresql_database.health_check_queries.does_view_exist')
+    def test_should_close_session_if_query_did_not_end_on_an_exception(self,
+                                                                       does_view_exist_mock):
+        # Given
+        does_view_exist_mock.return_value = True
+        Session, local_session = _get_mocked_session()
+
+        # When
+        result = is_enriched_view_queryable(Session, 'enriched_offer_data')
+
+        # Then
+        assert result is True
+        local_session.close.assert_called_once()
+
+    @patch('read.postgresql_database.health_check_queries.does_view_exist')
+    def test_should_look_for_given_view_in_database(self, does_view_exist_mock):
+        # Given
+        does_view_exist_mock.return_value = True
+        Session, local_session = _get_mocked_session()
+
+        # When
+        result = is_enriched_view_queryable(Session, 'enriched_stock_data')
+
+        # Then
+        does_view_exist_mock.assert_called_once_with(local_session, 'enriched_stock_data')
+
+    @patch('read.postgresql_database.health_check_queries.does_view_exist')
+    @patch('read.postgresql_database.health_check_queries.logger')
+    def test_should_log_error_and_close_session_when_operational_error_is_raised(self, logger_mock,
+                                                                                 does_view_exist_mock):
+        # Given
+        does_view_exist_mock.side_effect = OperationalError('', '', '')
+        Session, local_session = _get_mocked_session()
+
+        # When
+        result = is_enriched_view_queryable(Session, 'enriched_offer_data')
+
+        # Then
+        assert result is False
+        local_session.close.assert_called_once()
+        logger_mock.error.assert_called_once()
+
+    @patch('read.postgresql_database.health_check_queries.does_view_exist')
+    @patch('read.postgresql_database.health_check_queries.logger')
+    def test_should_log_error_and_close_session_when_an_sql_alchemy_error_is_raised(self, logger_mock,
+                                                                                    does_view_exist_mock):
+        # Given
+        does_view_exist_mock.side_effect = SQLAlchemyError('', '', '')
+        Session, local_session = _get_mocked_session()
+
+        # When
+        result = is_enriched_view_queryable(Session, 'enriched_offer_data')
+
+        # Then
+        assert result is False
+        local_session.close.assert_called_once()
+        logger_mock.error.assert_called_once()
+
+    @patch('read.postgresql_database.health_check_queries.does_view_exist')
+    @patch('read.postgresql_database.health_check_queries.logger')
+    def test_should_raise_exception_when_it_does_not_come_from_sql_alchemy(self, logger_mock,
+                                                                           does_view_exist_mock):
+        # Given
+        does_view_exist_mock.side_effect = Exception
+        Session, local_session = _get_mocked_session()
+
+        # When
+        with pytest.raises(Exception):
+            is_enriched_view_queryable(Session, 'enriched_offer_data')
 
         # Then
         local_session.close.assert_not_called()
