@@ -1,40 +1,35 @@
 version: 2
 jobs:
- build:
-   docker:
-     - image: circleci/python:3.7.6
-       environment:
-         DATABASE_URL: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
-     - image: circleci/postgres:11.6-postgis
-       name: postgres-product
-       environment:
-         POSTGRES_USER: pass_culture
-         POSTGRES_PASSWORD: passq
-         POSTGRES_DB: pass_culture
-   steps:
-     - checkout
-     - run:
-         name: Install requirements
-         command: |
-           python3 -m venv venv
-           . venv/bin/activate
-           pip install -r requirements.txt
-     - run:
-         name: Initialize environment
-         command: |
-           git clone https://github.com/betagouv/pass-culture-api.git;
-           cd pass-culture-api;
-           python3 -m venv venv
-           . venv/bin/activate
-           pip install -r requirements.txt;
-           python -m nltk.downloader punkt stopwords;
-           cp ../install_models.py install_models.py;
-           PYTHONPATH=. python install_models.py;
-     - run:
-         name: Running tests
-         command: |
-           . venv/bin/activate
-           pytest tests
+  build:
+    docker:
+      - image: circleci/python:3.7.6
+        environment:
+          DATABASE_URL: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
+      - image: circleci/postgres:11.6-postgis
+        name: postgres-product
+        environment:
+          POSTGRES_USER: pass_culture
+          POSTGRES_PASSWORD: passq
+          POSTGRES_DB: pass_culture
+    steps:
+      - checkout
+      - run:
+          name: Install requirements
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: Initialize environment
+          command: |
+            git clone https://github.com/betagouv/pass-culture-api.git;
+            cd pass-culture-api;
+            sh ./prepare-database.sh;
+      - run:
+          name: Running tests
+          command: |
+            . venv/bin/activate
+            pytest tests
 
 workflows:
   version: 2
