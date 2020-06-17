@@ -26,7 +26,7 @@ def is_enriched_view_queryable(healthcheck_session_maker: sessionmaker, view_nam
     is_enriched_offerer_data_present = False
     health_check_session = healthcheck_session_maker()
     try:
-        is_enriched_offerer_data_present = does_materialize_view_exist(health_check_session, view_name)
+        is_enriched_offerer_data_present = does_view_exist(health_check_session, view_name)
     except SQLAlchemyError as error:
         logger.error(f"[HEALTH CHECK] There was an error while handling the query : {str(error)}")
     except Exception as error:
@@ -42,7 +42,7 @@ def does_materialize_view_exist(health_check_session: session.Session, materiali
 
 
 def does_view_exist(health_check_session: session.Session, view_name: str) -> bool:
-    query = f'''SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name = '{view_name}');'''
+    query = f'''SELECT EXISTS(SELECT FROM pg_views WHERE viewname = '{view_name}');'''
     is_enriched_view_present = health_check_session.execute(query).scalar()
     return is_enriched_view_present
 
