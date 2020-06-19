@@ -24,8 +24,12 @@ jobs:
           command: |
             git clone --single-branch --branch $CIRCLE_BRANCH https://github.com/betagouv/pass-culture-api.git || git clone https://github.com/betagouv/pass-culture-api.git;
             cd pass-culture-api;
-            sudo apt-get install -y postgresql-client;
-            sh ./prepare-database.sh;
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt;
+            python -m nltk.downloader punkt stopwords;
+            python install_database_extensions.py;
+            PYTHONPATH=. alembic upgrade head;
       - run:
           name: Running tests
           command: |
