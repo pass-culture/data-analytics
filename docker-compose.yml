@@ -28,8 +28,8 @@ services:
                cd pass-culture-api;
                pip install -r requirements.txt;
                python -m nltk.downloader punkt stopwords;
-               cp /opt/enriched_data/install_models.py /opt/pass-culture-api/install_models.py;
-               PYTHONPATH=. python install_models.py;
+               python install_database_extensions.py
+               PYTHONPATH=. alembic upgrade head
                "
     env_file:
       - env_file
