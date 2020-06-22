@@ -133,10 +133,10 @@ class ViewQueriesTest:
             # Then
             expected_columns = ["Identifiant de la structure", "Nom de la structure", "Identifiant du lieu",
                                 "Nom du lieu", "Département du lieu",
-                                "Nom de l'offe", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
-                                "Date de début de l'évènement", "Prix", "Offre numérique", "Stock",
+                                "Nom de l'offre", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
+                                "Offre numérique",
                                 "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
-                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris"]
+                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris","Stock"]
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)

@@ -3,7 +3,7 @@ import pytest
 
 from db import CONNECTION
 from write.create_intermediate_views_for_offer import _get_is_physical_information_query, _get_is_outing_information_query, \
-    _get_offer_booking_information_query, _get_count_favorites_query
+    _get_offer_booking_information_query, _get_count_favorites_query, _get_offer_stock_info
 
 from tests.data_creators import clean_database, clean_views, create_user, create_product, create_offerer, create_venue, \
     create_offer, create_stock, create_booking, create_deposit, create_favorite
@@ -205,3 +205,29 @@ class OfferQueriesTest:
             # Then
             count_favorites = pandas.read_sql(query, CONNECTION, index_col='offer_id')
             pandas.testing.assert_series_equal(count_favorites["Nombre de fois où l'offre a été mise en favoris"], expected_favorites_number)
+
+    class GetSumStockTest:
+        @pytest.fixture(autouse=True)
+        def setup_method(self, app):
+            yield
+            clean_database(app)
+            clean_views()
+
+        def test_should_return_how_many_stocks(self, app):
+            # Given
+            create_offerer(app, id=10)
+            create_venue(app, id=15, offerer_id=10)
+            create_product(app, id=1)
+            create_offer(app, id=30, venue_id=15,product_id=1)
+            create_stock(app, id=20, offer_id=30)
+            create_stock(app, id=21, offer_id=30)
+
+            expected_offer_stock = pandas.Series(
+                index=pandas.Index(data=[30], name='offer_id'),
+                data=[20],
+                name="Stock")
+            # When
+            query = _get_offer_stock_info()
+            # Then
+            offer_stock = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            pandas.testing.assert_series_equal(offer_stock["Stock"],expected_offer_stock)
