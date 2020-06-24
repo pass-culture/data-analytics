@@ -58,7 +58,7 @@ def _get_count_favorites_query() -> str:
     GROUP BY offer_id
     '''
 
-def _get_offer_stock_info() -> str:
+def _get_offer_info_with_quantity()-> str:
     return '''
         SELECT
             "offerId" AS offer_id
@@ -98,7 +98,7 @@ def create_count_favorites_view() -> None:
 
 def create_sum_stock_view() -> None:
     view_query = f'''
-        CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_stock_info()}
+        CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_info_with_quantity()}
         '''
     db.session.execute(view_query)
     db.session.commit()

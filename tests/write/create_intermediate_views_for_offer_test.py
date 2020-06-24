@@ -3,7 +3,7 @@ import pytest
 
 from db import CONNECTION
 from write.create_intermediate_views_for_offer import _get_is_physical_information_query, _get_is_outing_information_query, \
-    _get_offer_booking_information_query, _get_count_favorites_query, _get_offer_stock_info
+    _get_offer_booking_information_query, _get_count_favorites_query, _get_offer_info_with_quantity
 
 from tests.data_creators import clean_database, clean_views, create_user, create_product, create_offerer, create_venue, \
     create_offer, create_stock, create_booking, create_deposit, create_favorite
@@ -227,7 +227,7 @@ class OfferQueriesTest:
                 data=[20],
                 name="Stock")
             # When
-            query = _get_offer_stock_info()
+            query = _get_offer_info_with_quantity()
             # Then
             offer_stock = pandas.read_sql(query, CONNECTION, index_col='offer_id')
             pandas.testing.assert_series_equal(offer_stock["Stock"],expected_offer_stock)

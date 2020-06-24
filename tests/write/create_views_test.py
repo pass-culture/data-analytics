@@ -136,7 +136,7 @@ class ViewQueriesTest:
                                 "Nom de l'offre", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
                                 "Offre numérique",
                                 "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
-                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris","Stock"]
+                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris", "Stock"]
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
