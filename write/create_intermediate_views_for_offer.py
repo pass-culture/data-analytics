@@ -58,7 +58,7 @@ def _get_count_favorites_query() -> str:
     GROUP BY offer_id
     '''
 
-def _get_offer_stock_info() -> str:
+def _get_offer_info_with_quantity() -> str:
     return '''
         SELECT
             "offerId" AS offer_id
