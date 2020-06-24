@@ -62,7 +62,7 @@ def _get_offer_stock_info() -> str:
     return '''
         SELECT
             "offerId" AS offer_id
-            ,sum(quantity) AS "Stock"
+            ,sum(quantity) AS stock_quantity
         FROM stock
         GROUP BY offer_id
     '''
