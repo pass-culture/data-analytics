@@ -12,10 +12,8 @@ from write.offerer_view.create_intermediate_views_for_offerer import _get_first_
 
 
 class OffererQueriesTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
 
     class GetFirstStockCreationDatesQueryTest:

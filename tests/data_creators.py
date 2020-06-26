@@ -12,9 +12,9 @@ def create_user(app, id=1, email='test@email.com', can_book_free_offers=True, is
                '666c6b69675061793347397968527561'
     with app.app_context():
         db.session.execute(f'''
-        INSERT INTO "user" (id, email, "publicName", "canBookFreeOffers", "isAdmin", password, "postalCode", 
+        INSERT INTO "user" (id, email, "publicName", "canBookFreeOffers", "isAdmin", password, "postalCode",
         "departementCode", "dateCreated", "needsToFillCulturalSurvey", "culturalSurveyFilledDate")
-        VALUES ({id}, '{email}', '{public_name}', {can_book_free_offers}, {is_admin}, '{password}', '{postal_code}', 
+        VALUES ({id}, '{email}', '{public_name}', {can_book_free_offers}, {is_admin}, '{password}', '{postal_code}',
         '{departement_code}', '{date_created}', {needs_to_fill_cultural_survey}, {cultural_survey_filled_date})
         ''')
         db.session.commit()
@@ -177,31 +177,29 @@ def create_favorite(app, id=1, offer_id=1, user_id=1):
 def update_table_column(app, id, table_name, column, value):
     with app.app_context():
         db.session.execute(f'''
-                UPDATE {table_name} 
+                UPDATE {table_name}
                 SET {column} = ({value})
                 WHERE id={id}
                 ''')
         db.session.commit()
 
 
-def clean_database(app):
-    with app.app_context():
-        db.session.execute('''
-        DELETE FROM "deposit";
-        DELETE FROM "favorite";
-        DELETE FROM "recommendation";
-        DELETE FROM payment_status;
-        DELETE FROM payment;
-        DELETE FROM "booking";
-        DELETE FROM "stock";
-        DELETE FROM "offer";
-        DELETE FROM "product";
-        DELETE FROM "venue";
-        DELETE FROM "mediation";
-        DELETE FROM "offerer";
-        DELETE FROM "user";
-        ''')
-        db.session.commit()
+def clean_database():
+    CONNECTION.execute('''
+    DELETE FROM "deposit";
+    DELETE FROM "favorite";
+    DELETE FROM "recommendation";
+    DELETE FROM payment_status;
+    DELETE FROM payment;
+    DELETE FROM "booking";
+    DELETE FROM "stock";
+    DELETE FROM "offer";
+    DELETE FROM "product";
+    DELETE FROM "venue";
+    DELETE FROM "mediation";
+    DELETE FROM "offerer";
+    DELETE FROM "user";
+    ''')
 
 def clean_tables():
     CONNECTION.execute('DROP TABLE IF EXISTS offerer_cultural_activity;')

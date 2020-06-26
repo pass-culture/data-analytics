@@ -12,10 +12,8 @@ from tests.data_creators import clean_database, clean_views, create_user, create
 class OfferQueriesTest:
 
     class GetIsPhysicalInformationQueryTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         @pytest.mark.parametrize('offer_type', [
@@ -70,10 +68,8 @@ class OfferQueriesTest:
 
 
     class GetIsOutingInformationQueryTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         @pytest.mark.parametrize('offer_type', [
@@ -133,10 +129,8 @@ class OfferQueriesTest:
 
 
     class GetOfferBookingInformationQueryTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_return_booking_cancelled_booking_and_used_booking_number_columns(self, app):
@@ -178,10 +172,8 @@ class OfferQueriesTest:
 
 
     class GetCountFavoritesQueryTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_return_how_many_time_in_favorite_columns(self, app):
@@ -207,10 +199,8 @@ class OfferQueriesTest:
             pandas.testing.assert_series_equal(count_favorites["Nombre de fois où l'offre a été mise en favoris"], expected_favorites_number)
 
     class GetSumStockTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_return_how_many_stocks(self, app):

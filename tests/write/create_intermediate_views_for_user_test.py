@@ -12,10 +12,8 @@ from tests.data_creators import create_user, create_offerer, create_venue, creat
 
 
 class UserQueriesTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
 
     class GetExperimentationSessionsTest:

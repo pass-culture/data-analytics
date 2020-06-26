@@ -5,10 +5,8 @@ from tests.data_creators import clean_database, clean_views, create_offerer
 
 
 class OffererQueriesTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
 
     class GetSirenDataFrameTest:
