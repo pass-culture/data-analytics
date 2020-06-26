@@ -25,10 +25,8 @@ def _get_mocked_session() -> Tuple[sessionmaker, session.Session]:
 
 
 class DoesMaterializeViewExistTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
         clean_tables()
 
@@ -52,10 +50,8 @@ class DoesMaterializeViewExistTest:
 
 
 class DoesViewExistTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
         clean_tables()
 
@@ -79,10 +75,8 @@ class DoesViewExistTest:
 
 
 class IsEnrichedMaterializedViewQueryableTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
         clean_tables()
 
@@ -239,9 +233,8 @@ class IsEnrichedViewQueryableTest:
 
 
 class DoesViewHaveDataTest:
-    @pytest.fixture(autouse=True)
-    def setup_class(self, app):
-        clean_database(app)
+    def setup_class(self):
+        clean_database()
         clean_views()
 
     def test_should_return_false_if_view_exists_but_is_empty(self, app):
@@ -275,9 +268,8 @@ class DoesViewHaveDataTest:
 
 
 class DoesEnrichedOffererSourceContainDataTest:
-    @pytest.fixture(autouse=True)
-    def setup_class(self, app):
-        clean_database(app)
+    def setup_class(self):
+        clean_database()
         clean_views()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable')
@@ -368,9 +360,8 @@ class DoesEnrichedOffererSourceContainDataTest:
 
 
 class DoesEnrichedUserSourceContainsDataTest:
-    @pytest.fixture(autouse=True)
-    def setup_class(self, app):
-        clean_database(app)
+    def setup_class(self):
+        clean_database()
         clean_views()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable')
@@ -461,9 +452,8 @@ class DoesEnrichedUserSourceContainsDataTest:
 
 
 class DoesEnrichedStocksSourceContainsDataTest:
-    @pytest.fixture(autouse=True)
-    def setup_class(self, app):
-        clean_database(app)
+    def setup_class(self):
+        clean_database()
         clean_views()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_view_queryable')
@@ -554,9 +544,8 @@ class DoesEnrichedStocksSourceContainsDataTest:
 
 
 class DoesEnrichedOfferSourceContainsDataTest:
-    @pytest.fixture(autouse=True)
-    def setup_class(self, app):
-        clean_database(app)
+    def setup_class(self):
+        clean_database()
         clean_views()
 
     @patch('read.postgresql_database.health_check_queries.is_enriched_view_queryable')

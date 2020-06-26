@@ -8,10 +8,8 @@ from write.create_intermediate_views_for_stock import _get_stocks_booking_inform
 
 
 class StockQueriesTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_views()
 
     class GetStocksBookingInformationQueryTest:

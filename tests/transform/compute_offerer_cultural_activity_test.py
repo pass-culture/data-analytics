@@ -8,10 +8,8 @@ from transform.compute_offerer_cultural_activity import get_offerer_cultural_act
 
 
 class GetOffererCulturalActivityDataframeTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
 
     def test_should_return_empty_dataframe_when_given_empty_dataframe(self):
         # Given

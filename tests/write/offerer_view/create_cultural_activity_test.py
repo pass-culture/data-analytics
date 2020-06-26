@@ -7,10 +7,8 @@ from write.offerer_view.create_cultural_activity import _create_table_offerer_cu
 
 
 class CreateTableOffererCulturalActivityTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_tables()
 
     def test_should_create_table(self, app):

@@ -7,10 +7,8 @@ from write.offerer_view.create_departement_code import create_table_offerer_depa
 
 
 class CreateTableOffererWithDepartmentCodeTest:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, app):
-        yield
-        clean_database(app)
+    def teardown_method(self):
+        clean_database()
         clean_tables()
 
     def test_should_create_table(self, app):

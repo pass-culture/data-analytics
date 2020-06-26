@@ -58,6 +58,15 @@ def _get_count_favorites_query() -> str:
     GROUP BY offer_id
     '''
 
+def _get_offer_info_with_quantity() -> str:
+    return '''
+        SELECT
+            "offerId" AS offer_id
+            ,sum(quantity) AS "Stock"
+        FROM stock
+        GROUP BY offer_id
+    '''
+
 def create_is_physical_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW is_physical_view AS {_get_is_physical_information_query()}
@@ -86,6 +95,15 @@ def create_count_favorites_view() -> None:
     db.session.execute(view_query)
     db.session.commit()
 
+
+def create_sum_stock_view() -> None:
+    view_query = f'''
+        CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_info_with_quantity()}
+        '''
+    db.session.execute(view_query)
+    db.session.commit()
+
+
 def create_enriched_offer_view() -> None:
     query = f'''
         CREATE OR REPLACE VIEW enriched_offer_data AS (
@@ -96,30 +114,27 @@ def create_enriched_offer_view() -> None:
             ,venue."name" AS "Nom du lieu"
             ,venue."departementCode" AS "Département du lieu"   
             ,offer.id AS offer_id
-            ,offer."name" AS "Nom de l'offe"
+            ,offer."name" AS "Nom de l'offre"
             ,offer."type" AS "Catégorie de l'offre"
             ,offer."dateCreated" AS "Date de création de l'offre"
             ,offer."isDuo"
             ,venue."isVirtual" AS "Offre numérique"
-            ,stock."beginningDatetime" AS "Date de début de l'évènement"
-            ,stock."price" AS "Prix"
-            ,stock."quantity" AS "Stock"
             ,is_physical_view."Bien physique"
             ,is_outing_view."Sortie"
             ,offer_booking_information_view."Nombre de réservations"
             ,offer_booking_information_view."Nombre de réservations annulées"
             ,offer_booking_information_view."Nombre de réservations validées"
             ,count_favorites_view."Nombre de fois où l'offre a été mise en favoris"
+            ,sum_stock_view."Stock"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id 
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
-        LEFT JOIN stock ON stock."offerId" = offer.id
-        LEFT JOIN booking ON booking."stockId" = stock.id
         LEFT JOIN favorite ON favorite."offerId" = offer.id
         LEFT JOIN is_physical_view ON is_physical_view.offer_id = offer.id
         LEFT JOIN is_outing_view ON is_outing_view.offer_id = offer.id
         LEFT JOIN offer_booking_information_view ON offer_booking_information_view.offer_id = offer.id
         LEFT JOIN count_favorites_view ON count_favorites_view.offer_id = offer.id
+        LEFT JOIN sum_stock_view ON sum_stock_view.offer_id = offer.id
         )
         '''
     db.session.execute(query)

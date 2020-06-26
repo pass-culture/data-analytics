@@ -12,10 +12,8 @@ from tests.data_creators import clean_database, clean_views, create_user, create
 
 class ViewQueriesTest:
     class CreateEnrichedStockViewTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_return_all_values(self, app):
@@ -68,10 +66,8 @@ class ViewQueriesTest:
 
 
     class CreateEnrichedUserViewTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_create_enriched_user_data_view_with_columns(self, app):
@@ -97,10 +93,8 @@ class ViewQueriesTest:
 
 
     class CreateEnrichedOffererViewTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_create_enriched_offerer_data_view_with_columns(self, app):
@@ -119,10 +113,8 @@ class ViewQueriesTest:
 
 
     class CreateEnrichedOfferViewTest:
-        @pytest.fixture(autouse=True)
-        def setup_method(self, app):
-            yield
-            clean_database(app)
+        def teardown_method(self):
+            clean_database()
             clean_views()
 
         def test_should_create_enriched_offer_data_view_with_columns(self, app):
@@ -133,10 +125,10 @@ class ViewQueriesTest:
             # Then
             expected_columns = ["Identifiant de la structure", "Nom de la structure", "Identifiant du lieu",
                                 "Nom du lieu", "Département du lieu",
-                                "Nom de l'offe", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
-                                "Date de début de l'évènement", "Prix", "Offre numérique", "Stock",
+                                "Nom de l'offre", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
+                                "Offre numérique",
                                 "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
-                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris"]
+                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris", "Stock"]
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
