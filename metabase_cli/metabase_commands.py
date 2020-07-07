@@ -3,7 +3,7 @@ import os
 
 import click
 
-from metabase import edit_dump_table_connection, get_app_name_for_restore
+from metabase_cli.metabase import edit_dump_table_connection, get_app_name_for_restore
 
 
 @click.group()

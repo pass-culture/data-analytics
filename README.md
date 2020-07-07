@@ -124,3 +124,13 @@ Après avoir lancé les conteneurs du backend, taper :
 
 ### Accéder au résumé des commandes du Makefile
 `make help`
+`make create-enriched-views`
+
+## Configurer son IDE
+- Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `brew install pipenv`
+- exécuter les commandes suivantes :
+1. `cd pass-culture-data-analytics`
+2. `virtualenv venv -p python3` (si vous n'avez pas python3).
+3. Sinon faire `python3 -m venv venv`
+4. `source venv/bin/activate`
+5. `pip install -r requirements.txt`
