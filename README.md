@@ -5,11 +5,11 @@ C'est l'outil de visualisation de données du pass Culture.
 ## Utiliser Metabase
 ### Démarrer Metabase en local
 1. `cd pass-culture-data-analytics`
-2. `docker-compose -f docker-compose.yml -f docker-compose-with-metabase.yml up`
+2. `make start-metabase`
 
 ### Démarrer uniquement les containers nécessaires aux tests
 1. `cd pass-culture-data-analytics`
-2. `docker-compose up`
+2. `make start-backend`
 
 ### Configurer Metabase
 L'url pour accéder à Metabase en local est : http://localhost:3002/
@@ -26,24 +26,24 @@ Pour configurer Metabase, il suffit de créer un compte admin, puis de se connec
 ## Créer les vues de données enrichies
 Après avoir lancé les conteneurs, taper :
 
-`docker exec -it analytics-datasource bash -c "cd /opt/data-analytics ; python create_enriched_data_views.py"`
+`make create-enriched-views`
 
 ## Configurer son IDE
-- Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `pip install virtualenv`
+- Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `brew install pipenv`
 - exécuter les commandes suivantes :
 1. `cd pass-culture-data-analytics`
-2. `virtualenv venv -p python3` (si vous n'avez pas python3). 
+2. `virtualenv venv -p python3` (si vous n'avez pas python3).
 3. Sinon faire `python3 -m venv venv`
 4. `source venv/bin/activate`
 5. `pip install -r requirements.txt`
 
 ## Exécution des tests
-`pytest`
+`make tests`
 
 # Accès à la base
 1. `cd pass-culture-data-analytics`
-2. `docker exec -it analytics-datasource-postgres psql -U pass_culture`
+2. `make access-database`
 
 # Exécution de code python dans le container
 1. `cd pass-culture-data-analytics`
-2. `docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && PYTHONPATH=. python"`
+2. `make run-python`
