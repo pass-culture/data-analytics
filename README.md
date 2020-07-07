@@ -1,13 +1,36 @@
 # pass-culture-data-analytics
 
-C'est l'outil de visualisation de données du pass Culture.
+C'est l'outil d'analyse de données du pass Culture.
 
-## Utiliser Metabase
+## Lancer les commandes relatives à l'environnement Data Analytics
+### Installer le package 
+1. Créer le package à partir du code de pass-culture-data-analytics
+`cd pass-culture-data-analytics`
+`make dist`
+2. L'installer dans un environnement virtuel
+a) Activer l'environnement cible
+b) 
+`cd pass-culture-data-analytics`
+`pip install -e .`
+
+### Lancer la création des tables enrichies
+`curl -X POST $DATA_ANALYTICS_DATASOURCE_URL?token=$DATA_ANALYTICS_TOKEN`
+Où `$DATA_ANALYTICS_DATASOURCE_URL` correspond à l'url de Metabase et `$DATA_ANALYTICS_TOKEN` au token d'authentification autorisant la création des tables enrichies
+
+### Requêter l'environnement connecté à la base Produit sur Metabase
+Une fois le paquet installé, taper : 
+`pc-data-analytics show_app_name_for_restore`
+
+### Basculer de la base blue à green (et vice-versa)
+Une fois le paquet installé, taper : 
+`pc-data-analytics switch_host_for_restore`
+
+## Simuler l'architecture fonctionnelle en local
 ### Démarrer Metabase en local
 1. `cd pass-culture-data-analytics`
 2. `make start-metabase`
 
-### Démarrer uniquement les containers nécessaires aux tests
+### Démarrer uniquement les containers du backend
 1. `cd pass-culture-data-analytics`
 2. `make start-backend`
 
@@ -23,27 +46,22 @@ Pour configurer Metabase, il suffit de créer un compte admin, puis de se connec
 - Database username : pass_culture
 - Database password : passq
 
-## Créer les vues de données enrichies
-Après avoir lancé les conteneurs, taper :
-
-`make create-enriched-views`
-
-## Configurer son IDE
-- Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `brew install pipenv`
-- exécuter les commandes suivantes :
-1. `cd pass-culture-data-analytics`
-2. `virtualenv venv -p python3` (si vous n'avez pas python3).
-3. Sinon faire `python3 -m venv venv`
-4. `source venv/bin/activate`
-5. `pip install -r requirements.txt`
-
-## Exécution des tests
+## Aide au développement
+### Exécution des tests
+Après avoir lancé les contenuers du backend, taper :
 `make tests`
 
-# Accès à la base
+### Accéder à la base locale
 1. `cd pass-culture-data-analytics`
 2. `make access-database`
 
-# Exécution de code python dans le container
+### Exécution de code python dans le container
 1. `cd pass-culture-data-analytics`
 2. `make run-python`
+
+### Créer les vues de données enrichies en local
+Après avoir lancé les conteneurs du backend, taper :
+`make create-enriched-views`
+
+### Accéder au résumé des commandes du Makefile
+`make help`
