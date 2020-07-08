@@ -3,6 +3,7 @@
 C'est l'outil d'analyse de données du pass Culture.
 
 ## Lancer les commandes relatives à l'environnement Data Analytics
+<<<<<<< HEAD
 ### First setup
 1. Cloner le repos
 2. Ajouter ses variables d'environnment en local
@@ -42,6 +43,8 @@ export BLUE_DB_INFO='{
 }'
 ```
 
+=======
+>>>>>>> (PC-3921): add metabase cli command to clean database and create views
 ### Installer le package
 1. Créer le package à partir du code de pass-culture-data-analytics
 `cd pass-culture-data-analytics`
@@ -49,6 +52,7 @@ export BLUE_DB_INFO='{
 2. L'installer dans un environnement virtuel
 
 a) Activer l'environnement cible
+<<<<<<< HEAD
 
 Par exemple :
 Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `pip install virtualenv`
@@ -63,6 +67,11 @@ b) Dans cet environnement :
 
 c) Vous pouvez faire un `pc-data-analytics` pour voir la liste des commandes à lancer
 
+=======
+b)
+`cd pass-culture-data-analytics`
+`pip install -e .`
+>>>>>>> (PC-3921): add metabase cli command to clean database and create views
 
 ### Lancer la création des tables enrichies
 `curl -X POST $DATA_ANALYTICS_DATASOURCE_URL?token=$DATA_ANALYTICS_TOKEN`
