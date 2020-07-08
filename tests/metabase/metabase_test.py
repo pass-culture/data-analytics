@@ -1,7 +1,8 @@
-from metabase.commands import configure_new_metabase_session, get_connected_database_id, get_connected_database_host_name, \
-     get_db_details_by_app_name, get_app_name_for_restore, switch_metabase_database_connection
 from unittest.mock import patch, MagicMock
 import json
+
+from metabase.commands import configure_new_metabase_session, get_connected_database_id, get_connected_database_host_name, \
+     get_db_details_by_app_name, get_app_name_for_restore, switch_metabase_database_connection, clean_database_if_local
 
 
 ENV_VAR = {
@@ -198,3 +199,27 @@ def test_switch_metabase_database_connection(mock_configure_new_metabase_session
      'name': 'table_name', 'engine': 'postgres'})
 
 
+@patch('metabase.commands.clean_database')
+@patch('metabase.commands.clean_views')
+@patch('metabase.commands.LOCAL_DATABASE_URL', 'postgresql://pass_culture:passq@localhost:5435/pass_culture')
+@patch('metabase.commands.DATABASE_URL', 'postgresql://pass_culture:passq@remote.host:5435/pass_culture')
+def test_clean_database_if_local_does_not_clean_when_url_is_remote(mock_clean_views, mock_clean_database):
+    # Given / When
+    clean_database_if_local()
+
+    # Then
+    mock_clean_views.assert_not_called()
+    mock_clean_database.assert_not_called()
+
+
+@patch('metabase.commands.clean_database')
+@patch('metabase.commands.clean_views')
+@patch('metabase.commands.LOCAL_DATABASE_URL', 'postgresql://pass_culture:passq@localhost:5435/pass_culture')
+@patch('metabase.commands.DATABASE_URL', 'postgresql://pass_culture:passq@localhost:5435/pass_culture')
+def test_clean_database_if_local_clean_when_url_is_local(mock_clean_views, mock_clean_database):
+    # Given / When
+    clean_database_if_local()
+
+    # Then
+    mock_clean_views.assert_called_once()
+    mock_clean_database.assert_called_once()

@@ -1,7 +1,10 @@
 import json
 import os
-
 import requests
+
+from tests.data_creators import clean_database, clean_views
+from db import DATABASE_URL, LOCAL_DATABASE_URL
+from utils.logger import logger
 
 METABASE_URL = 'https://metabase-test.osc-fr1.scalingo.io'
 
@@ -59,3 +62,12 @@ def get_db_details_by_app_name(app_name: str):
     if db_blue['app_name'] == app_name:
         return db_blue['details']
     return db_green['details']
+
+
+def clean_database_if_local():
+    if LOCAL_DATABASE_URL == DATABASE_URL:
+        clean_database()
+        clean_views()
+        logger.info('[CLEAN DATABASE AND VIEW] Database cleaned')
+        return
+    logger.info('[CLEAN DATABASE AND VIEW] Cannot clean production database')

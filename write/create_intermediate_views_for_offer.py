@@ -11,7 +11,7 @@ def _get_is_physical_information_query() -> str:
                                         'ThingType.MUSIQUE',
                                         'ThingType.OEUVRE_ART',
                                         'ThingType.AUDIOVISUEL')
-             AND offer.url IS NULL 
+             AND offer.url IS NULL
              then true else false end as "Bien physique"
         FROM offer
     '''
@@ -51,7 +51,7 @@ def _get_offer_booking_information_query() -> str:
 
 def _get_count_favorites_query() -> str:
     return '''
-    SELECT 
+    SELECT
         "offerId" AS offer_id
         ,count(*) AS "Nombre de fois où l'offre a été mise en favoris"
     FROM favorite
@@ -112,7 +112,7 @@ def create_enriched_offer_view() -> None:
             ,offerer."name" AS "Nom de la structure"
             ,venue.id AS "Identifiant du lieu"
             ,venue."name" AS "Nom du lieu"
-            ,venue."departementCode" AS "Département du lieu"   
+            ,venue."departementCode" AS "Département du lieu"
             ,offer.id AS offer_id
             ,offer."name" AS "Nom de l'offre"
             ,offer."type" AS "Catégorie de l'offre"
@@ -127,7 +127,7 @@ def create_enriched_offer_view() -> None:
             ,count_favorites_view."Nombre de fois où l'offre a été mise en favoris"
             ,sum_stock_view."Stock"
         FROM offer
-        LEFT JOIN venue ON offer."venueId" = venue.id 
+        LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
         LEFT JOIN favorite ON favorite."offerId" = offer.id
         LEFT JOIN is_physical_view ON is_physical_view.offer_id = offer.id
