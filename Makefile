@@ -40,7 +40,7 @@ start-backend:  ## run backend using docker
 
 .PHONY: start-metabase
 start-metabase: ## run metabase using docker
-	docker-compose -f docker-compose.yml -f docker-compose-with-metabase.yml up
+	docker-compose -f docker-compose-with-metabase.yml up
 
 .PHONY: create-enriched-views
 create-enriched-views: ## connect to docker postgres database

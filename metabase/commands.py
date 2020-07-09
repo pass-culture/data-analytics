@@ -6,7 +6,7 @@ from tests.data_creators import clean_database, clean_views
 from db import DATABASE_URL, LOCAL_DATABASE_URL
 from utils.logger import logger
 
-METABASE_URL = 'https://metabase-test.osc-fr1.scalingo.io'
+METABASE_URL = os.environ.get('METABASE_URL', 'http://localhost:3002')
 
 
 def configure_new_metabase_session(user_name: str, password: str):
@@ -28,7 +28,7 @@ def switch_metabase_database_connection(database_name: str, user_name: str, pass
     database_id = get_connected_database_id(database_name, session_id)
     app_name = get_app_name_for_restore()
     db_details = get_db_details_by_app_name(app_name)
-    db_details['ssl'] = True
+    db_details['ssl'] = False if LOCAL_DATABASE_URL == DATABASE_URL else True
     db_settings = {'details': db_details,
                  'name': database_name,
                  'engine': "postgres"}
@@ -52,8 +52,7 @@ def get_app_name_for_restore():
     db_green = json.loads(os.environ.get('GREEN_DB_INFO'))
     if db_blue['details']['host'] == host:
         return db_green['app_name']
-    else:
-        return db_blue['app_name']
+    return db_blue['app_name']
 
 
 def get_db_details_by_app_name(app_name: str):
