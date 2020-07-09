@@ -1,5 +1,5 @@
 POSTGRES_USER=pass_culture
 POSTGRES_PASSWORD=passq
 POSTGRES_DB=pass_culture
-DATABASE_URL=postgresql://pass_culture:passq@datasource-postgres:5432/pass_culture
+DATABASE_URL=postgresql://pass_culture:passq@datasource-postgres-blue:5432/pass_culture
 BASTION_TOKEN=abc123

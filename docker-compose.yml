@@ -15,7 +15,7 @@ services:
     env_file:
       - env_file
     depends_on:
-      - datasource-postgres
+      - datasource-postgres-blue
 
   install-models:
     image: python:3.6-stretch
@@ -34,11 +34,11 @@ services:
     env_file:
       - env_file
     depends_on:
-      - datasource-postgres
+      - datasource-postgres-blue
 
-  datasource-postgres:
+  datasource-postgres-blue:
     image: circleci/postgres:11.6-postgis
-    container_name: analytics-datasource-postgres
+    container_name: analytics-datasource-blue-postgres
     env_file:
       - env_file
     ports:
