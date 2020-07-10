@@ -70,3 +70,7 @@ def clean_database_if_local():
         logger.info('[CLEAN DATABASE AND VIEW] Database cleaned')
         return
     logger.info('[CLEAN DATABASE AND VIEW] Cannot clean production database')
+
+
+def initialize_metabase_if_local():
+    pass
