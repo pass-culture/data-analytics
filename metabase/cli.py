@@ -43,6 +43,7 @@ def initialize_metabase():
 
 cli.add_command(clean_database_and_view)
 cli.add_command(create_enriched_views)
+cli.add_command(initialize_metabase)
 cli.add_command(show_app_name_for_restore)
 cli.add_command(switch_host_for_restore)
 

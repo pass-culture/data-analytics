@@ -86,6 +86,37 @@ Une fois le paquet installé, taper :
 `pc-data-analytics switch_host_for_restore`
 
 ## Simuler l'architecture fonctionnelle en local
+### Exemple de variables d'environnement en local :
+A mettre dans votre .bshrc
+
+```
+export METABASE_URL='http://localhost:3002'
+export METABASE_USER_NAME='admin@example.com'
+export METABASE_PASSWORD='user@AZERTY123'
+export METABASE_DBNAME='Produit'
+export GREEN_DB_INFO='{
+"app_name": "app-green",
+"details": {
+"port": "5432",
+"host": "analytics-datasource-green-postgres",
+"dbname": "pass_culture",
+"user": "pass_culture",
+"password": "passq"
+}
+}'
+
+export BLUE_DB_INFO='{
+"app_name": "app-blue",
+"details": {
+"port": "5432",
+"host": "analytics-datasource-blue-postgres",
+"dbname": "pass_culture",
+"user": "pass_culture",
+"password": "passq"
+}
+}'
+```
+
 ### Démarrer Metabase en local
 1. `cd pass-culture-data-analytics`
 2. `make start-metabase`
