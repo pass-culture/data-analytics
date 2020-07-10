@@ -1,5 +1,7 @@
 import json
 import os
+from pprint import pprint
+
 import requests
 
 from tests.data_creators import clean_database, clean_views
@@ -34,6 +36,7 @@ def switch_metabase_database_connection(database_name: str, user_name: str, pass
                  'engine': "postgres"}
     requests.put(f'{METABASE_URL}/api/database/{database_id}',
                  headers={'cookie': f'metabase.SESSION={session_id}'},
+
                  json=db_settings)
 
 
@@ -72,5 +75,57 @@ def clean_database_if_local():
     logger.info('[CLEAN DATABASE AND VIEW] Cannot clean production database')
 
 
+def get_token_setup():
+    requests.get(f'{METABASE_URL}/setup')
+    response = requests.get(f'{METABASE_URL}/session/properties')
+    if response.content:
+        if "setup-token" in str(response.content):
+            return [content for content in str(response.content).split(',') if "setup-token" in content][0].split(':')[1]
+
+
+def post_create_metabase_superuser(token):
+    db_blue = json.loads(os.environ.get('BLUE_DB_INFO'))
+    user_email = os.environ.get('METABASE_USER_NAME', 'admin@example.com')
+    user_password = os.environ.get('METABASE_PASSWORD', 'user@AZERTY123')
+    payload = {"token": token,
+    "prefs":{
+        "site_name":"pc",
+    "allow_tracking":"true"},
+    "database":{
+        "engine":"postgres",
+        "name":"Produit",
+        "details":{
+            "host":db_blue['details']['host'],
+            "port":db_blue['details']['port'],
+            "dbname":db_blue['details']['dbname'],
+            "user":db_blue['details']['user'],
+            "password":db_blue['details']['password'],
+            "ssl":False,
+            "additional-options":None,
+            "tunnel-enabled":False},
+        "auto_run_queries":True,
+        "is_full_sync":True,"schedules":{
+            "cache_field_values":{
+                "schedule_day":None,
+                "schedule_frame":None,
+                "schedule_hour":0,
+                "schedule_type":"daily"},
+        "metadata_sync":{
+            "schedule_day":None,
+            "schedule_frame":None,
+            "schedule_hour":None,
+            "schedule_type":"hourly"}}},
+    "user":{
+        "first_name":"pc",
+        "last_name":"admin",
+        "email":user_email,
+        "password":user_password,
+        "site_name":"pc"}
+    }
+    response = requests.post(f'{METABASE_URL}/api/setup',
+        json=payload)
+
+
 def initialize_metabase_if_local():
-    pass
+    token = get_token_setup()[1:-1]
+    post_create_metabase_superuser(token)

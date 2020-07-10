@@ -42,6 +42,15 @@ start-backend:  ## run backend using docker
 start-metabase: ## run metabase using docker
 	docker-compose -f docker-compose-with-metabase.yml up
 
+.PHONY: initialize-metabase
+initialize-metabase: install_requirements ## create Metabase super user and setup database
+	pipenv run pc-data-analytics initialize_metabase
+
+.PHONY: reset-metabase
+reset-metabase: ## stop metabase delete metabase volume and mount it again
+	docker container stop pcm-metabase-app pcm-postgres-metabase && docker container rm pcm-metabase-app pcm-postgres-metabase && docker volume rm pass-culture-data-analytics_metabase_data
+	docker-compose -f docker-compose-with-metabase.yml up -d metabase-app
+
 .PHONY: create-enriched-views
 create-enriched-views: ## connect to docker postgres database
 	curl -X POST localhost:5000/?token=abc123
