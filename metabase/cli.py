@@ -5,7 +5,7 @@ import click
 from flask import Flask
 
 from metabase.commands import switch_metabase_database_connection, get_app_name_for_restore, \
-     get_app_name_for_restore, clean_database_if_local
+     clean_database_if_local, initialize_metabase_if_local
 from write.create_enriched_data_views import create_enriched_data_views
 
 
@@ -34,6 +34,11 @@ def show_app_name_for_restore():
 @click.command('switch_host_for_restore')
 def switch_host_for_restore():
     switch_metabase_database_connection(os.environ.get('METABASE_DBNAME'), os.environ.get('METABASE_USER_NAME'), os.environ.get('METABASE_PASSWORD'))
+
+
+@click.command('initialize_metabase')
+def initialize_metabase():
+    initialize_metabase_if_local()
 
 
 cli.add_command(clean_database_and_view)
