@@ -124,7 +124,6 @@ Après avoir lancé les conteneurs du backend, taper :
 
 ### Accéder au résumé des commandes du Makefile
 `make help`
-`make create-enriched-views`
 
 ## Configurer son IDE
 - Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `brew install pipenv`
