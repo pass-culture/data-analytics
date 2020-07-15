@@ -5,3 +5,8 @@
 # virtualenv
 venv/
 ENV/
+
+# package
+
+dist/
+*.egg-info
