@@ -1,5 +1,5 @@
-from metabase_cli.metabase import configure_new_metabase_session, get_dump_table_id, get_dump_table_information, \
-     get_db_details_by_app_name, get_app_name_for_restore, edit_dump_table_connection
+from metabase.commands import configure_new_metabase_session, get_connected_database_id, get_connected_database_host_name, \
+     get_db_details_by_app_name, get_app_name_for_restore, switch_metabase_database_connection
 from unittest.mock import patch, MagicMock
 import json
 
@@ -30,8 +30,8 @@ ENV_VAR = {
     }"""
 }
 
-@patch('metabase_cli.metabase.METABASE_URL', 'metabase.example.com')
-@patch('metabase_cli.metabase.requests.post')
+@patch('metabase.commands.METABASE_URL', 'metabase.example.com')
+@patch('metabase.commands.requests.post')
 def test_configure_new_metabase_session(mock_request):
     # Given
     user_name = 'admin.metabase@example.com'
@@ -51,9 +51,9 @@ def test_configure_new_metabase_session(mock_request):
     'password': 'password'})
 
 
-@patch('metabase_cli.metabase.METABASE_URL', 'metabase.example.com')
-@patch('metabase_cli.metabase.requests.get')
-def test_get_dump_table_id(mock_request):
+@patch('metabase.commands.METABASE_URL', 'metabase.example.com')
+@patch('metabase.commands.requests.get')
+def test_get_connected_database_id(mock_request):
     # Given
     session_id = 42
     request_json = [{'name': 'table_name', 'id': 'table_id_in_metabase'}]
@@ -62,7 +62,7 @@ def test_get_dump_table_id(mock_request):
     mock_request.return_value = response_return_value
 
     # When
-    result = get_dump_table_id('table_name', session_id)
+    result = get_connected_database_id('table_name', session_id)
 
     # Then
     assert result == 'table_id_in_metabase'
@@ -70,10 +70,10 @@ def test_get_dump_table_id(mock_request):
      headers={'cookie': 'metabase.SESSION=42'})
 
 
-@patch('metabase_cli.metabase.METABASE_URL', 'metabase.example.com')
-@patch('metabase_cli.metabase.get_dump_table_id')
-@patch('metabase_cli.metabase.requests.get')
-def test_get_dump_table_information(mock_request, mock_get_dump_table_id):
+@patch('metabase.commands.METABASE_URL', 'metabase.example.com')
+@patch('metabase.commands.get_connected_database_id')
+@patch('metabase.commands.requests.get')
+def test_get_connected_database_host_name(mock_request, mock_get_connected_database_id):
     # Given
     session_id = 42
     request_json = {
@@ -89,10 +89,10 @@ def test_get_dump_table_information(mock_request, mock_get_dump_table_id):
     response_return_value = MagicMock(status_code=200, text='')
     response_return_value.json = MagicMock(return_value=request_json)
     mock_request.return_value = response_return_value
-    mock_get_dump_table_id.return_value = 'table_id_in_metabase'
+    mock_get_connected_database_id.return_value = 'table_id_in_metabase'
 
     # When
-    result = get_dump_table_information('table_name', session_id)
+    result = get_connected_database_host_name('table_name', session_id)
 
     # Then
     assert result == 'db_name.postgresql.example.com'
@@ -131,12 +131,12 @@ def test_get_db_details_by_app_name_return_green_db_details_when_app_name_does_n
 
 
 @patch.dict('os.environ', ENV_VAR)
-@patch('metabase_cli.metabase.get_dump_table_information')
-@patch('metabase_cli.metabase.configure_new_metabase_session')
-def test_get_app_name_for_restore_return_green_app_name_when_blue_db_is_on_metabase(mock_configure_new_metabase_session, mock_get_dump_table_information):
+@patch('metabase.commands.get_connected_database_host_name')
+@patch('metabase.commands.configure_new_metabase_session')
+def test_get_app_name_for_restore_return_green_app_name_when_blue_db_is_on_metabase(mock_configure_new_metabase_session, mock_get_connected_database_host_name):
     # Given
     mock_configure_new_metabase_session.return_value = 'session_id'
-    mock_get_dump_table_information.return_value = 'db_blue.postgresql.example.com'
+    mock_get_connected_database_host_name.return_value = 'db_blue.postgresql.example.com'
 
     # When
     result = get_app_name_for_restore()
@@ -146,12 +146,12 @@ def test_get_app_name_for_restore_return_green_app_name_when_blue_db_is_on_metab
 
 
 @patch.dict('os.environ', ENV_VAR)
-@patch('metabase_cli.metabase.get_dump_table_information')
-@patch('metabase_cli.metabase.configure_new_metabase_session')
-def test_get_app_name_for_restore_return_blue_app_name_when_green_db_is_on_metabase(mock_configure_new_metabase_session, mock_get_dump_table_information):
+@patch('metabase.commands.get_connected_database_host_name')
+@patch('metabase.commands.configure_new_metabase_session')
+def test_get_app_name_for_restore_return_blue_app_name_when_green_db_is_on_metabase(mock_configure_new_metabase_session, mock_get_connected_database_host_name):
     # Given
     mock_configure_new_metabase_session.return_value = 'session_id'
-    mock_get_dump_table_information.return_value = 'db_green.postgresql.example.com'
+    mock_get_connected_database_host_name.return_value = 'db_green.postgresql.example.com'
 
     # When
     result = get_app_name_for_restore()
@@ -161,19 +161,19 @@ def test_get_app_name_for_restore_return_blue_app_name_when_green_db_is_on_metab
 
 
 @patch.dict('os.environ', ENV_VAR)
-@patch('metabase_cli.metabase.METABASE_URL', 'metabase.example.com')
-@patch('metabase_cli.metabase.requests.put')
-@patch('metabase_cli.metabase.get_db_details_by_app_name')
-@patch('metabase_cli.metabase.get_app_name_for_restore')
-@patch('metabase_cli.metabase.get_dump_table_id')
-@patch('metabase_cli.metabase.configure_new_metabase_session')
-def test_edit_dump_table_connection(mock_configure_new_metabase_session, mock_get_dump_table_id, mock_get_app_name_for_restore, mock_get_db_details_by_app_name, mock_request):
+@patch('metabase.commands.METABASE_URL', 'metabase.example.com')
+@patch('metabase.commands.requests.put')
+@patch('metabase.commands.get_db_details_by_app_name')
+@patch('metabase.commands.get_app_name_for_restore')
+@patch('metabase.commands.get_connected_database_id')
+@patch('metabase.commands.configure_new_metabase_session')
+def test_switch_metabase_database_connection(mock_configure_new_metabase_session, mock_get_connected_database_id, mock_get_app_name_for_restore, mock_get_db_details_by_app_name, mock_request):
     # Given
     table_name = 'table_name'
     user_name = 'user_name'
     password = 'password'
     mock_configure_new_metabase_session.return_value = 'session_id'
-    mock_get_dump_table_id.return_value = 'table_id'
+    mock_get_connected_database_id.return_value = 'table_id'
     mock_get_app_name_for_restore.return_value = 'app_name_blue'
     mock_get_db_details_by_app_name.return_value = {
         "port": "12345",
@@ -184,7 +184,7 @@ def test_edit_dump_table_connection(mock_configure_new_metabase_session, mock_ge
     }
 
     # When
-    edit_dump_table_connection(table_name, user_name, password)
+    switch_metabase_database_connection(table_name, user_name, password)
 
     # Then
     mock_request.assert_called_once_with('metabase.example.com/api/database/table_id',
