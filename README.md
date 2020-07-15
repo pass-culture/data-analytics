@@ -3,7 +3,6 @@
 C'est l'outil d'analyse de données du pass Culture.
 
 ## Lancer les commandes relatives à l'environnement Data Analytics
-<<<<<<< HEAD
 ### First setup
 1. Cloner le repos
 2. Ajouter ses variables d'environnment en local
@@ -43,8 +42,6 @@ export BLUE_DB_INFO='{
 }'
 ```
 
-=======
->>>>>>> (PC-3921): add metabase cli command to clean database and create views
 ### Installer le package
 1. Créer le package à partir du code de pass-culture-data-analytics
 `cd pass-culture-data-analytics`
@@ -52,7 +49,6 @@ export BLUE_DB_INFO='{
 2. L'installer dans un environnement virtuel
 
 a) Activer l'environnement cible
-<<<<<<< HEAD
 
 Par exemple :
 Monter un virtualenv ([lien](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html)) afin d'avoir un environnement isolé et contextualisé : `pip install virtualenv`
@@ -67,11 +63,6 @@ b) Dans cet environnement :
 
 c) Vous pouvez faire un `pc-data-analytics` pour voir la liste des commandes à lancer
 
-=======
-b)
-`cd pass-culture-data-analytics`
-`pip install -e .`
->>>>>>> (PC-3921): add metabase cli command to clean database and create views
 
 ### Lancer la création des tables enrichies
 `curl -X POST $DATA_ANALYTICS_DATASOURCE_URL?token=$DATA_ANALYTICS_TOKEN`
@@ -86,37 +77,6 @@ Une fois le paquet installé, taper :
 `pc-data-analytics switch_host_for_restore`
 
 ## Simuler l'architecture fonctionnelle en local
-### Exemple de variables d'environnement en local :
-A mettre dans votre .bshrc
-
-```
-export METABASE_URL='http://localhost:3002'
-export METABASE_USER_NAME='admin@example.com'
-export METABASE_PASSWORD='user@AZERTY123'
-export METABASE_DBNAME='Produit'
-export GREEN_DB_INFO='{
-"app_name": "app-green",
-"details": {
-"port": "5432",
-"host": "analytics-datasource-green-postgres",
-"dbname": "pass_culture",
-"user": "pass_culture",
-"password": "passq"
-}
-}'
-
-export BLUE_DB_INFO='{
-"app_name": "app-blue",
-"details": {
-"port": "5432",
-"host": "analytics-datasource-blue-postgres",
-"dbname": "pass_culture",
-"user": "pass_culture",
-"password": "passq"
-}
-}'
-```
-
 ### Démarrer Metabase en local
 1. `cd pass-culture-data-analytics`
 2. `make start-metabase`
