@@ -22,13 +22,13 @@ clean : ## remove all transient directories and files
 dist: ## create a package
 	pipenv run python setup.py sdist
 
-.PHONY: freeze_requirements
+.PHONY: freeze-requirements
 freeze_requirements: ## update the project dependencies based on setup.py declaration
 	pipenv update
 
-.PHONY: install_requirements
-install_requirements: ## install the project dependencies based on setup.py
-	pipenv install -e .
+.PHONY: install
+install: ## install the project dependencies based on setup.py
+	pipenv install --python 3.6 -e .
 
 .PHONY: tests
 tests: ## run automatic tests
@@ -43,7 +43,7 @@ start-metabase: ## run metabase using docker
 	docker-compose -f docker-compose-with-metabase.yml up
 
 .PHONY: initialize-metabase
-initialize-metabase: install_requirements ## create Metabase super user and setup database
+initialize-metabase: install ## create Metabase super user and setup database
 	pipenv run pc-data-analytics initialize_metabase
 
 .PHONY: reset-metabase
@@ -57,7 +57,7 @@ create-enriched-views: ## connect to docker postgres database
 
 .PHONY: access-database
 access-database: ## connect to docker postgres database
-	docker exec -it analytics-datasource-postgres psql -U pass_culture
+	docker exec -it analytics-datasource-blue-postgres psql -U pass_culture
 
 .PHONY: run-python
 run-python:  ## run python using docker container
