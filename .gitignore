@@ -10,3 +10,5 @@ ENV/
 
 dist/
 *.egg-info
+
+.env.local*

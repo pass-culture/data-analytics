@@ -4,6 +4,10 @@ C'est l'outil d'analyse de données du pass Culture.
 
 ## Lancer les commandes relatives à l'environnement Data Analytics
 ### First setup
+
+Il faut avoir la bonne version de python (3.6). Si vous ne l'avez pas vous pouvez l'installer rapidement
+via pyenv. Pour installer pyenv : https://github.com/pyenv/pyenv
+
 1. Cloner le repos
 2. Ajouter ses variables d'environnment en local
 3. Installer pipenv
@@ -12,7 +16,7 @@ C'est l'outil d'analyse de données du pass Culture.
 6. Pour vérifier `make tests`
 
 ### Exemple de variables d'environnement en local :
-A mettre dans votre .bshrc / .zshrc / .env.local ...
+Créer un fichier .env.local où on peut mettre ces variables d'environnements:
 
 ```
 export METABASE_URL='http://localhost:3002'
@@ -41,6 +45,38 @@ export BLUE_DB_INFO='{
 }
 }'
 ```
+
+## Simuler l'architecture fonctionnelle en local
+### Pour démarrer tout Metabase en local
+1. `cd pass-culture-data-analytics`
+2. `make start-metabase`
+
+### Pour démarrer uniquement les containers du backend
+1. `cd pass-culture-data-analytics`
+2. `make start-backend`
+
+### Configurer Metabase en une commmande :
+Il faut installer pipenv si ce n'est pas encore fait. On peut le faire avec la commande suivante:
+* pip install pipenv
+
+Ensuite exécuter les commandes suivantes : 
+1. `cd pass-culture-data-analytics`
+2. Après un  `make start-metabase`
+3. lancer `make initialize-metabase`
+
+L'url pour accéder à Metabase en local est : http://localhost:3002/, connectez vous avec METABASE_USER_NAME et METABASE_PASSWORD
+
+### Configurer Metabase manuellement :
+L'url pour accéder à Metabase en local est : http://localhost:3002/
+
+Pour configurer Metabase, il suffit de créer un compte admin, puis de se connecter à la base produit. Pour cela, il faut renseigner les informations suivantes :
+- Choisir Postgresql comme type de base de données
+- Name : Produit
+- Host : analytics-datasource-blue-postgres
+- Port : 5432
+- Database name : pass_culture
+- Database username : pass_culture
+- Database password : passq
 
 ### Installer le package
 1. Créer le package à partir du code de pass-culture-data-analytics
@@ -75,35 +111,6 @@ Une fois le paquet installé, taper :
 ### Basculer de la base blue à green (et vice-versa)
 Une fois le paquet installé, taper :
 `pc-data-analytics switch_host_for_restore`
-
-## Simuler l'architecture fonctionnelle en local
-### Démarrer Metabase en local
-1. `cd pass-culture-data-analytics`
-2. `make start-metabase`
-
-### Démarrer uniquement les containers du backend
-1. `cd pass-culture-data-analytics`
-2. `make start-backend`
-
-
-### Configurer Metabase en une commmande :
-1. `cd pass-culture-data-analytics`
-2. Après un  `make start-backend`
-3. lancer `make initialize-metabase`
-
-L'url pour accéder à Metabase en local est : http://localhost:3002/, connectez vous avec METABASE_USER_NAME et METABASE_PASSWORD
-
-### Configurer Metabase manuellement :
-L'url pour accéder à Metabase en local est : http://localhost:3002/
-
-Pour configurer Metabase, il suffit de créer un compte admin, puis de se connecter à la base produit. Pour cela, il faut renseigner les informations suivantes :
-- Choisir Postgresql comme type de base de données
-- Name : Produit
-- Host : analytics-datasource-blue-postgres
-- Port : 5432
-- Database name : pass_culture
-- Database username : pass_culture
-- Database password : passq
 
 ## Aide au développement
 ### Exécution des tests
