@@ -21,7 +21,7 @@ setup(
         'freezegun==0.3.12',
         'pandas==0.25.3',
         'PostgreSQL-Audit==0.10.0',
-        'psycopg2==2.8.5',
+        'psycopg2==2.7.7',
         'pytest==5.2.2',
         'SQLAlchemy==1.3.11',
         'psycopg2-binary==2.8.5',
