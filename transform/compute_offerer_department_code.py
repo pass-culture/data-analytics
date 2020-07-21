@@ -1,6 +1,6 @@
 import pandas
 
-from db import CONNECTION
+from db import ENGINE
 from transform.compute_offerer_cultural_activity import get_departement_code
 
 
@@ -11,6 +11,7 @@ def get_offerer_with_departement_code_dataframe(postal_code_dataframe: pandas.Da
 
 
 def create_postal_code_dataframe() -> pandas.DataFrame:
+    connection = ENGINE.connect()
     query = '''
     SELECT
         id
@@ -18,5 +19,7 @@ def create_postal_code_dataframe() -> pandas.DataFrame:
     FROM offerer
     WHERE "postalCode" is not NULL 
     '''
-    postalcode_df = pandas.read_sql(query, CONNECTION)
+    postalcode_df = pandas.read_sql(query, connection)
+    connection.close()
+    ENGINE.dispose()
     return postalcode_df
