@@ -5,11 +5,8 @@ C'est l'outil d'analyse de données du pass Culture.
 ## Lancer les commandes relatives à l'environnement Data Analytics
 ### First setup
 
-Il faut avoir la bonne version de python (3.6). Si vous ne l'avez pas vous pouvez l'installer rapidement
-via pyenv. Pour installer pyenv : https://github.com/pyenv/pyenv
-
 1. Cloner le repos
-2. Ajouter ses variables d'environnment en local
+2. Ajouter ses variables d'environnment en local (voir ci-dessous)
 3. Installer pipenv
 4. `make start-metabase`
 5. `make initialize-metabase`
@@ -19,7 +16,6 @@ via pyenv. Pour installer pyenv : https://github.com/pyenv/pyenv
 Créer un fichier .env.local où on peut mettre ces variables d'environnements:
 
 ```
-export METABASE_URL='http://localhost:3002'
 export METABASE_USER_NAME='admin@example.com'
 export METABASE_PASSWORD='user@AZERTY123'
 export METABASE_DBNAME='Produit'
@@ -59,7 +55,7 @@ export BLUE_DB_INFO='{
 Il faut installer pipenv si ce n'est pas encore fait. On peut le faire avec la commande suivante:
 * pip install pipenv
 
-Ensuite exécuter les commandes suivantes : 
+Ensuite exécuter les commandes suivantes :
 1. `cd pass-culture-data-analytics`
 2. Après un  `make start-metabase`
 3. lancer `make initialize-metabase`

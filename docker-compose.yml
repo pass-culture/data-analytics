@@ -7,8 +7,10 @@ services:
     volumes:
       - .:/opt/data-analytics
     command: >
-      bash -c "pip install -r /opt/data-analytics/requirements.txt;
-               python /opt/data-analytics/app.py;
+      bash -c "pip install pipenv
+               cd /opt/data-analytics/
+               pipenv install --python 3.6 -e .
+               pipenv run python /opt/data-analytics/app.py;
                "
     ports:
       - 5000:5000
@@ -17,9 +19,9 @@ services:
     depends_on:
       - datasource-postgres-blue
 
-  install-models:
+  install-models-blue:
     image: python:3.6-stretch
-    container_name: pcm-install-models
+    container_name: pcm-install-models-blue
     volumes:
       - .:/opt/enriched_data
     command: >
@@ -44,3 +46,4 @@ services:
     ports:
       - 5435:5432
     command: postgres -c logging_collector=on -c log_destination=stderr -c log_min_duration_statement=0 -c log_statement=all -c log_duration=on
+

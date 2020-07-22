@@ -1,10 +1,6 @@
 APPLICATION_MODULE=metabase_cli
 TEST_MODULE=tests
 
-.PHONY: activate
-activate: ## activate the virtualenv associate with this project
-	pipenv shell
-
 # @see http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -16,23 +12,18 @@ clean : ## remove all transient directories and files
 	rm -rf dist
 	rm -rf *.egg-info
 	find -name __pycache__ -print0 | xargs -0 sudo rm -rf
-	pipenv --rm
 
 .PHONY: dist
 dist: ## create a package
-	pipenv run python setup.py sdist
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics/ && pipenv run python setup.py sdist"
 
 .PHONY: freeze-requirements
 freeze_requirements: ## update the project dependencies based on setup.py declaration
-	pipenv update
-
-.PHONY: install
-install: ## install the project dependencies based on setup.py
-	pipenv install --python 3.6 -e .
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics/ && pipenv update"
 
 .PHONY: tests
 tests: ## run automatic tests
-	pipenv run pytest
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics/ && pipenv run pytest"
 
 .PHONY: start-backend
 start-backend:  ## run backend using docker
@@ -40,11 +31,11 @@ start-backend:  ## run backend using docker
 
 .PHONY: start-metabase
 start-metabase: ## run metabase using docker
-	docker-compose -f docker-compose-with-metabase.yml up
+	docker-compose -f docker-compose.yml -f docker-compose-with-metabase.yml up
 
 .PHONY: initialize-metabase
-initialize-metabase: install ## create Metabase super user and setup database
-	pipenv run pc-data-analytics initialize_metabase
+initialize-metabase: ## create Metabase super user and setup database
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics/ && pipenv run pc-data-analytics initialize_metabase"
 
 .PHONY: reset-metabase
 reset-metabase: ## stop metabase delete metabase volume and mount it again

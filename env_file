@@ -3,3 +3,4 @@ POSTGRES_PASSWORD=passq
 POSTGRES_DB=pass_culture
 DATABASE_URL=postgresql://pass_culture:passq@datasource-postgres-blue:5432/pass_culture
 BASTION_TOKEN=abc123
+METABASE_URL=http://pcm-metabase-app:3000
