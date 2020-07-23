@@ -280,7 +280,7 @@ class InitializeMetabaseIfLocalTest:
     @patch('metabase.commands.requests.get')
     def test_get_token_setup_should_return_token_setup(self, mock_request):
         # Given
-        request_json ={'setup-token': "my-setup-token"}
+        request_json ={'setup_token': "my-setup-token"}
         response_return_value = MagicMock(status_code=200)
         response_return_value.json = MagicMock(return_value=request_json)
         mock_request.return_value = response_return_value

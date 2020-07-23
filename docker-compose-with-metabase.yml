@@ -28,7 +28,7 @@ services:
 
   metabase-app:
     container_name: pcm-metabase-app
-    image: metabase/metabase
+    image: metabase/metabase:v0.34.1
     ports:
       - 3002:3000
     environment:
