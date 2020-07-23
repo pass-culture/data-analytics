@@ -76,10 +76,8 @@ def clean_database_if_local():
 
 def get_token_setup():
     requests.get(f'{METABASE_URL}/setup')
-    response = requests.get(f'{METABASE_URL}/session/properties')
-    if response.content:
-        if "setup-token" in str(response.content):
-            return [content for content in str(response.content).split(',') if "setup-token" in content][0].split(':')[1]
+    response = requests.get(f'{METABASE_URL}/api/session/properties')
+    return response.json()['setup-token']
 
 
 def post_create_metabase_superuser(token):
@@ -126,5 +124,5 @@ def post_create_metabase_superuser(token):
 
 
 def initialize_metabase_if_local():
-    token = get_token_setup()[1:-1]
+    token = get_token_setup()
     post_create_metabase_superuser(token)

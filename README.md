@@ -52,8 +52,6 @@ export BLUE_DB_INFO='{
 2. `make start-backend`
 
 ### Configurer Metabase en une commmande :
-Il faut installer pipenv si ce n'est pas encore fait. On peut le faire avec la commande suivante:
-* pip install pipenv
 
 Ensuite exécuter les commandes suivantes :
 1. `cd pass-culture-data-analytics`
@@ -63,7 +61,6 @@ Ensuite exécuter les commandes suivantes :
 L'url pour accéder à Metabase en local est : http://localhost:3002/, connectez vous avec METABASE_USER_NAME et METABASE_PASSWORD
 
 ### Configurer Metabase manuellement :
-L'url pour accéder à Metabase en local est : http://localhost:3002/
 
 Pour configurer Metabase, il suffit de créer un compte admin, puis de se connecter à la base produit. Pour cela, il faut renseigner les informations suivantes :
 - Choisir Postgresql comme type de base de données
@@ -112,6 +109,7 @@ Une fois le paquet installé, taper :
 ### Exécution des tests
 Après avoir lancé les contenuers du backend, taper :
 `make tests`
+Certains tests échoueront tant que les vues enrichies n'ont pas été créées (cela peut prendre quelques secondes)
 
 ### Accéder à la base locale
 1. `cd pass-culture-data-analytics`
@@ -121,9 +119,20 @@ Après avoir lancé les contenuers du backend, taper :
 1. `cd pass-culture-data-analytics`
 2. `make run-python`
 
+### Reset metabase
+1. `cd pass-culture-data-analytics`
+2. `make reset-metabase`
+
 ### Créer les vues de données enrichies en local
 Après avoir lancé les conteneurs du backend, taper :
-`make create-enriched-views`
+1. `make create-enriched-views`
+2. Il faut ensuite synchroniser la base sur metabase
+
+- se rendre sur http://localhost:3002/admin/databases
+- choisir la base à synchroniser (Produit)
+- cliquer sur `Sync database schema now`
+- vos tables enrichies sont maintenant accessibles
+
 
 ### Accéder au résumé des commandes du Makefile
 `make help`

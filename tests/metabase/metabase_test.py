@@ -280,33 +280,17 @@ class InitializeMetabaseIfLocalTest:
     @patch('metabase.commands.requests.get')
     def test_get_token_setup_should_return_token_setup(self, mock_request):
         # Given
-        request_content ="""
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <title>Metabase</title>
-                <script type="application/json">
-                {"engines":{
-                    "some-key":"value",
-                    "setup-token":"my-setup-token",
-                    }
-                }
-                </script>
-            <body>
-                <div id="root"></div>
-            </body>
-            </html>
-        """
+        request_json ={'setup-token': "my-setup-token"}
         response_return_value = MagicMock(status_code=200)
-        response_return_value.content = request_content
+        response_return_value.json = MagicMock(return_value=request_json)
         mock_request.return_value = response_return_value
 
         # When
         result = get_token_setup()
 
         # Then
-        assert result == '"my-setup-token"'
-        calls = [call('metabase.example.com/setup'), call('metabase.example.com/session/properties')]
+        assert result == "my-setup-token"
+        calls = [call('metabase.example.com/setup'), call('metabase.example.com/api/session/properties')]
         mock_request.assert_has_calls(calls)
 
 
@@ -370,5 +354,5 @@ class InitializeMetabaseIfLocalTest:
 
         # Then
         mock_get_token_setup.assert_called_once()
-        mock_post_create_metabase_superuser.assert_called_once_with(setup_token[1:-1])
+        mock_post_create_metabase_superuser.assert_called_once_with(setup_token)
 

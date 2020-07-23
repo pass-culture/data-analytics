@@ -44,7 +44,7 @@ reset-metabase: ## stop metabase delete metabase volume and mount it again
 
 .PHONY: create-enriched-views
 create-enriched-views: ## connect to docker postgres database
-	curl -X POST localhost:5000/?token=abc123
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics/ && pipenv run pc-data-analytics create_enriched_views"
 
 .PHONY: access-database
 access-database: ## connect to docker postgres database
