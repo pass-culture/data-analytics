@@ -2,7 +2,7 @@ import pandas
 import pytest
 
 from db import db
-from tests.data_creators import clean_database, clean_tables
+from utils.database_cleaners import clean_database, clean_tables
 from write.offerer_view.create_departement_code import create_table_offerer_departement_code
 
 

@@ -2,7 +2,8 @@ import pandas
 import pytest
 
 from read.postgresql_database.offerer_queries import get_siren_dataframe
-from tests.data_creators import clean_database, create_offerer
+from utils.database_cleaners import clean_database
+from tests.data_creators import create_offerer
 from transform.compute_offerer_cultural_activity import get_offerer_cultural_activity_dataframe, \
     get_label_from_given_ape_code
 

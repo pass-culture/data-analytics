@@ -99,7 +99,6 @@ On peut les créer via :
 - il est aussi possible de passer par le flask :
 `curl -X POST $DATA_ANALYTICS_DATASOURCE_URL?token=$DATA_ANALYTICS_TOKEN`
 Où `$DATA_ANALYTICS_DATASOURCE_URL` correspond à l'url de Metabase et `$DATA_ANALYTICS_TOKEN` au token d'authentification autorisant la création des tables enrichies
-- ou via la Cli : `pc-data-analytics create_enriched_views` (voir ci-dessous)
 
 2. Il faut ensuite synchroniser la base sur metabase
 - se rendre sur http://localhost:3002/admin/databases

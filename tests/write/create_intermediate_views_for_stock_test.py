@@ -2,7 +2,8 @@ import pandas
 import pytest
 
 from db import CONNECTION
-from tests.data_creators import clean_database, clean_views, create_user, create_product, create_offerer, create_venue, \
+from utils.database_cleaners import clean_database, clean_views
+from tests.data_creators import create_user, create_product, create_offerer, create_venue, \
     create_offer, create_stock, create_booking, create_payment, create_payment_status
 from write.create_intermediate_views_for_stock import _get_stocks_booking_information_query
 

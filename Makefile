@@ -35,7 +35,7 @@ start-metabase: ## run metabase using docker
 
 .PHONY: initialize-metabase
 initialize-metabase: ## create Metabase super user and setup database
-	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run pc-data-analytics initialize_metabase"
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run python -m utils.initialize_metabase"
 
 .PHONY: reset-metabase
 reset-metabase: ## stop metabase delete metabase volume and mount it again
@@ -48,7 +48,7 @@ create-enriched-views: ## connect to docker postgres database local
 
 .PHONY: clean-database-and-view
 clean-database-and-view: ## clean local database and view
-	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run pc-data-analytics clean_database_and_view"
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run python -m utils.clean_database_if_local"
 
 .PHONY: access-database
 access-database: ## connect to docker postgres database

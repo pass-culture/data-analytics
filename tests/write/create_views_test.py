@@ -6,7 +6,8 @@ from db import CONNECTION
 from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data
 from write.create_intermediate_views_for_stock import create_stocks_booking_view, create_available_stocks_view, \
     create_enriched_stock_view
-from tests.data_creators import clean_database, clean_views, create_user, create_product, create_offerer, create_venue, \
+from utils.database_cleaners import clean_database, clean_views
+from tests.data_creators import create_user, create_product, create_offerer, create_venue, \
     create_offer, create_stock, create_booking, create_payment_status, create_payment
 
 

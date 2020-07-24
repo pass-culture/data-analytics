@@ -1,7 +1,8 @@
 import pandas
 import pytest
 from read.postgresql_database.offerer_queries import get_siren_dataframe, get_postal_code_dataframe
-from tests.data_creators import clean_database, clean_views, create_offerer
+from utils.database_cleaners import clean_database, clean_views
+from tests.data_creators import create_offerer
 
 
 class OffererQueriesTest:
