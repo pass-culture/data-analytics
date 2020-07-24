@@ -7,8 +7,9 @@ from db import CONNECTION
 from write.create_intermediate_views_for_user import _get_experimentation_sessions_query, _get_users_seniority_query, \
     _get_actual_amount_spent_query, _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
     _get_theoric_amount_spent_in_physical_goods_query, _get_theoric_amount_spent_in_outings_query
+from utils.database_cleaners import clean_database, clean_views
 from tests.data_creators import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product, clean_database, create_deposit, clean_views
+    create_booking, create_product, create_deposit
 
 
 class UserQueriesTest:

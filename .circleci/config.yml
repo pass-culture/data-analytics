@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.7.6
+      - image: circleci/python:3.6.11
         environment:
           DATABASE_URL: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
       - image: circleci/postgres:11.6-postgis
@@ -13,12 +13,6 @@ jobs:
           POSTGRES_DB: pass_culture
     steps:
       - checkout
-      - run:
-          name: Install requirements
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
       - run:
           name: Initialize environment
           command: |
@@ -33,8 +27,8 @@ jobs:
       - run:
           name: Running tests
           command: |
-            . venv/bin/activate
-            pytest tests
+            pipenv install -e .
+            pipenv run pytest
 
 workflows:
   version: 2

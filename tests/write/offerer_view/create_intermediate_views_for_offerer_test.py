@@ -4,7 +4,8 @@ import pandas
 import pytest
 
 from db import CONNECTION
-from tests.data_creators import clean_database, clean_views, create_offerer, create_venue, create_product, \
+from utils.database_cleaners import clean_database, clean_views
+from tests.data_creators import create_offerer, create_venue, create_product, \
     create_offer, create_stock, create_user, create_booking
 from write.offerer_view.create_intermediate_views_for_offerer import _get_first_stock_creation_dates_query, \
     _get_first_booking_creation_dates_query, _get_number_of_offers_query, _get_number_of_bookings_not_cancelled_query, \

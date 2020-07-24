@@ -3,8 +3,7 @@ import os
 import pytest
 from flask import Flask
 
-from db import DATABASE_URL
-from db import db
+from db import db, DATABASE_URL
 
 
 @pytest.fixture(scope='session')

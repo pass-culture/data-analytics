@@ -1,10 +1,6 @@
 APPLICATION_MODULE=metabase_cli
 TEST_MODULE=tests
 
-.PHONY: activate
-activate: ## activate the virtualenv associate with this project
-	pipenv shell
-
 # @see http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -16,23 +12,18 @@ clean : ## remove all transient directories and files
 	rm -rf dist
 	rm -rf *.egg-info
 	find -name __pycache__ -print0 | xargs -0 sudo rm -rf
-	pipenv --rm
 
 .PHONY: dist
 dist: ## create a package
-	pipenv run python setup.py sdist
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run python setup.py sdist"
 
-.PHONY: freeze_requirements
+.PHONY: freeze-requirements
 freeze_requirements: ## update the project dependencies based on setup.py declaration
-	pipenv update
-
-.PHONY: install_requirements
-install_requirements: ## install the project dependencies based on setup.py
-	pipenv install -e .
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv update"
 
 .PHONY: tests
 tests: ## run automatic tests
-	pipenv run pytest
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run pytest"
 
 .PHONY: start-backend
 start-backend:  ## run backend using docker
@@ -42,15 +33,28 @@ start-backend:  ## run backend using docker
 start-metabase: ## run metabase using docker
 	docker-compose -f docker-compose.yml -f docker-compose-with-metabase.yml up
 
+.PHONY: initialize-metabase
+initialize-metabase: ## create Metabase super user and setup database
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run python -m utils.initialize_metabase"
+
+.PHONY: reset-metabase
+reset-metabase: ## stop metabase delete metabase volume and mount it again
+	docker container stop pcm-metabase-app pcm-postgres-metabase && docker container rm pcm-metabase-app pcm-postgres-metabase && docker volume rm pass-culture-data-analytics_metabase_data
+	docker-compose -f docker-compose-with-metabase.yml up -d metabase-app
+
 .PHONY: create-enriched-views
-create-enriched-views: ## connect to docker postgres database
-	curl -X POST localhost:5000/?token=abc123
+create-enriched-views: ## connect to docker postgres database local
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run pc-data-analytics create_enriched_views --local"
+
+.PHONY: clean-database-and-view
+clean-database-and-view: ## clean local database and view
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run python -m utils.clean_database_if_local"
 
 .PHONY: access-database
 access-database: ## connect to docker postgres database
-	docker exec -it analytics-datasource-postgres psql -U pass_culture
+	docker exec -it analytics-datasource-blue-postgres psql -U pass_culture
 
 .PHONY: run-python
 run-python:  ## run python using docker container
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && PYTHONPATH=. python"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run python"
 

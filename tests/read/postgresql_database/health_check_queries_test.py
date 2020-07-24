@@ -11,7 +11,8 @@ from read.postgresql_database.health_check_queries import is_enriched_materializ
     does_enriched_users_contains_data, \
     does_enriched_offer_contain_data, does_materialize_view_exist, does_view_exist, \
     does_view_have_data, is_enriched_view_queryable
-from tests.data_creators import clean_database, clean_views, clean_tables, create_offerer, create_venue, \
+from utils.database_cleaners import clean_database, clean_views, clean_tables
+from tests.data_creators import create_offerer, create_venue, \
     create_product, create_offer, \
     create_stock
 from write.create_views import create_enriched_offerer_data, create_enriched_stock_data
