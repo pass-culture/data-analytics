@@ -33,8 +33,9 @@ def show_app_name_for_restore():
 
 
 @click.command('switch_host_for_restore')
-def switch_host_for_restore():
-    app_name = switch_metabase_database_connection(os.environ.get('METABASE_DBNAME'), os.environ.get('METABASE_USER_NAME'), os.environ.get('METABASE_PASSWORD'))
+@click.option('-l', '--local', is_flag=True)
+def switch_host_for_restore(local: bool):
+    switch_metabase_database_connection(os.environ.get('METABASE_DBNAME'), os.environ.get('METABASE_USER_NAME'), os.environ.get('METABASE_PASSWORD'), local)
 
 
 @click.command('initialize_metabase')

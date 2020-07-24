@@ -195,7 +195,7 @@ class SwitchMetabaseDatabaseConnectionTest:
         }
 
         # When
-        switch_metabase_database_connection(table_name, user_name, password)
+        switch_metabase_database_connection(table_name, user_name, password, local=False)
 
         # Then
         mock_request.assert_called_once_with('metabase.example.com/api/database/table_id',
@@ -234,7 +234,7 @@ class SwitchMetabaseDatabaseConnectionTest:
         }
 
         # When
-        switch_metabase_database_connection(table_name, user_name, password)
+        switch_metabase_database_connection(table_name, user_name, password, local=True)
 
         # Then
         mock_request.assert_called_once_with('metabase.example.com/api/database/table_id',

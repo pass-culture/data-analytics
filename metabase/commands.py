@@ -24,19 +24,18 @@ def get_connected_database_id(database_name: str, session_id: str):
     return table_infos[0]['id']
 
 
-def switch_metabase_database_connection(database_name: str, user_name: str, password: str):
+def switch_metabase_database_connection(database_name: str, user_name: str, password: str, local: bool):
     session_id = configure_new_metabase_session(user_name, password)
     database_id = get_connected_database_id(database_name, session_id)
     app_name = get_app_name_for_restore()
     db_details = get_db_details_by_app_name(app_name)
-    db_details['ssl'] = False if DATABASE_URL == LOCAL_DATABASE_URL else True
+    db_details['ssl'] = False if local else True
     db_settings = {'details': db_details,
                  'name': database_name,
                  'engine': "postgres"}
     requests.put(f'{METABASE_URL}/api/database/{database_id}',
                  headers={'cookie': f'metabase.SESSION={session_id}'},
                  json=db_settings)
-    return app_name
 
 
 def get_connected_database_host_name(database_name: str, session_id: str):
@@ -66,7 +65,7 @@ def get_db_details_by_app_name(app_name: str):
 
 
 def clean_database_if_local():
-    if DATABASE_URL == LOCAL_DATABASE_URL:
+    if DATABASE_URL in LOCAL_DATABASE_URL:
         clean_database()
         clean_views()
         logger.info('[CLEAN DATABASE AND VIEW] Database cleaned')
