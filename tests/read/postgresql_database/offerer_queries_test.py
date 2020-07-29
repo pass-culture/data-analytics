@@ -1,8 +1,8 @@
 import pandas
-import pytest
+
 from read.postgresql_database.offerer_queries import get_siren_dataframe, get_postal_code_dataframe
-from utils.database_cleaners import clean_database, clean_views
 from tests.data_creators import create_offerer
+from utils.database_cleaners import clean_database, clean_views
 
 
 class OffererQueriesTest:
@@ -30,6 +30,7 @@ class OffererQueriesTest:
 
             # Then
             pandas.testing.assert_frame_equal(siren_dataframe, expected_siren_dataframe)
+
 
     class GetPostalCodeDataFrameTest:
         def test_should_return_empty_dataframe_if_no_offerer(self, app):
