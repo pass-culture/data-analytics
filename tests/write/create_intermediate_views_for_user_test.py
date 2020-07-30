@@ -1,15 +1,14 @@
 import pandas
-import pytest
 from freezegun import freeze_time
 from pandas import Int64Index
 
-from db import CONNECTION, ENGINE
+from db import ENGINE
+from tests.data_creators import create_user, create_offerer, create_venue, create_offer, create_stock, \
+    create_booking, create_product, create_deposit
+from utils.database_cleaners import clean_database, clean_views
 from write.create_intermediate_views_for_user import _get_experimentation_sessions_query, _get_users_seniority_query, \
     _get_actual_amount_spent_query, _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
     _get_theoric_amount_spent_in_physical_goods_query, _get_theoric_amount_spent_in_outings_query
-from utils.database_cleaners import clean_database, clean_views
-from tests.data_creators import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product, create_deposit
 
 
 class UserQueriesTest:
@@ -68,7 +67,8 @@ class UserQueriesTest:
             query = _get_experimentation_sessions_query()
 
             # Then
-            experimentation_sessions = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                experimentation_sessions = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_series_equal(
                 experimentation_sessions["Vague d'expérimentation"],
                 pandas.Series(data=[2], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
@@ -123,7 +123,8 @@ class UserQueriesTest:
             query = _get_users_seniority_query()
 
             # Then
-            user_seniority = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                user_seniority = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(user_seniority, pandas.DataFrame([0.], columns=["Ancienneté en jours"],
                                                                              index=Int64Index([1], name="user_id")))
 
@@ -150,7 +151,8 @@ class UserQueriesTest:
             query = _get_actual_amount_spent_query()
 
             # Then
-            amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(amount_spent, pandas.DataFrame([0.], columns=["Montant réél dépensé"],
                                                                              index=Int64Index([45], name="user_id")))
 

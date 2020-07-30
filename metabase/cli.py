@@ -6,8 +6,7 @@ load_environment_variables()
 import click
 from flask import Flask
 
-from metabase.commands import switch_metabase_database_connection, get_app_name_for_restore, \
-     initialize_metabase_if_local
+from metabase.commands import switch_metabase_database_connection, get_app_name_for_restore
 from write.create_enriched_data_views import create_enriched_data_views
 
 app = Flask(__name__, static_url_path='/static')
