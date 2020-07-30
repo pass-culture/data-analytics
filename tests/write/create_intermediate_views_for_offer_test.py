@@ -152,7 +152,7 @@ class OfferQueriesTest:
                 data=[5],
                 name="Nombre de réservations")
 
-            expected_cancled_booking_number = pandas.Series(
+            expected_cancelled_booking_number = pandas.Series(
                 index=pandas.Index(data=[30], name='offer_id'),
                 data=[3],
                 name="Nombre de réservations annulées")
@@ -168,7 +168,7 @@ class OfferQueriesTest:
             # Then
             offer_booking_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
             pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations"], expected_booking_number)
-            pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations annulées"], expected_cancled_booking_number)
+            pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations annulées"], expected_cancelled_booking_number)
             pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations validées"], expected_used_booking_number)
 
 
