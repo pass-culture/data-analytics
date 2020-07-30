@@ -17,27 +17,26 @@ class ViewQueriesTest:
             clean_database()
             clean_views()
 
-        def test_should_return_all_values(self, app):
+        def test_should_return_all_values(self):
             # Given
-            create_user(app, id=1)
-            create_user(app, id=2, email='other@test.com')
-            create_product(app, id=1, product_type='EventType.CINEMA')
-            create_product(app, id=2, product_type='ThingType.LIVRE_EDITION')
-            create_offerer(app, id=3)
-            create_venue(app, offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
+            create_user(id=1)
+            create_user(id=2, email='other@test.com')
+            create_product(id=1, product_type='EventType.CINEMA')
+            create_product(id=2, product_type='ThingType.LIVRE_EDITION')
+            create_offerer(id=3)
+            create_venue(offerer_id=3, id=1, siret=None, postal_code=None, city=None, departement_code=None,
                          is_virtual=True)
-            create_offer(app, venue_id=1, product_id=1, id=3, product_type='EventType.CINEMA', name="Test")
-            create_stock(app, offer_id=3, id=1, date_created='2019-11-01', quantity=10,
+            create_offer(venue_id=1, product_id=1, id=3, product_type='EventType.CINEMA', name="Test")
+            create_stock(offer_id=3, id=1, date_created='2019-11-01', quantity=10,
                          booking_limit_datetime='2019-11-23', beginning_datetime='2019-11-24')
-            create_offer(app, venue_id=1, product_id=2, id=2, product_type='ThingType.LIVRE_EDITION', name="Test bis")
-            create_stock(app, offer_id=2, id=2, date_created='2019-10-01', quantity=12)
-            create_booking(app, user_id=1, stock_id=1, id=4, quantity=2)
-            create_payment(app, booking_id=4, id=1)
-            create_payment_status(app, payment_id=1, id=1, date='2019-01-01', status='PENDING')
+            create_offer(venue_id=1, product_id=2, id=2, product_type='ThingType.LIVRE_EDITION', name="Test bis")
+            create_stock(offer_id=2, id=2, date_created='2019-10-01', quantity=12)
+            create_booking(user_id=1, stock_id=1, id=4, quantity=2)
+            create_payment(booking_id=4, id=1)
+            create_payment_status(payment_id=1, id=1, date='2019-01-01', status='PENDING')
 
-            with app.app_context():
-                create_stocks_booking_view()
-                create_available_stocks_view()
+            create_stocks_booking_view()
+            create_available_stocks_view()
 
             expected_stocks_details = pandas.DataFrame(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -58,20 +57,18 @@ class ViewQueriesTest:
             )
 
             # When
-            with app.app_context():
-                create_enriched_stock_view()
+            create_enriched_stock_view()
 
             # Then
             stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
-
 
     class CreateEnrichedUserViewTest:
         def teardown_method(self):
             clean_database()
             clean_views()
 
-        def test_should_create_enriched_user_data_view_with_columns(self, app):
+        def test_should_create_enriched_user_data_view_with_columns(self):
             # Given
             expected_columns = ["Vague d'expérimentation", "Département", "Code postal", "Statut", "Date d'activation",
                                 "Date de remplissage du typeform",
@@ -92,13 +89,12 @@ class ViewQueriesTest:
             beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
             assert sorted(expected_columns) == sorted(beneficiary_users_details.columns)
 
-
     class CreateEnrichedOffererViewTest:
         def teardown_method(self):
             clean_database()
             clean_views()
 
-        def test_should_create_enriched_offerer_data_view_with_columns(self, app):
+        def test_should_create_enriched_offerer_data_view_with_columns(self):
             # When
             with app.app_context():
                 create_enriched_offerer_data()
@@ -112,13 +108,12 @@ class ViewQueriesTest:
             offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
 
-
     class CreateEnrichedOfferViewTest:
         def teardown_method(self):
             clean_database()
             clean_views()
 
-        def test_should_create_enriched_offer_data_view_with_columns(self, app):
+        def test_should_create_enriched_offer_data_view_with_columns(self):
             # When
             with app.app_context():
                 create_enriched_offer_data()
@@ -129,7 +124,8 @@ class ViewQueriesTest:
                                 "Nom de l'offre", "Catégorie de l'offre", "Date de création de l'offre", "isDuo",
                                 "Offre numérique",
                                 "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
-                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris", "Stock"]
+                                "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris",
+                                "Stock"]
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)

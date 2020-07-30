@@ -1,7 +1,7 @@
 import pandas
 import pytest
 
-from db import CONNECTION
+from db import CONNECTION, ENGINE
 from utils.database_cleaners import clean_database, clean_views
 from tests.data_creators import create_user, create_product, create_offerer, create_venue, \
     create_offer, create_stock, create_booking, create_payment, create_payment_status
@@ -39,7 +39,8 @@ class StockQueriesTest:
             query = _get_stocks_booking_information_query()
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection, index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre total de réservations"],
                                                expected_stocks_booking_information)
 
@@ -67,7 +68,8 @@ class StockQueriesTest:
             query = _get_stocks_booking_information_query()
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection, index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre total de réservations"],
                                                expected_stocks_booking_information)
 
@@ -96,7 +98,8 @@ class StockQueriesTest:
             query = _get_stocks_booking_information_query()
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection, index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations annulées"],
                                                expected_stocks_booking_information)
 
@@ -121,7 +124,8 @@ class StockQueriesTest:
             query = _get_stocks_booking_information_query()
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection, index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations annulées"],
                                                expected_stocks_booking_information)
 
@@ -152,7 +156,8 @@ class StockQueriesTest:
             query = _get_stocks_booking_information_query()
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection, index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"],
                                                expected_stocks_booking_information)
 
@@ -183,7 +188,8 @@ class StockQueriesTest:
             query = _get_stocks_booking_information_query()
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION,
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection,
                                                                index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"],
                                                expected_stocks_booking_information)
@@ -220,6 +226,7 @@ class StockQueriesTest:
 
 
             # Then
-            stocks_booking_information = pandas.read_sql(query, CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_booking_information = pandas.read_sql(query, connection, index_col='stock_id')
             pandas.testing.assert_series_equal(stocks_booking_information["Nombre de réservations ayant un paiement"],
                                                expected_stocks_booking_information)

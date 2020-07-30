@@ -11,7 +11,7 @@ from read.postgresql_database.health_check_queries import is_enriched_materializ
     does_enriched_users_contains_data, \
     does_enriched_offer_contain_data, does_materialize_view_exist, does_view_exist, \
     does_view_have_data, is_enriched_view_queryable
-from utils.database_cleaners import clean_database, clean_views, clean_tables
+from utils.database_cleaners import clean_database, clean_views, drop_offerer_cultural_activity_table
 from tests.data_creators import create_offerer, create_venue, \
     create_product, create_offer, \
     create_stock
@@ -29,7 +29,7 @@ class DoesMaterializeViewExistTest:
     def teardown_method(self):
         clean_database()
         clean_views()
-        clean_tables()
+        drop_offerer_cultural_activity_table()
 
     def test_should_return_false_if_materialized_view_does_not_exist(self, app):
         with app.app_context():
@@ -54,7 +54,7 @@ class DoesViewExistTest:
     def teardown_method(self):
         clean_database()
         clean_views()
-        clean_tables()
+        drop_offerer_cultural_activity_table()
 
     def test_should_return_false_if_view_does_not_exist(self, app):
         with app.app_context():
@@ -79,7 +79,7 @@ class IsEnrichedMaterializedViewQueryableTest:
     def teardown_method(self):
         clean_database()
         clean_views()
-        clean_tables()
+        drop_offerer_cultural_activity_table()
 
     @patch('read.postgresql_database.health_check_queries.does_materialize_view_exist')
     def test_should_close_session_if_query_did_not_end_on_an_exception(self,

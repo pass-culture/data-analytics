@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas
 import pytest
 
-from db import CONNECTION
+from db import CONNECTION, ENGINE
 from utils.database_cleaners import clean_database, clean_views
 from tests.data_creators import create_offerer, create_venue, create_product, \
     create_offer, create_stock, create_user, create_booking
@@ -31,7 +31,8 @@ class OffererQueriesTest:
             query = _get_first_stock_creation_dates_query()
 
             # Then
-            first_stock_dates = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                first_stock_dates = pandas.read_sql(query, connection, index_col='offerer_id')
             assert first_stock_dates.loc[
                        1, "Date de création du premier stock"] == datetime(2019, 12, 1)
 
@@ -43,7 +44,8 @@ class OffererQueriesTest:
             query = _get_first_stock_creation_dates_query()
 
             # Then
-            first_stock_dates = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                first_stock_dates = pandas.read_sql(query, connection, index_col='offerer_id')
             assert first_stock_dates.loc[1, "Date de création du premier stock"] is None
 
     class GetFirstBookingCreationDatesQueryTest:
@@ -64,7 +66,8 @@ class OffererQueriesTest:
             query = _get_first_booking_creation_dates_query()
 
             # Then
-            first_booking_dates = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                first_booking_dates = pandas.read_sql(query, connection, index_col='offerer_id')
             assert first_booking_dates.loc[1, "Date de première réservation"] == first_booking_date
 
         def test_should_return_None_if_the_offerer_has_no_booking(self, app):
@@ -75,7 +78,8 @@ class OffererQueriesTest:
             query = _get_first_booking_creation_dates_query()
 
             # Then
-            first_booking_dates = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                first_booking_dates = pandas.read_sql(query, connection, index_col='offerer_id')
             assert first_booking_dates.loc[1, "Date de première réservation"] is None
 
     class GetNumberOfOffersQueryTest:
@@ -92,7 +96,8 @@ class OffererQueriesTest:
             query = _get_number_of_offers_query()
 
             # Then
-            number_of_offers = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_offers = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_offers.loc[1, "Nombre d’offres"] == 2
 
         def test_should_return_zero_if_the_offerer_has_no_offer(self, app):
@@ -103,7 +108,8 @@ class OffererQueriesTest:
             query = _get_number_of_offers_query()
 
             # Then
-            number_of_offers = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_offers = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_offers.loc[1, "Nombre d’offres"] == 0
 
     class GetNumberOfBookingsNotCancelledQueryTest:
@@ -124,7 +130,8 @@ class OffererQueriesTest:
             query = _get_number_of_bookings_not_cancelled_query()
 
             # Then
-            number_of_bookings_not_cancelled = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_bookings_not_cancelled = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 2
 
         def test_should_return_zero_if_the_offerer_has_no_booking(self, app):
@@ -135,7 +142,8 @@ class OffererQueriesTest:
             query = _get_number_of_bookings_not_cancelled_query()
 
             # Then
-            number_of_bookings_not_cancelled = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_bookings_not_cancelled = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_bookings_not_cancelled.loc[1, "Nombre de réservations non annulées"] == 0
 
     class GetNumberOfVenuesPerOffererQueryTest:
@@ -148,7 +156,8 @@ class OffererQueriesTest:
             query = _get_number_of_venues_per_offerer_query()
 
             # Then
-            number_of_venue = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_venue = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_venue.loc[1, "Nombre de lieux"] == 1
 
         def test_should_return_zero_if_the_offerer_has_no_venue(self, app):
@@ -159,7 +168,8 @@ class OffererQueriesTest:
             query = _get_number_of_venues_per_offerer_query()
 
             # Then
-            number_of_venue = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_venue = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_venue.loc[1, "Nombre de lieux"] == 0
 
     class GetNumberOfVenueWithOfferPerOffererQueryTest:
@@ -176,7 +186,8 @@ class OffererQueriesTest:
             query = _get_number_of_venues_with_offer_per_offerer_query()
 
             # Then
-            number_of_venue_with_offer = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_venue_with_offer = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 1
 
         def test_should_return_zero_if_the_offerer_has_no_venue(self, app):
@@ -187,7 +198,8 @@ class OffererQueriesTest:
             query = _get_number_of_venues_with_offer_per_offerer_query()
 
             # Then
-            number_of_venue_with_offer = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_venue_with_offer = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 0
 
         def test_should_return_zero_if_the_offerer_s_venue_has_no_offer(self, app):
@@ -199,5 +211,6 @@ class OffererQueriesTest:
             query = _get_number_of_venues_with_offer_per_offerer_query()
 
             # Then
-            number_of_venue_with_offer = pandas.read_sql(query, CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                number_of_venue_with_offer = pandas.read_sql(query, connection, index_col='offerer_id')
             assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 0

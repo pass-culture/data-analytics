@@ -7,15 +7,16 @@ from transform.compute_offerer_department_code import get_offerer_with_departeme
 
 
 def create_table_offerer_departement_code(department_code_dataframe: pandas.DataFrame) -> None:
-    department_code_dataframe.to_sql(
-        name='offerer_departement_code',
-        con=ENGINE,
-        if_exists='replace',
-        dtype={
-                'id': sqlalchemy.types.BIGINT(),
-                'APE_label': sqlalchemy.types.VARCHAR(length=250)
-                }
-    )
+    with ENGINE.connect() as connection:
+        department_code_dataframe.to_sql(
+            name='offerer_departement_code',
+            con=connection,
+            if_exists='replace',
+            dtype={
+                    'id': sqlalchemy.types.BIGINT(),
+                    'APE_label': sqlalchemy.types.VARCHAR(length=250)
+                    }
+        )
 
 
 def create_offerer_departement_code_data() -> None:

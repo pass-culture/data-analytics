@@ -1,7 +1,7 @@
 import pandas
 import pytest
 
-from db import CONNECTION
+from db import CONNECTION, ENGINE
 from write.create_intermediate_views_for_offer import _get_is_physical_information_query, _get_is_outing_information_query, \
     _get_offer_booking_information_query, _get_count_favorites_query, _get_offer_info_with_quantity
 
@@ -43,7 +43,8 @@ class OfferQueriesTest:
             query = _get_is_physical_information_query()
 
             # Then
-            is_physical_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                is_physical_information = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(is_physical_information["Bien physique"], expected_is_physical_information)
 
         def test_should_return_physical_product_column_with_false_if_not_relevant_product_type(self, app):
@@ -64,7 +65,8 @@ class OfferQueriesTest:
             query = _get_is_physical_information_query()
 
             # Then
-            is_physical_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                is_physical_information = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(is_physical_information["Bien physique"], expected_is_physical_information)
 
 
@@ -104,7 +106,8 @@ class OfferQueriesTest:
             query = _get_is_outing_information_query()
 
             # Then
-            is_outing_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                is_outing_information = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(is_outing_information["Sortie"], expected_is_outing_information)
 
         def test_should_return_outings_column_with_false_if_not_relevant_product_type(self, app):
@@ -125,7 +128,8 @@ class OfferQueriesTest:
             query = _get_is_outing_information_query()
 
             # Then
-            is_outing_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                is_outing_information = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(is_outing_information["Sortie"], expected_is_outing_information)
 
 
@@ -166,7 +170,8 @@ class OfferQueriesTest:
             query = _get_offer_booking_information_query()
 
             # Then
-            offer_booking_information = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                offer_booking_information = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations"], expected_booking_number)
             pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations annulées"], expected_cancelled_booking_number)
             pandas.testing.assert_series_equal(offer_booking_information["Nombre de réservations validées"], expected_used_booking_number)
@@ -196,7 +201,8 @@ class OfferQueriesTest:
             query = _get_count_favorites_query()
 
             # Then
-            count_favorites = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                count_favorites = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(count_favorites["Nombre de fois où l'offre a été mise en favoris"], expected_favorites_number)
 
     class GetSumStockTest:
@@ -220,5 +226,6 @@ class OfferQueriesTest:
             # When
             query = _get_offer_info_with_quantity()
             # Then
-            offer_stock = pandas.read_sql(query, CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                offer_stock = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(offer_stock["Stock"],expected_offer_stock)

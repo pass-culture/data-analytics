@@ -3,11 +3,10 @@ from typing import Optional
 import pandas
 from pandas import DataFrame
 
-from db import ENGINE, connect_to_database
+from db import ENGINE
 
 
-@connect_to_database
-def get_siren_dataframe(connection) -> Optional[DataFrame]:
+def get_siren_dataframe() -> Optional[DataFrame]:
     query = '''
     SELECT
         id
@@ -15,12 +14,13 @@ def get_siren_dataframe(connection) -> Optional[DataFrame]:
     FROM offerer
     WHERE siren IS NOT NULL 
     '''
-    siren_df = pandas.read_sql(query, connection)
+
+    with ENGINE.connect() as connection:
+        siren_df = pandas.read_sql(query, connection)
     return siren_df
 
 
-@connect_to_database
-def get_postal_code_dataframe(connection) -> DataFrame:
+def get_postal_code_dataframe() -> DataFrame:
     query = '''
     SELECT
         id
@@ -28,5 +28,7 @@ def get_postal_code_dataframe(connection) -> DataFrame:
     FROM offerer
     WHERE "postalCode" is not NULL 
     '''
-    postalcode_df = pandas.read_sql(query, connection)
+
+    with ENGINE.connect() as connection:
+        postalcode_df = pandas.read_sql(query, connection)
     return postalcode_df

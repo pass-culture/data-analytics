@@ -3,7 +3,7 @@ import pytest
 from freezegun import freeze_time
 from pandas import Int64Index
 
-from db import CONNECTION
+from db import CONNECTION, ENGINE
 from write.create_intermediate_views_for_user import _get_experimentation_sessions_query, _get_users_seniority_query, \
     _get_actual_amount_spent_query, _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
     _get_theoric_amount_spent_in_physical_goods_query, _get_theoric_amount_spent_in_outings_query
@@ -32,7 +32,8 @@ class UserQueriesTest:
             query = _get_experimentation_sessions_query()
 
             # Then
-            experimentation_sessions = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                experimentation_sessions = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_series_equal(
                 experimentation_sessions["Vague d'expérimentation"],
                 pandas.Series(data=[1], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
@@ -52,7 +53,8 @@ class UserQueriesTest:
             query = _get_experimentation_sessions_query()
 
             # Then
-            experimentation_sessions = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                experimentation_sessions = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_series_equal(
                 experimentation_sessions["Vague d'expérimentation"],
                 pandas.Series(data=[2], name="Vague d'expérimentation", index=Int64Index([1], name='user_id'))
@@ -87,7 +89,8 @@ class UserQueriesTest:
             query = _get_experimentation_sessions_query()
 
             # Then
-            experimentation_sessions = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                experimentation_sessions = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_series_equal(
                 experimentation_sessions["Vague d'expérimentation"],
                 pandas.Series(data=[1], name="Vague d'expérimentation", index=Int64Index([1], name='user_id')))
@@ -100,7 +103,8 @@ class UserQueriesTest:
             query = _get_experimentation_sessions_query()
 
             # Then
-            experimentation_sessions = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                experimentation_sessions = pandas.read_sql(query, connection, index_col='user_id')
             assert experimentation_sessions["Vague d'expérimentation"].empty
 
     class GetUserSeniorityTest:
@@ -132,7 +136,8 @@ class UserQueriesTest:
             query = _get_users_seniority_query()
 
             # Then
-            user_seniority = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                user_seniority = pandas.read_sql(query, connection, index_col='user_id')
             assert user_seniority.empty
 
     class GetUserActualAmountSpent:
@@ -164,7 +169,8 @@ class UserQueriesTest:
             query = _get_actual_amount_spent_query()
 
             # Then
-            amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(amount_spent, pandas.DataFrame([10.], columns=["Montant réél dépensé"],
                                                                              index=Int64Index([45], name="user_id")))
 
@@ -183,7 +189,8 @@ class UserQueriesTest:
             query = _get_actual_amount_spent_query()
 
             # Then
-            amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(amount_spent, pandas.DataFrame([0.], columns=["Montant réél dépensé"],
                                                                              index=Int64Index([45], name="user_id")))
 
@@ -202,7 +209,8 @@ class UserQueriesTest:
             query = _get_actual_amount_spent_query()
 
             # Then
-            amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(amount_spent, pandas.DataFrame([20.], columns=["Montant réél dépensé"],
                                                                              index=Int64Index([45], name="user_id")))
 
@@ -221,7 +229,8 @@ class UserQueriesTest:
             query = _get_actual_amount_spent_query()
 
             # Then
-            amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(amount_spent, pandas.DataFrame([0.], columns=["Montant réél dépensé"],
                                                                              index=Int64Index([45], name="user_id")))
 
@@ -233,7 +242,8 @@ class UserQueriesTest:
             query = _get_actual_amount_spent_query()
 
             # Then
-            amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             assert amount_spent.empty
 
     class GetUserTheoricAmountSpent:
@@ -246,7 +256,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_query()
 
             # Then
-            theoric_amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             assert theoric_amount_spent.empty
 
         def test_if_user_has_not_booked_return_0(self, app):
@@ -257,7 +268,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_query()
 
             # Then
-            theoric_amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent,
                                               pandas.DataFrame([0.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
@@ -277,7 +289,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_query()
 
             # Then
-            theoric_amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent,
                                               pandas.DataFrame([0.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
@@ -297,7 +310,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_query()
 
             # Then
-            theoric_amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent,
                                               pandas.DataFrame([10.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
@@ -317,7 +331,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_query()
 
             # Then
-            theoric_amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent,
                                               pandas.DataFrame([10.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
@@ -337,7 +352,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_query()
 
             # Then
-            theoric_amount_spent = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent,
                                               pandas.DataFrame([20.], columns=["Montant théorique dépensé"],
                                                                index=Int64Index([45], name="user_id")))
@@ -351,7 +367,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
                                               pandas.DataFrame([0.], columns=["Dépenses numériques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -364,7 +381,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             assert theoric_amount_spent_in_digital.empty
 
         def test_if_booking_on_digital_good_return_amount(self, app):
@@ -382,7 +400,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
                                               pandas.DataFrame([20.], columns=["Dépenses numériques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -402,7 +421,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
                                               pandas.DataFrame([0.], columns=["Dépenses numériques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -422,7 +442,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
                                               pandas.DataFrame([0.], columns=["Dépenses numériques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -442,7 +463,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
                                               pandas.DataFrame([0.], columns=["Dépenses numériques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -462,7 +484,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_digital_goods_query()
 
             # Then
-            theoric_amount_spent_in_digital = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_digital = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_digital,
                                               pandas.DataFrame([0.], columns=["Dépenses numériques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -476,7 +499,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -489,7 +513,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             assert theoric_amount_spent_in_physical.empty
 
         def test_if_booking_on_physical_good_return_amount(self, app):
@@ -507,7 +532,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([20.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -527,7 +553,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -547,7 +574,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -567,7 +595,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -587,7 +616,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_physical_goods_query()
 
             # Then
-            theoric_amount_spent_in_physical = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_physical = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_physical,
                                               pandas.DataFrame([0.], columns=["Dépenses physiques"],
                                                                index=Int64Index([1], name="user_id")))
@@ -601,7 +631,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_outings_query()
 
             # Then
-            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_outings = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
                                               pandas.DataFrame([0.], columns=["Dépenses sorties"],
                                                                index=Int64Index([1], name="user_id")))
@@ -614,7 +645,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_outings_query()
 
             # Then
-            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_outings = pandas.read_sql(query, connection, index_col='user_id')
             assert theoric_amount_spent_in_outings.empty
 
         def test_if_booking_on_outings_return_amount(self, app):
@@ -632,7 +664,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_outings_query()
 
             # Then
-            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_outings = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
                                               pandas.DataFrame([20.], columns=["Dépenses sorties"],
                                                                index=Int64Index([1], name="user_id")))
@@ -652,7 +685,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_outings_query()
 
             # Then
-            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_outings = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
                                               pandas.DataFrame([0.], columns=["Dépenses sorties"],
                                                                index=Int64Index([1], name="user_id")))
@@ -672,7 +706,8 @@ class UserQueriesTest:
             query = _get_theoric_amount_spent_in_outings_query()
 
             # Then
-            theoric_amount_spent_in_outings = pandas.read_sql(query, CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                theoric_amount_spent_in_outings = pandas.read_sql(query, connection, index_col='user_id')
             pandas.testing.assert_frame_equal(theoric_amount_spent_in_outings,
                                               pandas.DataFrame([0.], columns=["Dépenses sorties"],
                                                                index=Int64Index([1], name="user_id")))
