@@ -40,9 +40,9 @@ class DoesMaterializeViewExistTest:
 
     def test_should_return_true_if_materialized_view_exists(self, app):
         # Given
-        with app.app_context():
-            create_enriched_offerer_data()
+        create_enriched_offerer_data()
 
+        with app.app_context():
             # When
             result = does_materialize_view_exist(db.session, 'enriched_offerer_data')
 
@@ -65,9 +65,9 @@ class DoesViewExistTest:
 
     def test_should_return_true_if_view_exists(self, app):
         # Given
-        with app.app_context():
-            create_enriched_stock_data()
+        create_enriched_stock_data()
 
+        with app.app_context():
             # When
             result = does_view_exist(db.session, 'enriched_stock_data')
 
@@ -240,9 +240,9 @@ class DoesViewHaveDataTest:
 
     def test_should_return_false_if_view_exists_but_is_empty(self, app):
         # Given
-        with app.app_context():
-            create_enriched_offerer_data()
+        create_enriched_offerer_data()
 
+        with app.app_context():
             # When
             result = does_view_have_data(db.session, 'enriched_offerer_data')
             db.session.close()
@@ -252,14 +252,14 @@ class DoesViewHaveDataTest:
 
     def test_should_return_true_if_view_has_entries(self, app):
         # Given
-        with app.app_context():
-            create_offerer(app, id=1)
-            create_venue(app, offerer_id=1, id=1)
-            create_product(app, id=1)
-            create_offer(app, venue_id=1, product_id=1, id=1)
-            create_stock(app, offer_id=1, date_created='2019-12-01')
-            create_enriched_stock_data()
+        create_offerer(id=1)
+        create_venue(offerer_id=1, id=1)
+        create_product(id=1)
+        create_offer(venue_id=1, product_id=1, id=1)
+        create_stock(offer_id=1, date_created='2019-12-01')
+        create_enriched_stock_data()
 
+        with app.app_context():
             # When
             result = does_view_have_data(db.session, 'enriched_stock_data')
             db.session.close()
