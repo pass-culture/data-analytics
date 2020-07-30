@@ -16,17 +16,18 @@ def cli():
     pass
 
 
-@app.cli.command('create_enriched_views')
+@click.command('create', help='Create enriched views on Analytics Data Source')
 def create_enriched_views():
     create_enriched_data_views()
 
 
-@click.command('show_app_name_for_restore')
+@click.command('show', help='Show app name that is not linked to Metabase. The restore has to be done on this app')
 def show_app_name_for_restore():
     print(get_app_name_for_restore())
 
 
-@click.command('switch_host_for_restore')
+@click.command('switch',
+               help='Switch Metabase connection to the other app. Invoke this command after a successful restore')
 @click.option('-l', '--local', is_flag=True)
 def switch_host_for_restore(local: bool):
     switch_metabase_database_connection(os.environ.get('METABASE_DBNAME'), os.environ.get('METABASE_USER_NAME'), os.environ.get('METABASE_PASSWORD'), local)
