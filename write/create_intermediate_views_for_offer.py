@@ -1,4 +1,4 @@
-from db import db
+from db import db, ENGINE
 
 
 def _get_is_physical_information_query() -> str:
@@ -71,37 +71,37 @@ def create_is_physical_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW is_physical_view AS {_get_is_physical_information_query()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 def create_is_outing_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW is_outing_view AS {_get_is_outing_information_query()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 def create_booking_information_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW offer_booking_information_view AS {_get_offer_booking_information_query()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 def create_count_favorites_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW count_favorites_view AS {_get_count_favorites_query()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_sum_stock_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_info_with_quantity()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_enriched_offer_view() -> None:
@@ -137,5 +137,5 @@ def create_enriched_offer_view() -> None:
         LEFT JOIN sum_stock_view ON sum_stock_view.offer_id = offer.id
         )
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)

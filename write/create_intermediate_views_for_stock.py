@@ -1,4 +1,4 @@
-from db import db
+from db import ENGINE
 
 STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "offer_name": "Nom de l'offre",
@@ -18,16 +18,16 @@ def create_stocks_booking_view() -> None:
         CREATE OR REPLACE VIEW stock_booking_information AS
         {_get_stocks_booking_information_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 def create_available_stocks_view() -> None:
     query = f'''
         CREATE OR REPLACE VIEW available_stock_information AS
         {_get_available_stock_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 def _get_stocks_booking_information_query() -> str:
     return f'''
@@ -114,5 +114,5 @@ def create_enriched_stock_view() -> None:
          LEFT JOIN stock_booking_information ON stock.id = stock_booking_information.stock_id
          LEFT JOIN available_stock_information ON stock_booking_information.stock_id = available_stock_information.stock_id);
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)

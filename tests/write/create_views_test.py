@@ -1,14 +1,15 @@
 from datetime import datetime
-import pandas
-import pytest
 
-from db import CONNECTION
-from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data, create_enriched_venue_data
-from write.create_intermediate_views_for_stock import create_stocks_booking_view, create_available_stocks_view, \
-    create_enriched_stock_view
-from utils.database_cleaners import clean_database, clean_views
+import pandas
+
+from db import ENGINE
 from tests.data_creators import create_user, create_product, create_offerer, create_venue, \
     create_offer, create_stock, create_booking, create_payment_status, create_payment
+from utils.database_cleaners import clean_database, clean_views
+from write.create_intermediate_views_for_stock import create_stocks_booking_view, create_available_stocks_view, \
+    create_enriched_stock_view
+from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data, \
+    create_enriched_venue_data
 
 
 class ViewQueriesTest:
@@ -60,7 +61,8 @@ class ViewQueriesTest:
             create_enriched_stock_view()
 
             # Then
-            stocks_details = pandas.read_sql_table('enriched_stock_data', CONNECTION, index_col='stock_id')
+            with ENGINE.connect() as connection:
+                stocks_details = pandas.read_sql_table('enriched_stock_data', connection, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
 
     class CreateEnrichedUserViewTest:
@@ -82,11 +84,11 @@ class ViewQueriesTest:
                                 "Dépenses physiques", "Dépenses sorties"]
 
             # When
-            with app.app_context():
-                create_enriched_user_data()
+            create_enriched_user_data()
 
             # Then
-            beneficiary_users_details = pandas.read_sql_table('enriched_user_data', CONNECTION, index_col='user_id')
+            with ENGINE.connect() as connection:
+                beneficiary_users_details = pandas.read_sql_table('enriched_user_data', connection, index_col='user_id')
             assert sorted(expected_columns) == sorted(beneficiary_users_details.columns)
 
     class CreateEnrichedOffererViewTest:
@@ -96,8 +98,7 @@ class ViewQueriesTest:
 
         def test_should_create_enriched_offerer_data_view_with_columns(self):
             # When
-            with app.app_context():
-                create_enriched_offerer_data()
+            create_enriched_offerer_data()
 
             # Then
             expected_columns = ["Nom", "Date de création", "Date de création du premier stock",
@@ -105,7 +106,8 @@ class ViewQueriesTest:
                                 "Nombre de réservations non annulées", "Département", "Nombre de lieux",
                                 "Nombre de lieux avec offres"]
 
-            offerers_details = pandas.read_sql_table('enriched_offerer_data', CONNECTION, index_col='offerer_id')
+            with ENGINE.connect() as connection:
+                offerers_details = pandas.read_sql_table('enriched_offerer_data', connection, index_col='offerer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
 
     class CreateEnrichedOfferViewTest:
@@ -115,8 +117,7 @@ class ViewQueriesTest:
 
         def test_should_create_enriched_offer_data_view_with_columns(self):
             # When
-            with app.app_context():
-                create_enriched_offer_data()
+            create_enriched_offer_data()
 
             # Then
             expected_columns = ["Identifiant de la structure", "Nom de la structure", "Identifiant du lieu",
@@ -126,8 +127,8 @@ class ViewQueriesTest:
                                 "Bien physique", "Sortie", "Nombre de réservations", "Nombre de réservations annulées",
                                 "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris",
                                 "Stock"]
-
-            offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
+            with ENGINE.connect() as connection:
+                offerers_details = pandas.read_sql_table('enriched_offer_data', connection, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
 
     class CreateEnrichedVenueViewTest:
@@ -146,6 +147,7 @@ class ViewQueriesTest:
                                 "Nombre total de réservations", "Nombre de réservations non annulées", "Nombre de réservations validées", "Date de création de la première offre","Date de création de la dernière offre",
                                 "Nombre d'offres créées", "Chiffre d'affaires théorique réalisé", "Chiffre d'affaires réel réalisé"]
 
-            venue_details = pandas.read_sql_table('enriched_venue_data', CONNECTION, index_col='venue_id')
+            with ENGINE.connect() as connection:
+                venue_details = pandas.read_sql_table('enriched_venue_data', connection, index_col='venue_id')
             assert sorted(expected_columns) == sorted(venue_details.columns)
 

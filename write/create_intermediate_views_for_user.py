@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from db import db
+from db import ENGINE
 
 
 def _get_experimentation_sessions_query() -> str:
@@ -373,120 +373,120 @@ def create_experimentation_sessions_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW experimentation_sessions AS {_get_experimentation_sessions_query()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_activation_dates_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW activation_dates AS {_get_activation_dates_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_first_connection_dates_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW first_connection_dates AS {_get_first_connection_dates_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_date_of_first_bookings_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW date_of_first_bookings AS {_get_date_of_first_bookings_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_date_of_second_bookings_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW date_of_second_bookings AS {_get_date_of_second_bookings_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_date_of_bookings_on_third_product_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW date_of_bookings_on_third_product AS {_get_date_of_bookings_on_third_product_type_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_last_recommendation_dates_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW last_recommendation_dates AS {_get_last_recommendation_dates_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_number_of_bookings_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW number_of_bookings AS {_get_number_of_bookings_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_number_of_non_cancelled_bookings_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW number_of_non_cancelled_bookings AS {_get_number_of_non_cancelled_bookings_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_users_seniority_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW users_seniority AS {_get_users_seniority_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_actual_amount_spent_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW actual_amount_spent AS {_get_actual_amount_spent_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_theoric_amount_spent_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW theoric_amount_spent AS {_get_theoric_amount_spent_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_theoric_amount_spent_in_digital_goods_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW theoric_amount_spent_in_digital_goods AS {_get_theoric_amount_spent_in_digital_goods_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_theoric_amount_spent_in_physical_goods_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW theoric_amount_spent_in_physical_goods AS {_get_theoric_amount_spent_in_physical_goods_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_theoric_amount_spent_in_outings_view() -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW theoric_amount_spent_in_outings AS {_get_theoric_amount_spent_in_outings_query()} 
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
 def create_materialized_enriched_user_view() -> None:
@@ -531,5 +531,5 @@ def create_materialized_enriched_user_view() -> None:
         LEFT JOIN theoric_amount_spent_in_outings ON theoric_amount_spent_in_physical_goods.user_id = theoric_amount_spent_in_outings.user_id
         WHERE "user"."canBookFreeOffers");
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
