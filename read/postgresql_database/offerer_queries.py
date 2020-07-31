@@ -3,10 +3,8 @@ from typing import Optional
 import pandas
 from pandas import DataFrame
 
-from db import ENGINE
 
-
-def get_siren_dataframe() -> Optional[DataFrame]:
+def get_siren_dataframe(ENGINE) -> Optional[DataFrame]:
     query = '''
     SELECT
         id
@@ -20,7 +18,7 @@ def get_siren_dataframe() -> Optional[DataFrame]:
     return siren_df
 
 
-def get_postal_code_dataframe() -> DataFrame:
+def get_postal_code_dataframe(ENGINE) -> DataFrame:
     query = '''
     SELECT
         id

@@ -14,7 +14,7 @@ class CreateTableOffererCulturalActivityTest:
         offerer_cultural_activity_dataframe = pandas.DataFrame()
 
         # When
-        _create_table_offerer_cultural_activity(offerer_cultural_activity_dataframe)
+        _create_table_offerer_cultural_activity(offerer_cultural_activity_dataframe, ENGINE)
 
         # Then
         with ENGINE.connect() as connection:

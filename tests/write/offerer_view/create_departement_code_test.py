@@ -14,7 +14,7 @@ class CreateTableOffererWithDepartmentCodeTest:
         department_code_dataframe = pandas.DataFrame()
 
         # When
-        create_table_offerer_departement_code(department_code_dataframe)
+        create_table_offerer_departement_code(department_code_dataframe, ENGINE)
 
         # Then
         with ENGINE.connect() as connection:

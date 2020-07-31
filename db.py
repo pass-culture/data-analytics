@@ -9,3 +9,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL', LOCAL_DATABASE_URL[0])
 ENGINE = create_engine(DATABASE_URL)
 
 db = SQLAlchemy()
+
+
+class AppNameNotFound(Exception):
+    pass

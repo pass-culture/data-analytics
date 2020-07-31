@@ -1,6 +1,3 @@
-from db import db, ENGINE
-
-
 def _get_is_physical_information_query() -> str:
     return '''
         SELECT
@@ -67,28 +64,28 @@ def _get_offer_info_with_quantity() -> str:
         GROUP BY offer_id
     '''
 
-def create_is_physical_view() -> None:
+def create_is_physical_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW is_physical_view AS {_get_is_physical_information_query()}
         '''
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
-def create_is_outing_view() -> None:
+def create_is_outing_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW is_outing_view AS {_get_is_outing_information_query()}
         '''
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
-def create_booking_information_view() -> None:
+def create_booking_information_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW offer_booking_information_view AS {_get_offer_booking_information_query()}
         '''
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
-def create_count_favorites_view() -> None:
+def create_count_favorites_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW count_favorites_view AS {_get_count_favorites_query()}
         '''
@@ -96,7 +93,7 @@ def create_count_favorites_view() -> None:
         connection.execute(view_query)
 
 
-def create_sum_stock_view() -> None:
+def create_sum_stock_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_info_with_quantity()}
         '''
@@ -104,7 +101,7 @@ def create_sum_stock_view() -> None:
         connection.execute(view_query)
 
 
-def create_enriched_offer_view() -> None:
+def create_enriched_offer_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW enriched_offer_data AS (
         SELECT

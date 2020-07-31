@@ -1,6 +1,5 @@
 import pandas
 
-from db import ENGINE
 from transform.compute_offerer_cultural_activity import get_departement_code
 
 
@@ -10,7 +9,7 @@ def get_offerer_with_departement_code_dataframe(postal_code_dataframe: pandas.Da
     return department_code_dataframe.drop('postalCode', axis=1)
 
 
-def create_postal_code_dataframe() -> pandas.DataFrame:
+def create_postal_code_dataframe(ENGINE) -> pandas.DataFrame:
     connection = ENGINE.connect()
     query = '''
     SELECT

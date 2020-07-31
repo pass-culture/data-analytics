@@ -1,8 +1,3 @@
-from datetime import datetime
-
-from db import db
-
-
 def _get_number_of_bookings_per_venue() -> str:
     return '''
     SELECT
@@ -140,71 +135,71 @@ def _get_real_revenue_per_venue() -> str:
     '''
 
 
-def create_total_bookings_per_venue_view() -> None:
+def create_total_bookings_per_venue_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW total_bookings_per_venue AS {_get_number_of_bookings_per_venue()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_non_cancelled_bookings_per_venue_view() -> None:
+def create_non_cancelled_bookings_per_venue_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW non_cancelled_bookings_per_venue AS {_get_number_of_non_cancelled_bookings_per_venue()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_used_bookings_per_venue_view() -> None:
+def create_used_bookings_per_venue_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW used_bookings_per_venue  AS {_get_number_of_used_bookings()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_first_offer_creation_date_view() -> None:
+def create_first_offer_creation_date_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW first_offer_creation_date AS {_get_first_offer_creation_date()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_last_offer_creation_date_view() -> None:
+def create_last_offer_creation_date_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW last_offer_creation_date AS {_get_last_offer_creation_date()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_offers_created_per_venue_view() -> None:
+def create_offers_created_per_venue_view(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW offers_created_per_venue AS {_get_offers_created_per_venue()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_theoretic_revenue_per_venue() -> None:
+def create_theoretic_revenue_per_venue(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW theoretic_revenue_per_venue AS {_get_theoretic_revenue_per_venue()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_real_revenue_per_venue() -> None:
+def create_real_revenue_per_venue(ENGINE) -> None:
     view_query = f'''
         CREATE OR REPLACE VIEW real_revenue_per_venue AS {_get_real_revenue_per_venue()}
         '''
-    db.session.execute(view_query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
 
 
-def create_enriched_venue_view() -> None:
+def create_enriched_venue_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW enriched_venue_data AS (
         SELECT
@@ -256,5 +251,5 @@ def create_enriched_venue_view() -> None:
         ON venue.id = real_revenue_per_venue.venue_id
         )
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)

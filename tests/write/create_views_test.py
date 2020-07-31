@@ -36,8 +36,8 @@ class ViewQueriesTest:
             create_payment(booking_id=4, id=1)
             create_payment_status(payment_id=1, id=1, date='2019-01-01', status='PENDING')
 
-            create_stocks_booking_view()
-            create_available_stocks_view()
+            create_stocks_booking_view(ENGINE)
+            create_available_stocks_view(ENGINE)
 
             expected_stocks_details = pandas.DataFrame(
                 index=pandas.Index(data=[1, 2], name='stock_id'),
@@ -58,7 +58,7 @@ class ViewQueriesTest:
             )
 
             # When
-            create_enriched_stock_view()
+            create_enriched_stock_view(ENGINE)
 
             # Then
             with ENGINE.connect() as connection:
@@ -84,7 +84,7 @@ class ViewQueriesTest:
                                 "Dépenses physiques", "Dépenses sorties"]
 
             # When
-            create_enriched_user_data()
+            create_enriched_user_data(ENGINE)
 
             # Then
             with ENGINE.connect() as connection:
@@ -98,7 +98,7 @@ class ViewQueriesTest:
 
         def test_should_create_enriched_offerer_data_view_with_columns(self):
             # When
-            create_enriched_offerer_data()
+            create_enriched_offerer_data(ENGINE)
 
             # Then
             expected_columns = ["Nom", "Date de création", "Date de création du premier stock",
@@ -117,7 +117,7 @@ class ViewQueriesTest:
 
         def test_should_create_enriched_offer_data_view_with_columns(self):
             # When
-            create_enriched_offer_data()
+            create_enriched_offer_data(ENGINE)
 
             # Then
             expected_columns = ["Identifiant de la structure", "Nom de la structure", "Identifiant du lieu",
@@ -139,7 +139,7 @@ class ViewQueriesTest:
         def test_should_create_enriched_venue_data_view_with_columns(self, app):
             # When
             with app.app_context():
-                create_enriched_venue_data()
+                create_enriched_venue_data(ENGINE)
 
             # Then
             expected_columns = ["Nom du lieu", "email","Adresse","latitude","longitude","Département",

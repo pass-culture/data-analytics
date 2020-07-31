@@ -1,4 +1,5 @@
 import pandas
+from db import ENGINE
 
 from read.postgresql_database.offerer_queries import get_siren_dataframe, get_postal_code_dataframe
 from tests.data_creators import create_offerer
@@ -13,7 +14,7 @@ class OffererQueriesTest:
     class GetSirenDataFrameTest:
         def test_should_return_empty_dataframe_if_no_offerer(self, app):
             # When
-            df = get_siren_dataframe()
+            df = get_siren_dataframe(ENGINE)
 
             # Then
             assert df.empty
@@ -26,7 +27,7 @@ class OffererQueriesTest:
             expected_siren_dataframe = pandas.DataFrame(data={"id": [1, 3], "siren": ['345678123', '123456789']})
 
             # When
-            siren_dataframe = get_siren_dataframe()
+            siren_dataframe = get_siren_dataframe(ENGINE)
 
             # Then
             pandas.testing.assert_frame_equal(siren_dataframe, expected_siren_dataframe)
@@ -35,7 +36,7 @@ class OffererQueriesTest:
     class GetPostalCodeDataFrameTest:
         def test_should_return_empty_dataframe_if_no_offerer(self, app):
             # When
-            df = get_postal_code_dataframe()
+            df = get_postal_code_dataframe(ENGINE)
 
             # Then
             assert df.empty
@@ -47,7 +48,7 @@ class OffererQueriesTest:
             expected_postal_code_dataframe = pandas.DataFrame(data={"id": [1, 2], "postalCode": ['75003', '97459']})
 
             # When
-            postal_code_dataframe = get_postal_code_dataframe()
+            postal_code_dataframe = get_postal_code_dataframe(ENGINE)
 
             # Then
             pandas.testing.assert_frame_equal(postal_code_dataframe, expected_postal_code_dataframe)

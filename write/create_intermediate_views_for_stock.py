@@ -1,5 +1,3 @@
-from db import ENGINE
-
 STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "offer_name": "Nom de l'offre",
                  "offerer_id": "offerer_id",
@@ -13,7 +11,8 @@ STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
                  "bookings_cancelled": "Nombre de réservations annulées",
                  "bookings_paid": "Nombre de réservations ayant un paiement"}
 
-def create_stocks_booking_view() -> None:
+
+def create_stocks_booking_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW stock_booking_information AS
         {_get_stocks_booking_information_query()}
@@ -21,13 +20,15 @@ def create_stocks_booking_view() -> None:
     with ENGINE.connect() as connection:
         connection.execute(query)
 
-def create_available_stocks_view() -> None:
+
+def create_available_stocks_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW available_stock_information AS
         {_get_available_stock_query()}
         '''
     with ENGINE.connect() as connection:
         connection.execute(query)
+
 
 def _get_stocks_booking_information_query() -> str:
     return f'''
@@ -90,7 +91,7 @@ def _get_available_stock_query() -> str:
     '''
 
 
-def create_enriched_stock_view() -> None:
+def create_enriched_stock_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW enriched_stock_data AS
         (SELECT

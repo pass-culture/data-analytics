@@ -17,8 +17,9 @@ def cli():
 
 
 @click.command('create', help='Create enriched views on Analytics Data Source')
-def create_enriched_views():
-    create_enriched_data_views()
+@click.option('-u', '--db_url')
+def create_enriched_views(db_url):
+    create_enriched_data_views(db_url)
 
 
 @click.command('show', help='Show app name that is not linked to Metabase. The restore has to be done on this app')
