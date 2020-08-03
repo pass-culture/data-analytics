@@ -53,13 +53,3 @@ class PingTest:
 
             # Then
             assert response.status_code == 200
-
-
-class WriteEnrichedDataTest:
-    def test_should_return_401_when_call_is_made_with_wrong_token(self):
-        with app.test_client() as client:
-            # When
-            response = client.post('/?token=xxxxx')
-
-            # Then
-            assert response.status_code == 401
