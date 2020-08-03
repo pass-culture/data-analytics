@@ -26,7 +26,7 @@ def _get_mocked_session() -> Tuple[sessionmaker, session.Session]:
 
 
 class DoesMaterializeViewExistTest:
-    def teardown_method(self):
+    def setup_method(self):
         clean_database()
         clean_views()
         drop_offerer_cultural_activity_table()

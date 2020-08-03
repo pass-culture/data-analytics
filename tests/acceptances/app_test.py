@@ -5,7 +5,7 @@ app.testing = True
 
 
 class HealthCheckTest:
-    def teardown_method(self):
+    def setup_method(self):
         clean_database()
         clean_views()
     def test_health_check_on_offerer(self):
