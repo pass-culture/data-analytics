@@ -28,7 +28,6 @@ class GetOffererCulturalActivityDataframeTest:
 
         # When
         result = get_offerer_cultural_activity_dataframe(siren_dataframe)
-        print(siren_dataframe)
 
         # Then
         pandas.testing.assert_frame_equal(expected_dataframe, result)
