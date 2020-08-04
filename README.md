@@ -6,6 +6,8 @@ Il est composé de :
 - une app flask + une cli
 - une app metabase qui rend ces données accessible aux équipes pass Culture
 
+![Architecture Data Analytics](doc/archi-pass-culture-data-analytics.png)
+
 En local, vous avez le choix de faire tourner simplement Flask + Posgresql `make start-backend` ou tout metabase `make start-metabase`
 
 Les commandes utiles au déveleppement se trouvent dans le Makefile ou dans la cli.
