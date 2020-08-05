@@ -9,7 +9,9 @@ from write.create_intermediate_views_for_venue import _get_number_of_bookings_pe
     _get_first_offer_creation_date, _get_last_offer_creation_date, _get_offers_created_per_venue, \
     _get_theoretic_revenue_per_venue ,_get_real_revenue_per_venue
 from tests.data_creators import create_user, create_offerer, create_venue, create_offer, create_stock, \
-    create_booking, create_product, clean_database, create_deposit, clean_views
+    create_booking, create_product,  create_deposit
+
+from utils.database_cleaners import clean_database, clean_views
 
 
 class VenueQueriesTest:
@@ -159,6 +161,36 @@ class VenueQueriesTest:
             last_offer_creation_date = pandas.read_sql(query, CONNECTION, index_col='venue_id')
             pandas.testing.assert_series_equal(expected_last_offer_creation_date,
                                                last_offer_creation_date['last_offer_creation_date'])
+
+    class GetOffersCreatedPerVenueTest:
+        def test_should_return_number_of_offers_created_per_venue(self, app):
+            # Given
+            create_user(app, id=1)
+            create_offerer(app, id=1)
+            create_venue(app, offerer_id=1, id=1)
+            create_product(app, id=1, product_type='ThingType.ACTIVATION')
+            create_offer(app, venue_id=1, product_id=1, id=1, product_type='ThingType.ACTIVATION',date_created='2020-05-13')
+            create_stock(app, offer_id=1, id=1)
+            create_product(app, id=2, product_type='ThingType.MUSIQUE')
+            create_offer(app, venue_id=1, product_id=2, id=2, product_type='ThingType.MUSIQUE',date_created='2020-05-10')
+            create_offer(app, venue_id=1, product_id=2, id=3, product_type='ThingType.MUSIQUE',
+                         date_created='2020-05-11')
+            create_stock(app, offer_id=2, id=2)
+            create_booking(app, id=1, user_id=1, quantity=1, stock_id=2, is_used=True)
+            create_booking(app, id=2, user_id=1, quantity=1, stock_id=2, token='ABC321', is_used=True)
+            create_booking(app, id=3, user_id=1, quantity=3, stock_id=2, token='FAM321', is_cancelled=True)
+            create_booking(app, id=4, user_id=1, quantity=3, stock_id=1, token='CON321')
+            expected_offers_created_per_venue = pandas.Series(data=[2],
+                                                                       name="offers_created",
+                                                                       index=Int64Index([1],
+                                                                                        name='venue_id'))
+            # When
+            query = _get_offers_created_per_venue()
+
+            # Then
+            offers_created_per_venue = pandas.read_sql(query, CONNECTION, index_col='venue_id')
+            pandas.testing.assert_series_equal(expected_offers_created_per_venue,
+                                               offers_created_per_venue['offers_created'])
 
     class TheoreticalRevenuePerVenueTest:
         def test_should_return_theoretic_revenue_per_venue(self, app):
