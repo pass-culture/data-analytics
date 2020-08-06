@@ -220,6 +220,7 @@ def create_enriched_venue_view() -> None:
             ,venue.siret
             ,venue."isVirtual" AS "Lieu numérique"
             ,venue."managingOffererId" AS "Identifiant de la structure"
+            ,offerer."name" AS "Nom de la structure"
             ,venue_type."label" AS "Type de lieu"
             ,venue_label."label" AS "Label du lieu"
             ,total_bookings_per_venue.total_bookings AS "Nombre total de réservations"
@@ -231,6 +232,8 @@ def create_enriched_venue_view() -> None:
             ,theoretic_revenue_per_venue.theoretic_revenue AS "Chiffre d'affaires théorique réalisé"
             ,real_revenue_per_venue.real_revenue AS "Chiffre d'affaires réel réalisé"
         FROM venue
+        LEFT JOIN offerer
+        ON venue."managingOffererId" = offerer.id
         LEFT JOIN venue_type
         ON venue."venueTypeId" = venue_type.id
         LEFT JOIN venue_label

@@ -146,7 +146,7 @@ class ViewQueriesTest:
 
             # Then
             expected_columns = ["Nom du lieu", "email","Adresse","latitude","longitude","Département",
-                                "Code postal","Ville","siret","Lieu numérique","Identifiant de la structure","Type de lieu","Label du lieu",
+                                "Code postal","Ville","siret","Lieu numérique","Identifiant de la structure","Nom de la structure","Type de lieu","Label du lieu",
                                 "Nombre total de réservations", "Nombre de réservations non annulées", "Nombre de réservations validées", "Date de création de la première offre","Date de création de la dernière offre",
                                 "Nombre d'offres créées", "Chiffre d'affaires théorique réalisé", "Chiffre d'affaires réel réalisé"]
 
