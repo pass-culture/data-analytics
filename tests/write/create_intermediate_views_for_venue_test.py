@@ -4,7 +4,7 @@ from freezegun import freeze_time
 from pandas import Int64Index
 
 from db import CONNECTION
-from write.create_intermediate_views_for_venue import ENRICHED_VENUE_QUERY, \
+from write.create_intermediate_views_for_venue import _get_number_of_bookings_per_venue, \
     _get_number_of_non_cancelled_bookings_per_venue, _get_number_of_used_bookings, \
     _get_first_offer_creation_date, _get_last_offer_creation_date, _get_offers_created_per_venue, \
     _get_theoretic_revenue_per_venue ,_get_real_revenue_per_venue
@@ -32,13 +32,14 @@ class VenueQueriesTest:
             create_booking(app, id=1, user_id=1, quantity=1, stock_id=2, is_used=True)
             create_booking(app, id=2, user_id=1, quantity=1, stock_id=2, token='ABC321', is_used=True)
             create_booking(app, id=3, user_id=1, quantity=3, stock_id=2, token='FAM321', is_cancelled=True)
-            expected_number_of_bookings_per_venue = pandas.Series(data=[3], name='Nombre total de réservations', index=Int64Index([1],name='venue_id'))
+            expected_number_of_bookings_per_venue = pandas.Series(data=[3], name="total_bookings", index=Int64Index([1],name='venue_id'))
 
             # When
-            total_bookings_per_venue = pandas.read_sql(ENRICHED_VENUE_QUERY, CONNECTION, index_col='venue_id')
+            query = _get_number_of_bookings_per_venue()
 
             # Then
-            pandas.testing.assert_series_equal(total_bookings_per_venue['Nombre total de réservations'], expected_number_of_bookings_per_venue)
+            total_bookings_per_venue = pandas.read_sql(query, CONNECTION, index_col='venue_id')
+            pandas.testing.assert_series_equal(total_bookings_per_venue['total_bookings'],expected_number_of_bookings_per_venue)
 
     class GetNumberOfNonCancelledBookingsTest:
         def test_should_return_exact_number_of_non_cancelled_bookings(self, app):

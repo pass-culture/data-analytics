@@ -14,7 +14,7 @@ from write.offerer_view.create_intermediate_views_for_offerer import create_firs
     create_first_booking_creation_dates_view, create_number_of_offers_view, \
     create_number_of_bookings_not_cancelled_view, create_number_of_venues_view, create_number_of_venues_without_offer_view, \
     create_materialized_enriched_offerer_view
-from write.create_intermediate_views_for_venue import create_used_bookings_per_venue_view, \
+from write.create_intermediate_views_for_venue import create_total_bookings_per_venue_view, create_used_bookings_per_venue_view, \
     create_non_cancelled_bookings_per_venue_view, create_first_offer_creation_date_view, create_last_offer_creation_date_view, \
     create_offers_created_per_venue_view, create_theoretic_revenue_per_venue, create_real_revenue_per_venue, create_enriched_venue_view
 
@@ -61,6 +61,7 @@ def create_enriched_offer_data():
     create_enriched_offer_view()
 
 def create_enriched_venue_data():
+    create_total_bookings_per_venue_view()
     create_non_cancelled_bookings_per_venue_view()
     create_used_bookings_per_venue_view()
     create_first_offer_creation_date_view()
