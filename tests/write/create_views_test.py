@@ -3,7 +3,7 @@ import pandas
 import pytest
 
 from db import CONNECTION
-from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data
+from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data, create_enriched_venue_data
 from write.create_intermediate_views_for_stock import create_stocks_booking_view, create_available_stocks_view, \
     create_enriched_stock_view
 from utils.database_cleaners import clean_database, clean_views
@@ -133,3 +133,23 @@ class ViewQueriesTest:
 
             offerers_details = pandas.read_sql_table('enriched_offer_data', CONNECTION, index_col='offer_id')
             assert sorted(expected_columns) == sorted(offerers_details.columns)
+
+    class CreateEnrichedVenueViewTest:
+        def teardown_method(self):
+            clean_database()
+            clean_views()
+
+        def test_should_create_enriched_venue_data_view_with_columns(self, app):
+            # When
+            with app.app_context():
+                create_enriched_venue_data()
+
+            # Then
+            expected_columns = ["Nom du lieu", "email","Adresse","latitude","longitude","Département",
+                                "Code postal","Ville","siret","Lieu numérique","Identifiant de la structure","Nom de la structure","Type de lieu","Label du lieu",
+                                "Nombre total de réservations", "Nombre de réservations non annulées", "Nombre de réservations validées", "Date de création de la première offre","Date de création de la dernière offre",
+                                "Nombre d'offres créées", "Chiffre d'affaires théorique réalisé", "Chiffre d'affaires réel réalisé"]
+
+            venue_details = pandas.read_sql_table('enriched_venue_data', CONNECTION, index_col='venue_id')
+            assert sorted(expected_columns) == sorted(venue_details.columns)
+
