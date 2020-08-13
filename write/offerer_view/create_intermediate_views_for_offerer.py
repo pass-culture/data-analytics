@@ -1,61 +1,58 @@
-from db import db
-
-
-def create_first_stock_creation_dates_view() -> None:
+def create_first_stock_creation_dates_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW related_stocks AS
         {_get_first_stock_creation_dates_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
-def create_first_booking_creation_dates_view() -> None:
+def create_first_booking_creation_dates_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW related_bookings AS
         {_get_first_booking_creation_dates_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
-def create_number_of_offers_view() -> None:
+def create_number_of_offers_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW related_offers AS
         {_get_number_of_offers_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
-def create_number_of_bookings_not_cancelled_view() -> None:
+def create_number_of_bookings_not_cancelled_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW related_non_cancelled_bookings AS
         {_get_number_of_bookings_not_cancelled_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
-def create_number_of_venues_view() -> None:
+def create_number_of_venues_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW related_venues AS
         {_get_number_of_venues_per_offerer_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
-def create_number_of_venues_without_offer_view() -> None:
+def create_number_of_venues_without_offer_view(ENGINE) -> None:
     query = f'''
         CREATE OR REPLACE VIEW related_venues_with_offer AS
         {_get_number_of_venues_with_offer_per_offerer_query()}
         '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
-def create_materialized_enriched_offerer_view() -> str:
+def create_materialized_enriched_offerer_view(ENGINE) -> str:
     query = '''
     CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offerer_data AS
     (SELECT
@@ -80,8 +77,8 @@ def create_materialized_enriched_offerer_view() -> str:
     )
     ;
     '''
-    db.session.execute(query)
-    db.session.commit()
+    with ENGINE.connect() as connection:
+        connection.execute(query)
 
 
 def _get_first_stock_creation_dates_query() -> str:

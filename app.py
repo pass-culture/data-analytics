@@ -1,19 +1,16 @@
 import os
 from functools import partial
 
-from flask import Flask, request, jsonify
-
 from db import DATABASE_URL, db
+from flask import Flask, jsonify
 from read.postgresql_database.health_check_queries import is_enriched_materialized_view_queryable, \
     does_enriched_offerer_contain_data, does_enriched_users_contains_data, does_enriched_stock_contain_data, \
     does_enriched_offer_contain_data, \
     is_enriched_view_queryable
 from utils.health_check.get_offer_enriched_data_status import get_offer_enriched_data_status
 from utils.health_check.get_offerer_enriched_data_status import get_offerer_enriched_data_status
-from utils.load_environment_variables import load_environment_variables
 from utils.health_check.get_stock_enriched_data_status import get_stock_enriched_data_status
 from utils.health_check.get_user_enriched_data_status import get_user_enriched_data_status
-from write.create_enriched_data_views import create_enriched_data_views
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET', '+%+3Q23!zbc+!Dd@')
@@ -72,16 +69,6 @@ def health_check_offer_status():
     )
 
     return jsonify(table_status), 200
-
-
-@app.route('/', methods=['POST'])
-def write_enriched_data():
-    token = request.args.get('token')
-    bastion_token = os.environ.get('BASTION_TOKEN')
-    if token == bastion_token:
-        create_enriched_data_views()
-        return '', 200
-    return '', 401
 
 
 if __name__ == '__main__':

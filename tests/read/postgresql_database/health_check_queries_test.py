@@ -5,13 +5,13 @@ import pytest
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import sessionmaker, session
 
-from db import db
+from db import db, ENGINE
 from read.postgresql_database.health_check_queries import is_enriched_materialized_view_queryable, \
     does_enriched_offerer_contain_data, does_enriched_stock_contain_data, \
     does_enriched_users_contains_data, \
     does_enriched_offer_contain_data, does_materialize_view_exist, does_view_exist, \
     does_view_have_data, is_enriched_view_queryable
-from utils.database_cleaners import clean_database, clean_views, clean_tables
+from utils.database_cleaners import clean_database, clean_views, drop_offerer_cultural_activity_table
 from tests.data_creators import create_offerer, create_venue, \
     create_product, create_offer, \
     create_stock
@@ -26,10 +26,10 @@ def _get_mocked_session() -> Tuple[sessionmaker, session.Session]:
 
 
 class DoesMaterializeViewExistTest:
-    def teardown_method(self):
+    def setup_method(self):
         clean_database()
         clean_views()
-        clean_tables()
+        drop_offerer_cultural_activity_table()
 
     def test_should_return_false_if_materialized_view_does_not_exist(self, app):
         with app.app_context():
@@ -40,9 +40,9 @@ class DoesMaterializeViewExistTest:
 
     def test_should_return_true_if_materialized_view_exists(self, app):
         # Given
-        with app.app_context():
-            create_enriched_offerer_data()
 
+        with app.app_context():
+            create_enriched_offerer_data(db.engine)
             # When
             result = does_materialize_view_exist(db.session, 'enriched_offerer_data')
 
@@ -54,7 +54,7 @@ class DoesViewExistTest:
     def teardown_method(self):
         clean_database()
         clean_views()
-        clean_tables()
+        drop_offerer_cultural_activity_table()
 
     def test_should_return_false_if_view_does_not_exist(self, app):
         with app.app_context():
@@ -65,9 +65,9 @@ class DoesViewExistTest:
 
     def test_should_return_true_if_view_exists(self, app):
         # Given
-        with app.app_context():
-            create_enriched_stock_data()
 
+        with app.app_context():
+            create_enriched_stock_data(db.engine)
             # When
             result = does_view_exist(db.session, 'enriched_stock_data')
 
@@ -79,7 +79,7 @@ class IsEnrichedMaterializedViewQueryableTest:
     def teardown_method(self):
         clean_database()
         clean_views()
-        clean_tables()
+        drop_offerer_cultural_activity_table()
 
     @patch('read.postgresql_database.health_check_queries.does_materialize_view_exist')
     def test_should_close_session_if_query_did_not_end_on_an_exception(self,
@@ -240,9 +240,9 @@ class DoesViewHaveDataTest:
 
     def test_should_return_false_if_view_exists_but_is_empty(self, app):
         # Given
-        with app.app_context():
-            create_enriched_offerer_data()
 
+        with app.app_context():
+            create_enriched_offerer_data(db.engine)
             # When
             result = does_view_have_data(db.session, 'enriched_offerer_data')
             db.session.close()
@@ -252,14 +252,14 @@ class DoesViewHaveDataTest:
 
     def test_should_return_true_if_view_has_entries(self, app):
         # Given
-        with app.app_context():
-            create_offerer(app, id=1)
-            create_venue(app, offerer_id=1, id=1)
-            create_product(app, id=1)
-            create_offer(app, venue_id=1, product_id=1, id=1)
-            create_stock(app, offer_id=1, date_created='2019-12-01')
-            create_enriched_stock_data()
+        create_offerer(id=1)
+        create_venue(offerer_id=1, id=1)
+        create_product(id=1)
+        create_offer(venue_id=1, product_id=1, id=1)
+        create_stock(offer_id=1, date_created='2019-12-01')
 
+        with app.app_context():
+            create_enriched_stock_data(db.engine)
             # When
             result = does_view_have_data(db.session, 'enriched_stock_data')
             db.session.close()
@@ -332,7 +332,7 @@ class DoesEnrichedOffererSourceContainDataTest:
         # Given
         is_enriched_materialized_view_queryable_mock.return_value = True
         does_view_have_data_mock.side_effect = SQLAlchemyError
-        create_enriched_offerer_data()
+        create_enriched_offerer_data(ENGINE)
         Session, local_session = _get_mocked_session()
 
         # When
@@ -424,7 +424,7 @@ class DoesEnrichedUserSourceContainsDataTest:
         # Given
         is_enriched_materialized_view_queryable_mock.return_value = True
         does_view_have_data_mock.side_effect = SQLAlchemyError
-        create_enriched_offerer_data()
+        create_enriched_offerer_data(ENGINE)
         Session, local_session = _get_mocked_session()
 
         # When
@@ -516,7 +516,7 @@ class DoesEnrichedStocksSourceContainsDataTest:
         # Given
         is_enriched_view_queryable_mock.return_value = True
         does_view_have_data_mock.side_effect = SQLAlchemyError
-        create_enriched_offerer_data()
+        create_enriched_offerer_data(ENGINE)
         Session, local_session = _get_mocked_session()
 
         # When
@@ -608,7 +608,7 @@ class DoesEnrichedOfferSourceContainsDataTest:
         # Given
         is_enriched_view_queryable_mock.return_value = True
         does_view_have_data_mock.side_effect = SQLAlchemyError
-        create_enriched_offerer_data()
+        create_enriched_offerer_data(ENGINE)
         Session, local_session = _get_mocked_session()
 
         # When

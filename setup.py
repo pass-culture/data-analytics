@@ -12,7 +12,7 @@ setup(
     long_description_content_type='text/markdown',
     entry_points={
         'console_scripts': [
-            'pc-data-analytics = metabase.cli:cli',
+            'pcd = metabase.cli:cli',
         ],
     },
     install_requires=[
