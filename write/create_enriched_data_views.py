@@ -19,7 +19,7 @@ def create_enriched_data_views(db_url):
     logger.info('[ENRICHED DATA] Created enriched stock data')
     create_enriched_offer_data(engine)
     logger.info('[ENRICHED DATA] Created enriched offer data')
-    create_enriched_venue_data(ENGINE)
+    create_enriched_venue_data(engine)
     logger.info('[ENRICHED DATA] Created enriched venue data')
 
     logger.info('[ENRICHED DATA] End enriched data creation')

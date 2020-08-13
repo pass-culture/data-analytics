@@ -138,8 +138,7 @@ class ViewQueriesTest:
 
         def test_should_create_enriched_venue_data_view_with_columns(self, app):
             # When
-            with app.app_context():
-                create_enriched_venue_data(ENGINE)
+            create_enriched_venue_data(ENGINE)
 
             # Then
             expected_columns = ["Nom du lieu", "email","Adresse","latitude","longitude","Département",

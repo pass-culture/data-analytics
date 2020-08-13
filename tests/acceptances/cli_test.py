@@ -18,6 +18,8 @@ class CreateTest:
         result = runner.invoke(cli, ['create', '-u', DATABASE_URL])
 
         # Then
+        print(result)
+        print(vars(result))
         assert result.exit_code == 0
 
     def test_exits_with_1_when_called_without_db_url(self):
