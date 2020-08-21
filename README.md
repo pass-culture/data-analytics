@@ -8,6 +8,46 @@ Il est composé de :
 
 ![Architecture Data Analytics](doc/archi-pass-culture-data-analytics.png)
 
+<b> WARNING : Ce schéma est déprécié, il existe deux environnements analytics qui servent alternativement de source à métabase<b>
+
+# Environement Scalingo 
+
+Sur Scalingo il y a deux environnements où Metabase source ses données alternativement :
+- Environnnement #1 [à préciser]
+- Environnement #2 [à préciser]
+
+Dans chacun de ces environnements doivent être présentes les variables suivantes : 
+```
+GREEN_DB_INFO='{
+    "app_name": "<nom_environnement_green>",
+    "details": {
+        "port": "<port_green>",
+        "host": "<host_name_green>",
+        "dbname": "<db_name_green>",
+        "user": "<user_green>",
+        "password": "<password_green>"
+    }
+}'
+
+BLUE_DB_INFO='{
+    "app_name": "<nom_environnement_blue>",
+    "details": {
+        "port": "<port_blue>",
+        "host": "<host_name_blue>",
+        "dbname": "<db_name_blue>",
+        "user": "<user_blue>",
+        "password": "<password_blue>"
+    }
+}'
+```
+
+Les valeurs de ces différentes variables peuvent être obtenues à partir de la variable d'environement scalingo `SCALINGO_POSTGRESQL_URL` qui est construite selon le format suivant: 
+
+`postgres://<user>:<password>@<host_name>:<port>/<db_name>?<param1>=<value1>&...`
+
+
+# Environement Local 
+
 En local, vous avez le choix de faire tourner simplement Flask + Posgresql `make start-backend` ou tout metabase `make start-metabase`
 
 Les commandes utiles au déveleppement se trouvent dans le Makefile ou dans la cli.
