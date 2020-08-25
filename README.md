@@ -165,3 +165,15 @@ Une fois le paquet installé, taper :
 Une fois le paquet installé, taper :
 `pc-data-analytics switch_host_for_restore`
 
+
+# Utiliser python dans le postgres :
+
+on va installer une extension sur postgres : plpython3u
+1- se connecter au container
+`docker exec -it analytics-datasource-blue-postgres bash`
+2- mettre à jour les packets et installer le packet contenant l'extension
+`apt-get update && apt-get install postgresql-plpython3-11`
+3- installer l'extension sur postgres
+`psql -U pass_culture`
+`CREATE EXTENSION plpython3u;`
+

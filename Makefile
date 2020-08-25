@@ -23,7 +23,7 @@ freeze_requirements: ## update the project dependencies based on setup.py declar
 
 .PHONY: tests
 tests: ## run automatic tests
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run pytest"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run pytest tests/write/create_views_test.py -k CreateEnrichedStockViewTest"
 
 .PHONY: start-backend
 start-backend:  ## run backend using docker

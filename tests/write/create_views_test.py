@@ -32,28 +32,17 @@ class ViewQueriesTest:
                          booking_limit_datetime='2019-11-23', beginning_datetime='2019-11-24')
             create_offer(venue_id=1, product_id=2, id=2, product_type='ThingType.LIVRE_EDITION', name="Test bis")
             create_stock(offer_id=2, id=2, date_created='2019-10-01', quantity=12)
+            create_stock(offer_id=2, id=212, date_created='2019-10-01', quantity=12)
             create_booking(user_id=1, stock_id=1, id=4, quantity=2)
             create_payment(booking_id=4, id=1)
             create_payment_status(payment_id=1, id=1, date='2019-01-01', status='PENDING')
 
-            create_stocks_booking_view(ENGINE)
-            create_available_stocks_view(ENGINE)
+            # create_stocks_booking_view(ENGINE)
+            # create_available_stocks_view(ENGINE)
 
             expected_stocks_details = pandas.DataFrame(
-                index=pandas.Index(data=[1, 2], name='stock_id'),
-                data={"Identifiant de l'offre": [3, 2],
-                      "Nom de l'offre": ["Test", "Test bis"],
-                      "offerer_id": [3, 3],
-                      "Type d'offre": ["EventType.CINEMA", 'ThingType.LIVRE_EDITION'],
-                      "Département": [None, None],
-                      "Date de création du stock": [datetime(2019, 11, 1), datetime(2019, 10, 1)],
-                      "Date limite de réservation": [datetime(2019, 11, 23), pandas.NaT],
-                      "Date de début de l'évènement": [datetime(2019, 11, 24), pandas.NaT],
-                      "Stock disponible réel": [8, 12],
-                      "Stock disponible brut de réservations": [10, 12],
-                      "Nombre total de réservations": [2, 0],
-                      "Nombre de réservations annulées": [0, 0],
-                      "Nombre de réservations ayant un paiement": [2, 0]
+                index=pandas.Index(data=[1, 2, 212], name='stock_id'),
+                data={"do_stuff": ['AE', 'A9', '2Q'],
                       }
             )
 
@@ -64,6 +53,8 @@ class ViewQueriesTest:
             with ENGINE.connect() as connection:
                 stocks_details = pandas.read_sql_table('enriched_stock_data', connection, index_col='stock_id')
             pandas.testing.assert_frame_equal(stocks_details, expected_stocks_details)
+            print(stocks_details)
+            assert False
 
     class CreateEnrichedUserViewTest:
         def teardown_method(self):
