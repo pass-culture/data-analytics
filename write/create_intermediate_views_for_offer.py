@@ -126,7 +126,6 @@ def create_enriched_offer_view(ENGINE) -> None:
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
-        LEFT JOIN favorite ON favorite."offerId" = offer.id
         LEFT JOIN is_physical_view ON is_physical_view.offer_id = offer.id
         LEFT JOIN is_outing_view ON is_outing_view.offer_id = offer.id
         LEFT JOIN offer_booking_information_view ON offer_booking_information_view.offer_id = offer.id
