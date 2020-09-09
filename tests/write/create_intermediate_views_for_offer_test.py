@@ -229,3 +229,28 @@ class OfferQueriesTest:
             with ENGINE.connect() as connection:
                 offer_stock = pandas.read_sql(query, connection, index_col='offer_id')
             pandas.testing.assert_series_equal(offer_stock["Stock"],expected_offer_stock)
+
+    class NoDuplicatesTest:
+        def teardown_method(self):
+            clean_database()
+            clean_views()
+
+        def test_should_return_how_many_stocks(self):
+            # Given
+            create_offerer(id=10)
+            create_venue(id=15, offerer_id=10)
+            create_product(id=1)
+            create_offer(id=30, venue_id=15,product_id=1)
+            create_stock(id=20, offer_id=30)
+            create_stock(id=21, offer_id=30)
+
+            expected_offer_stock = pandas.Series(
+                index=pandas.Index(data=[30], name='offer_id'),
+                data=[20],
+                name="Stock")
+            # When
+            query = _get_offer_info_with_quantity()
+            # Then
+            with ENGINE.connect() as connection:
+                offer_stock = pandas.read_sql(query, connection, index_col='offer_id')
+            pandas.testing.assert_series_equal(offer_stock["Stock"],expected_offer_stock)
