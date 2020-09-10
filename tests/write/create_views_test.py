@@ -4,10 +4,12 @@ import pandas
 
 from db import ENGINE
 from tests.data_creators import create_user, create_product, create_offerer, create_venue, \
-    create_offer, create_stock, create_booking, create_payment_status, create_payment
+    create_offer, create_stock, create_booking, create_payment_status, create_payment, create_favorite
 from utils.database_cleaners import clean_database, clean_views
 from write.create_intermediate_views_for_stock import create_stocks_booking_view, create_available_stocks_view, \
     create_enriched_stock_view
+from write.create_intermediate_views_for_offer import create_is_physical_view, create_is_outing_view, \
+    create_booking_information_view, create_count_favorites_view, create_sum_stock_view, create_enriched_offer_view
 from write.create_views import create_enriched_user_data, create_enriched_offerer_data, create_enriched_offer_data, \
     create_enriched_venue_data
 
@@ -128,8 +130,61 @@ class ViewQueriesTest:
                                 "Nombre de réservations validées", "Nombre de fois où l'offre a été mise en favoris",
                                 "Stock"]
             with ENGINE.connect() as connection:
-                offerers_details = pandas.read_sql_table('enriched_offer_data', connection, index_col='offer_id')
-            assert sorted(expected_columns) == sorted(offerers_details.columns)
+                offers_details = pandas.read_sql_table('enriched_offer_data', connection, index_col='offer_id')
+            assert sorted(expected_columns) == sorted(offers_details.columns)
+
+        def test_should_create_enriched_offer_data_view_without_duplicates(self):
+            # Given
+            create_user(id=1)
+            create_user(id=2, email='other@test.com')
+            create_user(id=3,email='louie.lopez@test.com')
+            create_product(id=1, product_type='EventType.CINEMA')
+            create_product(id=2, product_type='ThingType.LIVRE_EDITION')
+            create_offerer(id=3)
+            create_offerer(id=4, siren='234567890')
+            create_venue(offerer_id=3, id=1, siret='12345678900026')
+            create_venue(offerer_id=4, id=2, siret='23456789000067')
+            create_offer(venue_id=1, product_id=1, id=3, product_type='EventType.CINEMA', name="Test")
+            create_offer(venue_id=2, product_id=2, id=4, product_type='ThingType.LIVRE_EDITION', name="RIP Dylan Rieder")
+            create_stock(offer_id=3, id=1, date_created='2019-11-01', quantity=10,
+                         booking_limit_datetime='2019-11-23', beginning_datetime='2019-11-24')
+            create_stock(offer_id=4, id=2, date_created='2019-10-01', quantity=12)
+            create_booking(user_id=1, stock_id=1, id=4, quantity=2)
+            create_payment(booking_id=4, id=1)
+            create_payment_status(payment_id=1, id=1, date='2019-01-01', status='PENDING')
+            create_favorite(id=1, offer_id=3, user_id=1)
+            create_favorite(id=2, offer_id=4, user_id=2)
+            create_favorite(id=3, offer_id=3, user_id=3)
+
+            expected_enriched_offer = pandas.DataFrame(
+                index=pandas.Index(data=[3, 4], name='offer_id'),
+                data={"Identifiant de la structure": [3, 4],
+                        "Nom de la structure": ['Test Offerer', 'Test Offerer'],
+                        "Identifiant du lieu": [1, 2],
+                        "Nom du lieu": ['Test Venue', 'Test Venue'],
+                        "Département du lieu": ['93','93'],
+                        "Nom de l'offre": ['Test', 'RIP Dylan Rieder'],
+                        "Catégorie de l'offre": ['EventType.CINEMA','ThingType.LIVRE_EDITION'],
+                        "Date de création de l'offre": [datetime(2019,11,20),datetime(2019,11,20)],
+                        "isDuo": [False,False],
+                        "Offre numérique": [False,False],
+                        "Bien physique": [False,True],
+                        "Sortie": [True,False],
+                        "Nombre de réservations": [2.0,0.0],
+                        "Nombre de réservations annulées": [0.0,0.0],
+                        "Nombre de réservations validées": [0.0,0.0],
+                        "Nombre de fois où l'offre a été mise en favoris": [2.0,1.0],
+                        "Stock": [10.0,12.0]
+                      }
+            )
+
+            # When
+            create_enriched_offer_data(ENGINE)
+
+            # Then
+            with ENGINE.connect() as connection:
+                offer_details = pandas.read_sql_table('enriched_offer_data', connection, index_col='offer_id')
+            pandas.testing.assert_frame_equal(offer_details, expected_enriched_offer)
 
     class CreateEnrichedVenueViewTest:
         def teardown_method(self):

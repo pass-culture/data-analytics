@@ -118,15 +118,14 @@ def create_enriched_offer_view(ENGINE) -> None:
             ,venue."isVirtual" AS "Offre numérique"
             ,is_physical_view."Bien physique"
             ,is_outing_view."Sortie"
-            ,offer_booking_information_view."Nombre de réservations"
-            ,offer_booking_information_view."Nombre de réservations annulées"
-            ,offer_booking_information_view."Nombre de réservations validées"
-            ,count_favorites_view."Nombre de fois où l'offre a été mise en favoris"
-            ,sum_stock_view."Stock"
+            ,coalesce(offer_booking_information_view."Nombre de réservations",0.0) AS "Nombre de réservations"
+            ,coalesce(offer_booking_information_view."Nombre de réservations annulées",0.0) AS "Nombre de réservations annulées"
+            ,coalesce(offer_booking_information_view."Nombre de réservations validées",0.0) AS "Nombre de réservations validées"
+            ,coalesce(count_favorites_view."Nombre de fois où l'offre a été mise en favoris",0.0) AS "Nombre de fois où l'offre a été mise en favoris"
+            ,coalesce(sum_stock_view."Stock",0.0) AS  "Stock"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
-        LEFT JOIN favorite ON favorite."offerId" = offer.id
         LEFT JOIN is_physical_view ON is_physical_view.offer_id = offer.id
         LEFT JOIN is_outing_view ON is_outing_view.offer_id = offer.id
         LEFT JOIN offer_booking_information_view ON offer_booking_information_view.offer_id = offer.id

@@ -69,7 +69,7 @@ def _get_first_connection_dates_query() -> str:
      LEFT JOIN recommendation ON recommendation."userId" = "user".id
      GROUP BY "user".id, "user"."canBookFreeOffers"
     )
-    
+
     SELECT
      recommendation_dates.first_recommendation_date AS "Date de première connexion",
      recommendation_dates.user_id AS user_id
@@ -177,7 +177,7 @@ def _get_last_recommendation_dates_query() -> str:
      LEFT JOIN recommendation ON recommendation."userId" = "user".id
      GROUP BY "user".id, "user"."canBookFreeOffers"
     )
-    
+
     SELECT
      recommendation_dates.last_recommendation_date AS "Date de dernière recommandation",
      recommendation_dates.user_id AS user_id
@@ -225,7 +225,7 @@ def _get_number_of_non_cancelled_bookings_query() -> str:
      booking."isCancelled" IS FALSE
     GROUP BY user_id
     )
-    
+
     SELECT
      CASE
       WHEN non_cancelled_bookings_grouped_by_user.number_of_bookings IS NULL THEN 0
@@ -250,7 +250,7 @@ def _get_users_seniority_query() -> str:
       AND offer.type = 'ThingType.ACTIVATION'
      WHERE booking."isUsed" 
     ),
-    
+
     activation_date AS
     ( SELECT
      CASE
@@ -262,7 +262,7 @@ def _get_users_seniority_query() -> str:
     LEFT JOIN validated_activation_booking
      ON validated_activation_booking."userId" = "user".id
     WHERE "user"."canBookFreeOffers")
-    
+
     SELECT 
      DATE_PART('day', '{datetime.now()}' - activation_date."Date d'activation") AS "Ancienneté en jours",
      "user".id as user_id
@@ -360,7 +360,7 @@ def _get_theoric_amount_spent_in_outings_query() -> str:
                              ,'EventType.CONFERENCE_DEBAT_DEDICACE')
      AND booking."isCancelled" IS FALSE
     )
-    
+
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses sorties"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
