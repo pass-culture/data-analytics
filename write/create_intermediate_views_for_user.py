@@ -69,7 +69,7 @@ def _get_first_connection_dates_query() -> str:
      LEFT JOIN recommendation ON recommendation."userId" = "user".id
      GROUP BY "user".id, "user"."canBookFreeOffers"
     )
-    
+
     SELECT
      recommendation_dates.first_recommendation_date AS "Date de première connexion",
      recommendation_dates.user_id AS user_id
@@ -80,37 +80,51 @@ def _get_first_connection_dates_query() -> str:
 
 def _get_date_of_first_bookings_query() -> str:
     return '''
-     SELECT
-        booking."userId" AS user_id
-        ,min(booking."dateCreated") AS "Date de première réservation"
+    WITH bookings_grouped_by_user AS (
+    SELECT
+     MIN(booking."dateCreated") AS date,
+     booking."userId" AS user_id
     FROM booking
     JOIN stock ON stock.id = booking."stockId"
-    JOIN offer ON offer.id = stock."offerId"
-    WHERE offer.type != 'ThingType.ACTIVATION'
-    AND offer."bookingEmail" != 'jeux-concours@passculture.app'
-    GROUP BY user_id
+    JOIN offer
+     ON offer.id = stock."offerId"
+     AND offer.type != 'ThingType.ACTIVATION'
+    GROUP BY booking."userId"
+    )
+    SELECT bookings_grouped_by_user.date AS "Date de première réservation",
+    "user".id AS user_id
+    FROM "user"
+    LEFT JOIN bookings_grouped_by_user ON "user".id = bookings_grouped_by_user.user_id
+    WHERE "user"."canBookFreeOffers"
     '''
 
 
 def _get_date_of_second_bookings_query() -> str:
     return '''
-     WITH ranked_booking_data AS (
-         SELECT
-            booking."userId" AS user_id
-            ,booking."dateCreated" AS date_creation_booking
-            ,rank() over (partition by booking."userId" order by booking."dateCreated" asc) AS rank_booking
-           FROM booking
-           JOIN stock ON stock.id = booking."stockId"
-           JOIN offer ON offer.id = stock."offerId"
-           WHERE offer.type != 'ThingType.ACTIVATION'
-           AND offer."bookingEmail" != 'jeux-concours@passculture.app'
+     WITH second_booking_dates AS (
+     SELECT
+      ordered_dates."dateCreated" AS date,
+      ordered_dates."userId" AS user_id
+      FROM (
+       SELECT ROW_NUMBER()
+       OVER(
+        PARTITION BY "userId"
+        ORDER BY booking."dateCreated" ASC
+        ) AS rank, booking."dateCreated", booking."userId"
+       FROM booking
+       JOIN stock ON stock.id = booking."stockId"
+       JOIN offer ON offer.id = stock."offerId"
+       WHERE offer.type != 'ThingType.ACTIVATION'
+      ) AS ordered_dates
+      WHERE ordered_dates.rank = 2
     )
-    
+
     SELECT
-        user_id
-        ,date_creation_booking AS "Date de deuxième réservation"
-    FROM ranked_booking_data
-    WHERE rank_booking = 2
+     second_booking_dates.date AS "Date de deuxième réservation",
+     "user".id AS user_id
+    FROM "user"
+    LEFT JOIN second_booking_dates ON second_booking_dates.user_id = "user".id
+    WHERE "user"."canBookFreeOffers"
     '''
 
 
@@ -163,7 +177,7 @@ def _get_last_recommendation_dates_query() -> str:
      LEFT JOIN recommendation ON recommendation."userId" = "user".id
      GROUP BY "user".id, "user"."canBookFreeOffers"
     )
-    
+
     SELECT
      recommendation_dates.last_recommendation_date AS "Date de dernière recommandation",
      recommendation_dates.user_id AS user_id
@@ -174,32 +188,53 @@ def _get_last_recommendation_dates_query() -> str:
 
 def _get_number_of_bookings_query() -> str:
     return '''
+    (WITH bookings_grouped_by_user AS (
      SELECT
-        booking."userId" AS user_id
-        ,count(booking.id) AS number_of_bookings
-    FROM booking
-    JOIN stock ON stock.id = booking."stockId"
-    JOIN offer ON offer.id = stock."offerId"
-    AND offer.type != 'ThingType.ACTIVATION'
-    AND offer."bookingEmail" != 'jeux-concours@passculture.app'
-    GROUP BY user_id
-    ORDER BY number_of_bookings ASC
+      MIN(booking."dateCreated") AS date,
+      SUM(booking.quantity) AS number_of_bookings,
+      "userId" AS user_id
+     FROM booking
+     JOIN stock ON stock.id = booking."stockId"
+     JOIN offer ON offer.id = stock."offerId"
+      AND offer.type != 'ThingType.ACTIVATION'
+     GROUP BY user_id
+    )
+
+    SELECT
+     CASE
+      WHEN bookings_grouped_by_user.number_of_bookings IS NULL THEN 0
+      ELSE bookings_grouped_by_user.number_of_bookings
+     END AS "Nombre de réservations totales",
+     "user".id AS user_id
+    FROM "user"
+    LEFT JOIN bookings_grouped_by_user ON "user".id = bookings_grouped_by_user.user_id
+    WHERE "user"."canBookFreeOffers")
     '''
 
 
 def _get_number_of_non_cancelled_bookings_query() -> str:
     return '''
+    (WITH non_cancelled_bookings_grouped_by_user AS(
     SELECT
-    booking."userId" AS user_id
-    ,count(booking.id) AS number_of_bookings
+     SUM(booking.quantity) AS number_of_bookings,
+     "userId" AS user_id
     FROM booking
     JOIN stock ON stock.id = booking."stockId"
-    JOIN offer ON offer.id = stock."offerId"
-    AND offer.type != 'ThingType.ACTIVATION'
-    AND offer."bookingEmail" != 'jeux-concours@passculture.app'
-    AND NOT booking."isCancelled"
+    JOIN offer ON offer.id = stock."offerId" AND offer.type != 'ThingType.ACTIVATION'
+    WHERE
+     booking."isCancelled" IS FALSE
     GROUP BY user_id
-    ORDER BY number_of_bookings ASC
+    )
+
+    SELECT
+     CASE
+      WHEN non_cancelled_bookings_grouped_by_user.number_of_bookings IS NULL THEN 0
+      ELSE non_cancelled_bookings_grouped_by_user.number_of_bookings
+    END AS "Nombre de réservations non annulées",
+     "user".id AS user_id
+    FROM "user"
+    LEFT JOIN non_cancelled_bookings_grouped_by_user ON non_cancelled_bookings_grouped_by_user.user_id = "user".id
+    WHERE "user"."canBookFreeOffers")
     '''
 
 
@@ -215,7 +250,7 @@ def _get_users_seniority_query() -> str:
       AND offer.type = 'ThingType.ACTIVATION'
      WHERE booking."isUsed" 
     ),
-    
+
     activation_date AS
     ( SELECT
      CASE
@@ -227,7 +262,7 @@ def _get_users_seniority_query() -> str:
     LEFT JOIN validated_activation_booking
      ON validated_activation_booking."userId" = "user".id
     WHERE "user"."canBookFreeOffers")
-    
+
     SELECT 
      DATE_PART('day', '{datetime.now()}' - activation_date."Date d'activation") AS "Ancienneté en jours",
      "user".id as user_id
@@ -325,7 +360,7 @@ def _get_theoric_amount_spent_in_outings_query() -> str:
                              ,'EventType.CONFERENCE_DEBAT_DEDICACE')
      AND booking."isCancelled" IS FALSE
     )
-    
+
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses sorties"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
@@ -470,8 +505,8 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
          date_of_second_bookings."Date de deuxième réservation",
          date_of_bookings_on_third_product."Date de première réservation dans 3 catégories différentes",
          last_recommendation_dates."Date de dernière recommandation",
-         COALESCE(number_of_bookings.number_of_bookings,0) AS "Nombre de réservations totales",
-         COALESCE(number_of_non_cancelled_bookings.number_of_bookings,0) AS "Nombre de réservations non annulées",
+         number_of_bookings."Nombre de réservations totales",
+         number_of_non_cancelled_bookings."Nombre de réservations non annulées",
          users_seniority."Ancienneté en jours",
          actual_amount_spent."Montant réél dépensé",
          theoric_amount_spent."Montant théorique dépensé",
