@@ -164,3 +164,4 @@ Une fois le paquet installé, taper :
 Une fois le paquet installé, taper :
 `pc-data-analytics switch_host_for_restore`
 
+test
