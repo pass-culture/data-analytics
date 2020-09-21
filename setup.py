@@ -19,7 +19,7 @@ setup(
         'python-dotenv==0.13.0',
         'Flask-SQLAlchemy==2.4.1',
         'freezegun==0.3.12',
-        'pandas==0.25.3',
+        'pandas==1.1.2',
         'PostgreSQL-Audit==0.10.0',
         'psycopg2==2.7.7',
         'pytest==5.2.2',
