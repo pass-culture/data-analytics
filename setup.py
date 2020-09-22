@@ -29,9 +29,9 @@ setup(
         'requests==2.23.0',
         'click==7.1.2'
     ],
-    python_requires='~=3.6',
+    python_requires='~=3.7',
     classifiers=[
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
         "Environment :: Console"
     ]
