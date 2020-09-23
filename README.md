@@ -18,11 +18,10 @@ Les commandes utiles au déveleppement se trouvent dans le Makefile ou dans la c
 
 1. Cloner le repos
 2. Ajouter ses variables d'environnment en local (voir ci-dessous)
-3. Installer pipenv
-4. `make start-metabase`
-5. `make initialize-metabase`
-6. Pour créer les tables enrichies la première fois `make create-enriched-views`
-7. Pour vérifier `make tests`, tous ces tests devraient être verts (la création des vues enrichies n'est pas instantanée)
+3. `make start-metabase`
+4. `make initialize-metabase`
+5. Pour créer les tables enrichies la première fois `make create-enriched-views`
+6. Pour vérifier `make tests`, tous ces tests devraient être verts (la création des vues enrichies n'est pas instantanée)
 
 ### Exemple de variables d'environnement en local :
 Créer un fichier .env.local où on peut mettre ces variables d'environnements:
