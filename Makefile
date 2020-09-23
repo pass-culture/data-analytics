@@ -13,6 +13,10 @@ clean : ## remove all transient directories and files
 	rm -rf *.egg-info
 	find -name __pycache__ -print0 | xargs -0 sudo rm -rf
 
+.PHONY: format
+format : ## reformat files using Black
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && black ."
+
 .PHONY: dist
 dist: ## create a package
 	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && python setup.py sdist"
