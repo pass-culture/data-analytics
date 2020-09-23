@@ -2,7 +2,9 @@ import pandas
 
 from db import ENGINE
 from utils.database_cleaners import clean_database, drop_offerer_cultural_activity_table
-from write.offerer_view.create_departement_code import create_table_offerer_departement_code
+from write.offerer_view.create_departement_code import (
+    create_table_offerer_departement_code,
+)
 
 
 class CreateTableOffererWithDepartmentCodeTest:
@@ -18,6 +20,6 @@ class CreateTableOffererWithDepartmentCodeTest:
 
         # Then
         with ENGINE.connect() as connection:
-            query = '''SELECT * FROM information_schema.tables WHERE table_name = 'offerer_departement_code';'''
+            query = """SELECT * FROM information_schema.tables WHERE table_name = 'offerer_departement_code';"""
             results = connection.execute(query).fetchall()
         assert len(results) == 1

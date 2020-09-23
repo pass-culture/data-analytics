@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
 
-from utils.health_check.get_offerer_enriched_data_status import get_offerer_enriched_data_status
+from utils.health_check.get_offerer_enriched_data_status import (
+    get_offerer_enriched_data_status,
+)
 
 
 class GetEnrichedDataStatusTest:
@@ -19,8 +21,8 @@ class GetEnrichedDataStatusTest:
             )
 
             # Then
-            assert status['is_enriched_offerer_datasource_exists']
-            assert status['is_offerer_ok'] is False
+            assert status["is_enriched_offerer_datasource_exists"]
+            assert status["is_offerer_ok"] is False
 
         def test_should_return_is_offerer_ok_as_true_when_table_exists_with_data(self):
             # Given
@@ -37,10 +39,12 @@ class GetEnrichedDataStatusTest:
             )
 
             # Then
-            assert status['is_enriched_offerer_datasource_exists']
-            assert status['is_offerer_ok']
+            assert status["is_enriched_offerer_datasource_exists"]
+            assert status["is_offerer_ok"]
 
-        def test_should_return_is_offerer_ok_as_false_when_table_exists_without_data(self):
+        def test_should_return_is_offerer_ok_as_false_when_table_exists_without_data(
+            self,
+        ):
             # Given
             is_enriched_offerer_contains_data = MagicMock(return_value=False)
             is_enriched_offerer_data_exists = MagicMock(return_value=False)
@@ -55,5 +59,5 @@ class GetEnrichedDataStatusTest:
             )
 
             # Then
-            assert status['is_enriched_offerer_datasource_exists']
-            assert status['is_offerer_ok'] is False
+            assert status["is_enriched_offerer_datasource_exists"]
+            assert status["is_offerer_ok"] is False
