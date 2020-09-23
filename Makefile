@@ -15,15 +15,15 @@ clean : ## remove all transient directories and files
 
 .PHONY: dist
 dist: ## create a package
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run python setup.py sdist"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && python setup.py sdist"
 
 .PHONY: freeze-requirements
 freeze_requirements: ## update the project dependencies based on setup.py declaration
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv update"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pip install -e ."
 
 .PHONY: tests
 tests: ## run automatic tests
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run pytest"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pytest"
 
 .PHONY: start-backend
 start-backend:  ## run backend using docker
@@ -35,20 +35,20 @@ start-metabase: ## run metabase using docker
 
 .PHONY: initialize-metabase
 initialize-metabase: ## create Metabase super user and setup database
-	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run python -m utils.initialize_metabase"
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && python -m utils.initialize_metabase"
 
 .PHONY: reset-metabase
 reset-metabase: ## stop metabase delete metabase volume and mount it again
-	docker container stop pcm-metabase-app pcm-postgres-metabase && docker container rm pcm-metabase-app pcm-postgres-metabase && docker volume rm pass-culture-data-analytics_metabase_data
+	docker container stop pcm-metabase-app pcm-postgres-metabase && docker container rm pcm-metabase-app pcm-postgres-metabase
 	docker-compose -f docker-compose-with-metabase.yml up -d metabase-app
 
 .PHONY: create-enriched-views
 create-enriched-views: ## connect to docker postgres database local
-	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run pc-data-analytics create_enriched_views --local"
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pc-data-analytics create_enriched_views --local"
 
 .PHONY: clean-database-and-view
 clean-database-and-view: ## clean local database and view
-	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && pipenv run python -m utils.clean_database_if_local"
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && python -m utils.clean_database_if_local"
 
 .PHONY: access-database
 access-database: ## connect to docker postgres database
@@ -56,5 +56,5 @@ access-database: ## connect to docker postgres database
 
 .PHONY: run-python
 run-python:  ## run python using docker container
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run python"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && python"
 
