@@ -39,7 +39,7 @@ initialize-metabase: ## create Metabase super user and setup database
 
 .PHONY: reset-metabase
 reset-metabase: ## stop metabase delete metabase volume and mount it again
-	docker container stop pcm-metabase-app pcm-postgres-metabase && docker container rm pcm-metabase-app pcm-postgres-metabase && docker volume rm pass-culture-data-analytics_metabase_data
+	docker container stop pcm-metabase-app pcm-postgres-metabase && docker container rm pcm-metabase-app pcm-postgres-metabase
 	docker-compose -f docker-compose-with-metabase.yml up -d metabase-app
 
 .PHONY: create-enriched-views
