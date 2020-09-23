@@ -15,7 +15,7 @@ clean : ## remove all transient directories and files
 
 .PHONY: dist
 dist: ## create a package
-	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && pipenv run python setup.py sdist"
+	docker exec -it analytics-datasource-application bash -c "cd /opt/data-analytics && poetry run python setup.py sdist"
 
 .PHONY: freeze-requirements
 freeze_requirements: ## update the project dependencies based on setup.py declaration

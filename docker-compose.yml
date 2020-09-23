@@ -2,15 +2,15 @@ version: "3.7"
 
 services:
   datasource-application:
-    image: python:3.6-stretch
+    image: python:3.7-stretch
     container_name: analytics-datasource-application
     volumes:
       - .:/opt/data-analytics
     command: >
-      bash -c "pip install pipenv
-               cd /opt/data-analytics/
-               pipenv install --python 3.6 -e .
-               pipenv run python /opt/data-analytics/app.py;
+      bash -c "cd /opt/data-analytics/
+               curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+               pip install -e .
+               poetry run python /opt/data-analytics/app.py;
                "
     ports:
       - 5000:5000
@@ -20,7 +20,7 @@ services:
       - datasource-postgres-blue
 
   install-models-blue:
-    image: python:3.6-stretch
+    image: python:3.7-stretch
     container_name: pcm-install-models-blue
     volumes:
       - .:/opt/enriched_data

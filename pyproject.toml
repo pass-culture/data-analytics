@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "data-analytics"
+version = "1.0.0"
+description = "Data analytics package"
+authors = [
+    "Team Data"
+]
+readme = 'README.md'  # Markdown files are supported
+
+repository = "https://github.com/pass-culture/data-analytics"
+
+keywords = ['packaging', 'poetry']
+
+[tool.poetry.dependencies]
+python = "^3.7"  # Compatible python versions must be declared here
+toml = "^0.10"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.0.2"
