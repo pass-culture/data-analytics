@@ -1,59 +1,59 @@
 def create_first_stock_creation_dates_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW related_stocks AS
         {_get_first_stock_creation_dates_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_first_booking_creation_dates_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW related_bookings AS
         {_get_first_booking_creation_dates_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_number_of_offers_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW related_offers AS
         {_get_number_of_offers_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_number_of_bookings_not_cancelled_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW related_non_cancelled_bookings AS
         {_get_number_of_bookings_not_cancelled_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_number_of_venues_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW related_venues AS
         {_get_number_of_venues_per_offerer_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_number_of_venues_without_offer_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW related_venues_with_offer AS
         {_get_number_of_venues_with_offer_per_offerer_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_materialized_enriched_offerer_view(ENGINE) -> str:
-    query = '''
+    query = """
     CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offerer_data AS
     (SELECT
      offerer.id AS offerer_id,
@@ -76,13 +76,13 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
     LEFT JOIN related_venues_with_offer ON related_venues_with_offer.offerer_id = offerer.id
     )
     ;
-    '''
+    """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def _get_first_stock_creation_dates_query() -> str:
-    return '''
+    return """
     SELECT
      offerer.id AS offerer_id,
      MIN(stock."dateCreated") AS "Date de création du premier stock"
@@ -91,11 +91,11 @@ def _get_first_stock_creation_dates_query() -> str:
     LEFT JOIN offer ON offer."venueId" = venue.id
     LEFT JOIN stock ON stock."offerId" = offer.id
     GROUP BY offerer_id
-    '''
+    """
 
 
 def _get_first_booking_creation_dates_query() -> str:
-    return '''
+    return """
     SELECT
      offerer.id AS offerer_id,
      MIN(booking."dateCreated") AS "Date de première réservation"
@@ -105,11 +105,11 @@ def _get_first_booking_creation_dates_query() -> str:
     LEFT JOIN stock ON stock."offerId" = offer.id
     LEFT JOIN booking ON booking."stockId" = stock.id
     GROUP BY offerer_id
-    '''
+    """
 
 
 def _get_number_of_offers_query() -> str:
-    return '''
+    return """
     SELECT
      offerer.id AS offerer_id,
      COUNT(offer.id) AS "Nombre d’offres"
@@ -117,11 +117,11 @@ def _get_number_of_offers_query() -> str:
     LEFT JOIN venue ON venue."managingOffererId" = offerer.id
     LEFT JOIN offer ON offer."venueId" = venue.id
     GROUP BY offerer_id
-    '''
+    """
 
 
 def _get_number_of_bookings_not_cancelled_query() -> str:
-    return '''
+    return """
     SELECT
      offerer.id AS offerer_id,
      COUNT(booking.id) AS "Nombre de réservations non annulées"
@@ -131,11 +131,11 @@ def _get_number_of_bookings_not_cancelled_query() -> str:
     LEFT JOIN stock ON stock."offerId" = offer.id
     LEFT JOIN booking ON booking."stockId" = stock.id AND booking."isCancelled" IS FALSE
     GROUP BY offerer_id
-    '''
+    """
 
 
 def _get_number_of_venues_per_offerer_query() -> str:
-    return '''
+    return """
     SELECT
         offerer.id AS offerer_id
         ,count(venue.id) AS "Nombre de lieux"
@@ -143,11 +143,11 @@ def _get_number_of_venues_per_offerer_query() -> str:
     LEFT JOIN venue
     ON offerer.id = venue."managingOffererId"
     GROUP BY 1
-    '''
+    """
 
 
 def _get_number_of_venues_with_offer_per_offerer_query() -> str:
-    return '''
+    return """
       WITH venues_with_offers AS (
       SELECT
           offerer.id AS offerer_id
@@ -166,4 +166,4 @@ def _get_number_of_venues_with_offer_per_offerer_query() -> str:
           ,COUNT(CASE WHEN count_offers > 0 THEN venue_id ELSE NULL END) AS "Nombre de lieux avec offres"
       FROM venues_with_offers
       GROUP BY offerer_id
-      '''
+      """

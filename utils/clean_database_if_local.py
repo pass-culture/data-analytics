@@ -8,10 +8,10 @@ def clean_database_if_local():
     if DATABASE_URL in LOCAL_DATABASE_URL:
         clean_database()
         clean_views()
-        logger.info('[CLEAN DATABASE AND VIEW] Database cleaned')
+        logger.info("[CLEAN DATABASE AND VIEW] Database cleaned")
         return
-    logger.info('[CLEAN DATABASE AND VIEW] Cannot clean production database')
+    logger.info("[CLEAN DATABASE AND VIEW] Cannot clean production database")
 
 
-if __name__ == '__main__':
-  clean_database_if_local()
+if __name__ == "__main__":
+    clean_database_if_local()

@@ -1,4 +1,6 @@
-from transform.parse_ape_code_from_offerer_details import parse_ape_code_from_offerer_details
+from transform.parse_ape_code_from_offerer_details import (
+    parse_ape_code_from_offerer_details,
+)
 
 
 class ParseApeNafFromOffererDetailsTest:
@@ -10,7 +12,7 @@ class ParseApeNafFromOffererDetailsTest:
         results = parse_ape_code_from_offerer_details(offerer_details)
 
         # Then
-        assert results == ''
+        assert results == ""
 
     def test_should_parse_api_result(self):
         # Given
@@ -23,16 +25,16 @@ class ParseApeNafFromOffererDetailsTest:
                     "id": 48863654,
                     "siren": "853318459",
                     "siret": "85331845900015",
-                    "activite_principale": "70.21ZX"
+                    "activite_principale": "70.21ZX",
                 },
                 "etablissements": [
                     {
                         "id": 48863654,
                         "siren": "853318459",
                         "siret": "85331845900015",
-                        "activite_principale": "70.21ZZZ"
+                        "activite_principale": "70.21ZZZ",
                     }
-                ]
+                ],
             }
         }
 
@@ -52,16 +54,16 @@ class ParseApeNafFromOffererDetailsTest:
                     "id": 48863654,
                     "siren": "853318459",
                     "siret": "85331845900015",
-                    "activite_principale": "70.21ZX"
+                    "activite_principale": "70.21ZX",
                 },
                 "etablissements": [
                     {
                         "id": 48863654,
                         "siren": "853318459",
                         "siret": "85331845900015",
-                        "activite_principale": "70.21ZZZ"
+                        "activite_principale": "70.21ZZZ",
                     }
-                ]
+                ],
             }
         }
 
