@@ -7,10 +7,9 @@ services:
     volumes:
       - .:/opt/data-analytics
     command: >
-      bash -c "pip install pipenv
-               cd /opt/data-analytics/
-               pipenv install --python 3.7 -e .
-               pipenv run python /opt/data-analytics/app.py;
+      bash -c "cd /opt/data-analytics/
+               pip install -e .
+               python /opt/data-analytics/app.py;
                "
     ports:
       - 5000:5000
