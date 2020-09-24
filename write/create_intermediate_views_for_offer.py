@@ -1,5 +1,5 @@
 def _get_is_physical_information_query() -> str:
-    return '''
+    return """
         SELECT
             offer.id AS offer_id
             ,case when offer.type IN ('ThingType.INSTRUMENT',
@@ -11,10 +11,11 @@ def _get_is_physical_information_query() -> str:
              AND offer.url IS NULL
              then true else false end as "Bien physique"
         FROM offer
-    '''
+    """
+
 
 def _get_is_outing_information_query() -> str:
-    return '''
+    return """
     SELECT
         offer.id AS offer_id
         ,case when offer.type IN ('EventType.SPECTACLE_VIVANT'
@@ -31,10 +32,11 @@ def _get_is_outing_information_query() -> str:
                          ,'EventType.CONFERENCE_DEBAT_DEDICACE')
         then true else false end as "Sortie"
     FROM offer
-'''
+"""
+
 
 def _get_offer_booking_information_query() -> str:
-    return '''
+    return """
     SELECT
         offer.id AS offer_id
         ,sum(booking."quantity") AS "Nombre de réservations"
@@ -44,65 +46,71 @@ def _get_offer_booking_information_query() -> str:
     LEFT JOIN stock ON stock."offerId" = offer.id
     LEFT JOIN booking ON stock.id = booking."stockId"
     GROUP BY offer_id
-    '''
+    """
+
 
 def _get_count_favorites_query() -> str:
-    return '''
+    return """
     SELECT
         "offerId" AS offer_id
         ,count(*) AS "Nombre de fois où l'offre a été mise en favoris"
     FROM favorite
     GROUP BY offer_id
-    '''
+    """
+
 
 def _get_offer_info_with_quantity() -> str:
-    return '''
+    return """
         SELECT
             "offerId" AS offer_id
             ,sum(quantity) AS "Stock"
         FROM stock
         GROUP BY offer_id
-    '''
+    """
+
 
 def create_is_physical_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW is_physical_view AS {_get_is_physical_information_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
+
 
 def create_is_outing_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW is_outing_view AS {_get_is_outing_information_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
+
 
 def create_booking_information_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW offer_booking_information_view AS {_get_offer_booking_information_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
+
 def create_count_favorites_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW count_favorites_view AS {_get_count_favorites_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_sum_stock_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_info_with_quantity()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_enriched_offer_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW enriched_offer_data AS (
         SELECT
             offerer.id AS "Identifiant de la structure"
@@ -132,6 +140,6 @@ def create_enriched_offer_view(ENGINE) -> None:
         LEFT JOIN count_favorites_view ON count_favorites_view.offer_id = offer.id
         LEFT JOIN sum_stock_view ON sum_stock_view.offer_id = offer.id
         )
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)

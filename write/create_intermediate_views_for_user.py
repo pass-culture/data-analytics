@@ -4,7 +4,7 @@ from db import ENGINE
 
 
 def _get_experimentation_sessions_query() -> str:
-    return '''
+    return """
     (WITH experimentation_session AS 
     (
         SELECT
@@ -28,11 +28,11 @@ def _get_experimentation_sessions_query() -> str:
     FROM "user"
     LEFT JOIN experimentation_session ON experimentation_session.user_id = "user".id
     WHERE "user"."canBookFreeOffers")
-    '''
+    """
 
 
 def _get_activation_dates_query() -> str:
-    return '''
+    return """
     (WITH validated_activation_booking AS (
      SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
      FROM booking
@@ -54,11 +54,11 @@ def _get_activation_dates_query() -> str:
     LEFT JOIN validated_activation_booking
      ON validated_activation_booking."userId" = "user".id
     WHERE "user"."canBookFreeOffers")
-    '''
+    """
 
 
 def _get_first_connection_dates_query() -> str:
-    return '''
+    return """
     (WITH recommendation_dates AS (
      SELECT
       MIN(recommendation."dateCreated") AS first_recommendation_date,
@@ -75,11 +75,11 @@ def _get_first_connection_dates_query() -> str:
      recommendation_dates.user_id AS user_id
     FROM recommendation_dates
     WHERE recommendation_dates."canBookFreeOffers")
-    '''
+    """
 
 
 def _get_date_of_first_bookings_query() -> str:
-    return '''
+    return """
     WITH bookings_grouped_by_user AS (
     SELECT
      MIN(booking."dateCreated") AS date,
@@ -96,11 +96,11 @@ def _get_date_of_first_bookings_query() -> str:
     FROM "user"
     LEFT JOIN bookings_grouped_by_user ON "user".id = bookings_grouped_by_user.user_id
     WHERE "user"."canBookFreeOffers"
-    '''
+    """
 
 
 def _get_date_of_second_bookings_query() -> str:
-    return '''
+    return """
      WITH second_booking_dates AS (
      SELECT
       ordered_dates."dateCreated" AS date,
@@ -125,11 +125,11 @@ def _get_date_of_second_bookings_query() -> str:
     FROM "user"
     LEFT JOIN second_booking_dates ON second_booking_dates.user_id = "user".id
     WHERE "user"."canBookFreeOffers"
-    '''
+    """
 
 
 def _get_date_of_bookings_on_third_product_type_query() -> str:
-    return '''
+    return """
     WITH
      bookings_on_distinct_types AS (
       SELECT DISTINCT ON (offer.type, booking."userId") offer.type, booking."userId", booking."dateCreated"
@@ -162,11 +162,11 @@ def _get_date_of_bookings_on_third_product_type_query() -> str:
       FROM "user"
       LEFT JOIN first_booking_on_third_category ON first_booking_on_third_category."userId" = "user".id
       WHERE "user"."canBookFreeOffers"
-    '''
+    """
 
 
 def _get_last_recommendation_dates_query() -> str:
-    return '''
+    return """
     (WITH recommendation_dates AS (
      SELECT
       MIN(recommendation."dateCreated") AS first_recommendation_date,
@@ -183,11 +183,11 @@ def _get_last_recommendation_dates_query() -> str:
      recommendation_dates.user_id AS user_id
     FROM recommendation_dates
     WHERE recommendation_dates."canBookFreeOffers")
-    '''
+    """
 
 
 def _get_number_of_bookings_query() -> str:
-    return '''
+    return """
     (WITH bookings_grouped_by_user AS (
      SELECT
       MIN(booking."dateCreated") AS date,
@@ -209,11 +209,11 @@ def _get_number_of_bookings_query() -> str:
     FROM "user"
     LEFT JOIN bookings_grouped_by_user ON "user".id = bookings_grouped_by_user.user_id
     WHERE "user"."canBookFreeOffers")
-    '''
+    """
 
 
 def _get_number_of_non_cancelled_bookings_query() -> str:
-    return '''
+    return """
     (WITH non_cancelled_bookings_grouped_by_user AS(
     SELECT
      SUM(booking.quantity) AS number_of_bookings,
@@ -235,11 +235,11 @@ def _get_number_of_non_cancelled_bookings_query() -> str:
     FROM "user"
     LEFT JOIN non_cancelled_bookings_grouped_by_user ON non_cancelled_bookings_grouped_by_user.user_id = "user".id
     WHERE "user"."canBookFreeOffers")
-    '''
+    """
 
 
 def _get_users_seniority_query() -> str:
-    return f'''
+    return f"""
     (WITH validated_activation_booking AS 
     ( SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
      FROM booking
@@ -269,11 +269,11 @@ def _get_users_seniority_query() -> str:
     FROM "user"
     LEFT JOIN activation_date ON "user".id = activation_date.user_id
     )
-    '''
+    """
 
 
 def _get_actual_amount_spent_query() -> str:
-    return '''
+    return """
     (SELECT 
      "user".id AS user_id, 
      COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
@@ -281,11 +281,11 @@ def _get_actual_amount_spent_query() -> str:
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isUsed" IS TRUE AND booking."isCancelled" IS FALSE
     WHERE "user"."canBookFreeOffers"
     GROUP BY "user".id)
-    '''
+    """
 
 
 def _get_theoric_amount_spent_query() -> str:
-    return '''
+    return """
     (SELECT 
      "user".id AS user_id, 
      COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
@@ -293,11 +293,11 @@ def _get_theoric_amount_spent_query() -> str:
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
     WHERE "user"."canBookFreeOffers"
     GROUP BY "user".id)
-    '''
+    """
 
 
 def _get_theoric_amount_spent_in_digital_goods_query() -> str:
-    return '''
+    return """
     (WITH eligible_booking AS (
      SELECT booking."userId", booking.amount, booking.quantity
      FROM booking
@@ -316,11 +316,11 @@ def _get_theoric_amount_spent_in_digital_goods_query() -> str:
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
     WHERE "user"."canBookFreeOffers" IS TRUE
     GROUP BY "user".id)
-    '''
+    """
 
 
 def _get_theoric_amount_spent_in_physical_goods_query() -> str:
-    return '''
+    return """
     (WITH eligible_booking AS (
      SELECT booking."userId", booking.amount, booking.quantity
      FROM booking
@@ -336,11 +336,11 @@ def _get_theoric_amount_spent_in_physical_goods_query() -> str:
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
     WHERE "user"."canBookFreeOffers" IS TRUE
     GROUP BY "user".id)
-    '''
+    """
 
 
 def _get_theoric_amount_spent_in_outings_query() -> str:
-    return '''
+    return """
     (WITH eligible_booking AS (
      SELECT booking."userId", booking.amount, booking.quantity
      FROM booking
@@ -366,131 +366,131 @@ def _get_theoric_amount_spent_in_outings_query() -> str:
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
     WHERE "user"."canBookFreeOffers" IS TRUE
     GROUP BY "user".id)
-    '''
+    """
 
 
 def create_experimentation_sessions_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW experimentation_sessions AS {_get_experimentation_sessions_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_activation_dates_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW activation_dates AS {_get_activation_dates_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_first_connection_dates_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW first_connection_dates AS {_get_first_connection_dates_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_date_of_first_bookings_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW date_of_first_bookings AS {_get_date_of_first_bookings_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_date_of_second_bookings_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW date_of_second_bookings AS {_get_date_of_second_bookings_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_date_of_bookings_on_third_product_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW date_of_bookings_on_third_product AS {_get_date_of_bookings_on_third_product_type_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_last_recommendation_dates_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW last_recommendation_dates AS {_get_last_recommendation_dates_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_number_of_bookings_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW number_of_bookings AS {_get_number_of_bookings_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_number_of_non_cancelled_bookings_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW number_of_non_cancelled_bookings AS {_get_number_of_non_cancelled_bookings_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_users_seniority_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW users_seniority AS {_get_users_seniority_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_actual_amount_spent_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW actual_amount_spent AS {_get_actual_amount_spent_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_theoric_amount_spent_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW theoric_amount_spent AS {_get_theoric_amount_spent_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_theoric_amount_spent_in_digital_goods_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW theoric_amount_spent_in_digital_goods AS {_get_theoric_amount_spent_in_digital_goods_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_theoric_amount_spent_in_physical_goods_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW theoric_amount_spent_in_physical_goods AS {_get_theoric_amount_spent_in_physical_goods_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_theoric_amount_spent_in_outings_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW theoric_amount_spent_in_outings AS {_get_theoric_amount_spent_in_outings_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_materialized_enriched_user_view(ENGINE) -> None:
-    query = '''
+    query = """
         CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_user_data AS
         (SELECT
          "user".id AS user_id,
@@ -530,6 +530,6 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
         LEFT JOIN theoric_amount_spent_in_physical_goods ON theoric_amount_spent_in_digital_goods.user_id = theoric_amount_spent_in_physical_goods.user_id
         LEFT JOIN theoric_amount_spent_in_outings ON theoric_amount_spent_in_physical_goods.user_id = theoric_amount_spent_in_outings.user_id
         WHERE "user"."canBookFreeOffers");
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)

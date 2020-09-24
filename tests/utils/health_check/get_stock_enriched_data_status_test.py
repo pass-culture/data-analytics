@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
 
-from utils.health_check.get_stock_enriched_data_status import get_stock_enriched_data_status
+from utils.health_check.get_stock_enriched_data_status import (
+    get_stock_enriched_data_status,
+)
 
 
 class GetEnrichedDataStatusTest:
@@ -15,12 +17,11 @@ class GetEnrichedDataStatusTest:
             # When
             status = get_stock_enriched_data_status(
                 is_enriched_stock_data_exists=is_enriched_stock_data_exists,
-                is_enriched_stocks_contains_data=is_enriched_stocks_contains_data
+                is_enriched_stocks_contains_data=is_enriched_stocks_contains_data,
             )
 
             # Then
-            assert status['is_enriched_stock_datasource_exists'] == True
-
+            assert status["is_enriched_stock_datasource_exists"] == True
 
         def test_should_return_is_stock_ok_as_true_when_table_exists_with_data(self):
             # Given
@@ -33,13 +34,12 @@ class GetEnrichedDataStatusTest:
             # When
             status = get_stock_enriched_data_status(
                 is_enriched_stock_data_exists=is_enriched_stock_data_exists,
-                is_enriched_stocks_contains_data=is_enriched_stocks_contains_data
+                is_enriched_stocks_contains_data=is_enriched_stocks_contains_data,
             )
 
             # Then
-            assert status['is_enriched_stock_datasource_exists'] == True
-            assert status['is_stock_ok'] == True
-
+            assert status["is_enriched_stock_datasource_exists"] == True
+            assert status["is_stock_ok"] == True
 
         def test_should_return_is_stock_ok_as_true_when_table_exists_without_data(self):
             # Given
@@ -52,9 +52,9 @@ class GetEnrichedDataStatusTest:
             # When
             status = get_stock_enriched_data_status(
                 is_enriched_stock_data_exists=is_enriched_stock_data_exists,
-                is_enriched_stocks_contains_data=is_enriched_stocks_contains_data
+                is_enriched_stocks_contains_data=is_enriched_stocks_contains_data,
             )
 
             # Then
-            assert status['is_enriched_stock_datasource_exists'] == True
-            assert status['is_stock_ok'] == False
+            assert status["is_enriched_stock_datasource_exists"] == True
+            assert status["is_stock_ok"] == False

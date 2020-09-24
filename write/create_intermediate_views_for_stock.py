@@ -1,37 +1,39 @@
-STOCK_COLUMNS = {"offer_id": "Identifiant de l'offre",
-                 "offer_name": "Nom de l'offre",
-                 "offerer_id": "offerer_id",
-                 "offer_type": "Type d'offre",
-                 "venue_departement_code": "Département",
-                 "stock_issued_at": "Date de création du stock",
-                 "booking_limit_datetime": "Date limite de réservation",
-                 "beginning_datetime": "Date de début de l'évènement",
-                 "quantity": "Stock disponible brut de réservations",
-                 "booking_quantity": "Nombre total de réservations",
-                 "bookings_cancelled": "Nombre de réservations annulées",
-                 "bookings_paid": "Nombre de réservations ayant un paiement"}
+STOCK_COLUMNS = {
+    "offer_id": "Identifiant de l'offre",
+    "offer_name": "Nom de l'offre",
+    "offerer_id": "offerer_id",
+    "offer_type": "Type d'offre",
+    "venue_departement_code": "Département",
+    "stock_issued_at": "Date de création du stock",
+    "booking_limit_datetime": "Date limite de réservation",
+    "beginning_datetime": "Date de début de l'évènement",
+    "quantity": "Stock disponible brut de réservations",
+    "booking_quantity": "Nombre total de réservations",
+    "bookings_cancelled": "Nombre de réservations annulées",
+    "bookings_paid": "Nombre de réservations ayant un paiement",
+}
 
 
 def create_stocks_booking_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW stock_booking_information AS
         {_get_stocks_booking_information_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def create_available_stocks_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW available_stock_information AS
         {_get_available_stock_query()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)
 
 
 def _get_stocks_booking_information_query() -> str:
-    return f'''
+    return f"""
     (WITH last_status AS 
     ( SELECT DISTINCT ON (payment_status."paymentId") payment_status."paymentId", 
     payment_status.status, 
@@ -64,11 +66,11 @@ def _get_stocks_booking_information_query() -> str:
     LEFT JOIN booking_with_payment ON booking_with_payment.booking_id = booking.id
     GROUP BY stock.id
     ORDER BY stock.id)
-    '''
+    """
 
 
 def _get_available_stock_query() -> str:
-    return '''
+    return """
     WITH bookings_grouped_by_stock AS (
     SELECT 
      booking."stockId", 
@@ -88,11 +90,11 @@ def _get_available_stock_query() -> str:
     FROM stock
     LEFT JOIN bookings_grouped_by_stock 
     ON bookings_grouped_by_stock."stockId" = stock.id
-    '''
+    """
 
 
 def create_enriched_stock_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW enriched_stock_data AS
         (SELECT
          stock.id AS stock_id,
@@ -114,6 +116,6 @@ def create_enriched_stock_view(ENGINE) -> None:
          LEFT JOIN venue ON venue.id = offer."venueId"
          LEFT JOIN stock_booking_information ON stock.id = stock_booking_information.stock_id
          LEFT JOIN available_stock_information ON stock_booking_information.stock_id = available_stock_information.stock_id);
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)

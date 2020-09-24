@@ -22,6 +22,7 @@ Les commandes utiles au déveleppement se trouvent dans le Makefile ou dans la c
 4. `make initialize-metabase`
 5. Pour créer les tables enrichies la première fois `make create-enriched-views`
 6. Pour vérifier `make tests`, tous ces tests devraient être verts (la création des vues enrichies n'est pas instantanée)
+7. Avant de commit du code base, il faut lancer black pour bien formater le code `make format`
 
 ### Exemple de variables d'environnement en local :
 Créer un fichier .env.local où on peut mettre ces variables d'environnements:

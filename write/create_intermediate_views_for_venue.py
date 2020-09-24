@@ -1,5 +1,5 @@
 def _get_number_of_bookings_per_venue() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,count(booking.id) AS total_bookings
@@ -13,11 +13,11 @@ def _get_number_of_bookings_per_venue() -> str:
     LEFT JOIN booking
     ON stock.id = booking."stockId"
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_number_of_non_cancelled_bookings_per_venue() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,count(booking.id) AS non_cancelled_bookings
@@ -32,11 +32,11 @@ def _get_number_of_non_cancelled_bookings_per_venue() -> str:
     ON stock.id = booking."stockId"
     AND NOT booking."isCancelled"
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_number_of_used_bookings() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,count(booking.id) AS used_bookings
@@ -51,11 +51,11 @@ def _get_number_of_used_bookings() -> str:
     ON stock.id = booking."stockId"
     AND  booking."isUsed"
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_first_offer_creation_date() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,MIN(offer."dateCreated") AS first_offer_creation_date
@@ -65,11 +65,11 @@ def _get_first_offer_creation_date() -> str:
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' or offer."bookingEmail" is null)
     AND offer."type" NOT IN ('EventType.ACTIVATION','ThingType.ACTIVATION')
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_last_offer_creation_date() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,MAX(offer."dateCreated") AS last_offer_creation_date
@@ -79,11 +79,11 @@ def _get_last_offer_creation_date() -> str:
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' or offer."bookingEmail" is null)
     AND offer."type" NOT IN ('EventType.ACTIVATION','ThingType.ACTIVATION')
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_offers_created_per_venue() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,count(offer.id) AS offers_created
@@ -93,11 +93,11 @@ def _get_offers_created_per_venue() -> str:
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' or offer."bookingEmail" is null)
     AND offer."type" NOT IN ('EventType.ACTIVATION','ThingType.ACTIVATION')
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_theoretic_revenue_per_venue() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,COALESCE(SUM(booking.amount * booking.quantity), 0) AS theoretic_revenue
@@ -112,11 +112,11 @@ def _get_theoretic_revenue_per_venue() -> str:
     ON booking."stockId" = stock.id
     AND NOT booking."isCancelled"
     GROUP BY venue.id
-    '''
+    """
 
 
 def _get_real_revenue_per_venue() -> str:
-    return '''
+    return """
     SELECT
         venue.id AS venue_id
         ,COALESCE(SUM(booking.amount * booking.quantity), 0) AS real_revenue
@@ -132,75 +132,75 @@ def _get_real_revenue_per_venue() -> str:
     AND NOT booking."isCancelled"
     AND booking."isUsed"
     GROUP BY venue.id
-    '''
+    """
 
 
 def create_total_bookings_per_venue_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW total_bookings_per_venue AS {_get_number_of_bookings_per_venue()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_non_cancelled_bookings_per_venue_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW non_cancelled_bookings_per_venue AS {_get_number_of_non_cancelled_bookings_per_venue()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_used_bookings_per_venue_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW used_bookings_per_venue  AS {_get_number_of_used_bookings()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_first_offer_creation_date_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW first_offer_creation_date AS {_get_first_offer_creation_date()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_last_offer_creation_date_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW last_offer_creation_date AS {_get_last_offer_creation_date()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_offers_created_per_venue_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW offers_created_per_venue AS {_get_offers_created_per_venue()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_theoretic_revenue_per_venue(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW theoretic_revenue_per_venue AS {_get_theoretic_revenue_per_venue()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_real_revenue_per_venue(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW real_revenue_per_venue AS {_get_real_revenue_per_venue()}
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
 
 def create_enriched_venue_view(ENGINE) -> None:
-    query = f'''
+    query = f"""
         CREATE OR REPLACE VIEW enriched_venue_data AS (
         SELECT
             venue.id AS venue_id
@@ -250,6 +250,6 @@ def create_enriched_venue_view(ENGINE) -> None:
         LEFT JOIN real_revenue_per_venue
         ON venue.id = real_revenue_per_venue.venue_id
         )
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(query)

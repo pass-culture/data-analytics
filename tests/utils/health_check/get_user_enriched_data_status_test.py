@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
 
-from utils.health_check.get_user_enriched_data_status import get_user_enriched_data_status
+from utils.health_check.get_user_enriched_data_status import (
+    get_user_enriched_data_status,
+)
 
 
 class GetEnrichedDataStatusTest:
@@ -18,7 +20,7 @@ class GetEnrichedDataStatusTest:
             )
 
             # Then
-            assert status['is_enriched_user_datasource_exists']  == False
+            assert status["is_enriched_user_datasource_exists"] == False
 
         def test_should_return_is_user_ok_as_true_when_table_exists_with_data(self):
             # Given
@@ -35,8 +37,8 @@ class GetEnrichedDataStatusTest:
             )
 
             # Then
-            assert status['is_enriched_user_datasource_exists'] == True
-            assert status['is_user_ok'] == True
+            assert status["is_enriched_user_datasource_exists"] == True
+            assert status["is_user_ok"] == True
 
         def test_should_return_is_user_ok_as_false_when_table_exists_without_data(self):
             # Given
@@ -53,5 +55,5 @@ class GetEnrichedDataStatusTest:
             )
 
             # Then
-            assert status['is_enriched_user_datasource_exists'] == True
-            assert status['is_user_ok'] == False
+            assert status["is_enriched_user_datasource_exists"] == True
+            assert status["is_user_ok"] == False
