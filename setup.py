@@ -24,9 +24,9 @@ setup(
         "requests==2.23.0",
         "black==20.8b1",
     ],
-    python_requires="~=3.7",
+    python_requires="~=3.6",
     classifiers=[
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.6",
         "Operating System :: OS Independent",
         "Environment :: Console",
     ],
