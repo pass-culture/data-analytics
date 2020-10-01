@@ -10,11 +10,6 @@ setup(
     license="Mozilla Public License 2.0",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    entry_points={
-        "console_scripts": [
-            "pcd = metabase.cli:cli",
-        ],
-    },
     install_requires=[
         "python-dotenv==0.13.0",
         "Flask-SQLAlchemy==2.4.1",
@@ -27,12 +22,11 @@ setup(
         "psycopg2-binary==2.8.5",
         "freezegun==0.3.12",
         "requests==2.23.0",
-        "click==7.1.2",
         "black==20.8b1",
     ],
-    python_requires="~=3.7",
+    python_requires="~=3.6",
     classifiers=[
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.6",
         "Operating System :: OS Independent",
         "Environment :: Console",
     ],
