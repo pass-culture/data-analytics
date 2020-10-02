@@ -512,7 +512,8 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
          theoric_amount_spent."Montant théorique dépensé",
          theoric_amount_spent_in_digital_goods."Dépenses numériques",
          theoric_amount_spent_in_physical_goods."Dépenses physiques",
-         theoric_amount_spent_in_outings."Dépenses sorties"
+         theoric_amount_spent_in_outings."Dépenses sorties",
+         user_humanized_id.humanized_id AS "user_humanized_id"
         FROM "user"
         LEFT JOIN experimentation_sessions ON "user".id = experimentation_sessions."user_id"
         LEFT JOIN activation_dates ON experimentation_sessions.user_id = activation_dates.user_id
@@ -529,6 +530,7 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
         LEFT JOIN theoric_amount_spent_in_digital_goods ON theoric_amount_spent.user_id = theoric_amount_spent_in_digital_goods.user_id
         LEFT JOIN theoric_amount_spent_in_physical_goods ON theoric_amount_spent_in_digital_goods.user_id = theoric_amount_spent_in_physical_goods.user_id
         LEFT JOIN theoric_amount_spent_in_outings ON theoric_amount_spent_in_physical_goods.user_id = theoric_amount_spent_in_outings.user_id
+        LEFT JOIN user_humanized_id ON user_humanized_id.id = "user".id
         WHERE "user"."canBookFreeOffers");
         """
     with ENGINE.connect() as connection:

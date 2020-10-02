@@ -226,6 +226,7 @@ def create_enriched_venue_view(ENGINE) -> None:
             ,offers_created_per_venue.offers_created AS "Nombre d'offres créées"
             ,theoretic_revenue_per_venue.theoretic_revenue AS "Chiffre d'affaires théorique réalisé"
             ,real_revenue_per_venue.real_revenue AS "Chiffre d'affaires réel réalisé"
+            ,venue_humanized_id.humanized_id AS "venue_humanized_id"
         FROM venue
         LEFT JOIN offerer
         ON venue."managingOffererId" = offerer.id
@@ -249,6 +250,8 @@ def create_enriched_venue_view(ENGINE) -> None:
         ON venue.id = theoretic_revenue_per_venue.venue_id
         LEFT JOIN real_revenue_per_venue
         ON venue.id = real_revenue_per_venue.venue_id
+        LEFT JOIN venue_humanized_id 
+        ON venue_humanized_id.id = venue.id
         )
         """
     with ENGINE.connect() as connection:
