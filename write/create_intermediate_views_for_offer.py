@@ -131,6 +131,7 @@ def create_enriched_offer_view(ENGINE) -> None:
             ,coalesce(offer_booking_information_view."Nombre de réservations validées",0.0) AS "Nombre de réservations validées"
             ,coalesce(count_favorites_view."Nombre de fois où l'offre a été mise en favoris",0.0) AS "Nombre de fois où l'offre a été mise en favoris"
             ,coalesce(sum_stock_view."Stock",0.0) AS  "Stock"
+            ,offer_humanized_id.humanized_id AS "offer_humanized_id"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
@@ -139,6 +140,7 @@ def create_enriched_offer_view(ENGINE) -> None:
         LEFT JOIN offer_booking_information_view ON offer_booking_information_view.offer_id = offer.id
         LEFT JOIN count_favorites_view ON count_favorites_view.offer_id = offer.id
         LEFT JOIN sum_stock_view ON sum_stock_view.offer_id = offer.id
+        LEFT JOIN offer_humanized_id ON offer_humanized_id.id = offer.id
         )
         """
     with ENGINE.connect() as connection:

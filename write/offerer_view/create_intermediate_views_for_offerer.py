@@ -65,7 +65,8 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
      related_non_cancelled_bookings."Nombre de réservations non annulées",
      offerer_departement_code.department_code AS "Département",
      related_venues."Nombre de lieux",
-     related_venues_with_offer."Nombre de lieux avec offres"
+     related_venues_with_offer."Nombre de lieux avec offres",
+     offerer_humanized_id.humanized_id AS "offerer_humanized_id"
     FROM offerer
     LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
     LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
@@ -74,6 +75,7 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
     LEFT JOIN offerer_departement_code ON offerer_departement_code.id = offerer.id
     LEFT JOIN related_venues ON related_venues.offerer_id = offerer.id
     LEFT JOIN related_venues_with_offer ON related_venues_with_offer.offerer_id = offerer.id
+    LEFT JOIN offerer_humanized_id ON offerer_humanized_id.id = offerer.id
     )
     ;
     """
