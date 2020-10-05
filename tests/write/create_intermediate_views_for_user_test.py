@@ -14,15 +14,9 @@ from tests.data_creators import (
     create_deposit,
 )
 from utils.database_cleaners import clean_database, clean_views
-from write.create_intermediate_views_for_user import (
-    _get_experimentation_sessions_query,
-    _get_users_seniority_query,
-    _get_actual_amount_spent_query,
-    _get_theoric_amount_spent_query,
-    _get_theoric_amount_spent_in_digital_goods_query,
-    _get_theoric_amount_spent_in_physical_goods_query,
-    _get_theoric_amount_spent_in_outings_query,
-)
+from write.create_intermediate_views_for_user import _get_experimentation_sessions_query, _get_users_seniority_query, \
+    _get_actual_amount_spent_query, _get_theoric_amount_spent_query, _get_theoric_amount_spent_in_digital_goods_query, \
+    _get_theoric_amount_spent_in_physical_goods_query, _get_theoric_amount_spent_in_outings_query
 
 
 class UserQueriesTest:
