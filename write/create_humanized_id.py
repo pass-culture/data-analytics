@@ -12,7 +12,9 @@ def create_table_humanized_id(
 ) -> None:
     with ENGINE.connect() as connection:
         humanized_id_dataframe.to_sql(
-            name="{}_humanized_id".format(table_name),
+            name="user_humanized_id"
+            if table_name == '"user"'
+            else "{}_humanized_id".format(table_name),
             con=connection,
             if_exists="replace",
             dtype={
