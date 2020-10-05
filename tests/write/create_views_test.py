@@ -21,14 +21,6 @@ from write.create_intermediate_views_for_stock import (
     create_available_stocks_view,
     create_enriched_stock_view,
 )
-from write.create_intermediate_views_for_offer import (
-    create_is_physical_view,
-    create_is_outing_view,
-    create_booking_information_view,
-    create_count_favorites_view,
-    create_sum_stock_view,
-    create_enriched_offer_view,
-)
 from write.create_views import (
     create_enriched_user_data,
     create_enriched_offerer_data,
@@ -153,6 +145,7 @@ class ViewQueriesTest:
                 "Dépenses numériques",
                 "Dépenses physiques",
                 "Dépenses sorties",
+                "user_humanized_id",
             ]
 
             # When
@@ -185,6 +178,7 @@ class ViewQueriesTest:
                 "Département",
                 "Nombre de lieux",
                 "Nombre de lieux avec offres",
+                "offerer_humanized_id",
             ]
 
             with ENGINE.connect() as connection:
@@ -221,6 +215,7 @@ class ViewQueriesTest:
                 "Nombre de réservations validées",
                 "Nombre de fois où l'offre a été mise en favoris",
                 "Stock",
+                "offer_humanized_id",
             ]
             with ENGINE.connect() as connection:
                 offers_details = pandas.read_sql_table(
@@ -297,6 +292,7 @@ class ViewQueriesTest:
                     "Nombre de réservations validées": [0.0, 0.0],
                     "Nombre de fois où l'offre a été mise en favoris": [2.0, 1.0],
                     "Stock": [10.0, 12.0],
+                    "offer_humanized_id": ["AM", "AQ"],
                 },
             )
 
@@ -343,6 +339,7 @@ class ViewQueriesTest:
                 "Nombre d'offres créées",
                 "Chiffre d'affaires théorique réalisé",
                 "Chiffre d'affaires réel réalisé",
+                "venue_humanized_id",
             ]
 
             with ENGINE.connect() as connection:
