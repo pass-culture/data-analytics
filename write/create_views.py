@@ -83,7 +83,7 @@ def create_enriched_user_data(ENGINE):
     create_theoric_amount_spent_in_digital_goods_view(ENGINE)
     create_theoric_amount_spent_in_physical_goods_view(ENGINE)
     create_theoric_amount_spent_in_outings_view(ENGINE)
-    create_humanized_id_data(ENGINE, "user")
+    create_humanized_id_data(ENGINE, '"user"')
     create_materialized_enriched_user_view(ENGINE)
 
 
