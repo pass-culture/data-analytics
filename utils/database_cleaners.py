@@ -69,9 +69,15 @@ def clean_views():
             "DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;"
         )
         connection.execute("DROP VIEW IF EXISTS enriched_offer_data CASCADE;")
+        connection.execute("DROP VIEW IF EXISTS enriched_venue_data CASCADE;")
         connection.execute("DROP VIEW IF EXISTS is_physical_view CASCADE;")
         connection.execute("DROP VIEW IF EXISTS is_outing_view CASCADE;")
         connection.execute(
             "DROP VIEW IF EXISTS offer_booking_information_view CASCADE;"
         )
         connection.execute("DROP VIEW IF EXISTS count_favorites_view CASCADE;")
+
+
+def drop_offerer_humanized_id_table():
+    with ENGINE.connect() as connection:
+        connection.execute("DROP TABLE IF EXISTS offerer_humanized_id CASCADE;")

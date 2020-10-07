@@ -32,6 +32,7 @@ from write.create_intermediate_views_for_offer import (
     create_sum_stock_view,
     create_enriched_offer_view,
 )
+from write.create_humanized_id import create_humanized_id_data
 from write.offerer_view.create_intermediate_views_for_offerer import (
     create_first_stock_creation_dates_view,
     create_first_booking_creation_dates_view,
@@ -62,6 +63,7 @@ def create_enriched_offerer_data(ENGINE):
     create_offerer_departement_code_data(ENGINE)
     create_number_of_venues_view(ENGINE)
     create_number_of_venues_without_offer_view(ENGINE)
+    create_humanized_id_data(ENGINE, "offerer")
     create_materialized_enriched_offerer_view(ENGINE)
 
 
@@ -81,6 +83,7 @@ def create_enriched_user_data(ENGINE):
     create_theoric_amount_spent_in_digital_goods_view(ENGINE)
     create_theoric_amount_spent_in_physical_goods_view(ENGINE)
     create_theoric_amount_spent_in_outings_view(ENGINE)
+    create_humanized_id_data(ENGINE, '"user"')
     create_materialized_enriched_user_view(ENGINE)
 
 
@@ -96,6 +99,7 @@ def create_enriched_offer_data(ENGINE):
     create_booking_information_view(ENGINE)
     create_count_favorites_view(ENGINE)
     create_sum_stock_view(ENGINE)
+    create_humanized_id_data(ENGINE, "offer")
     create_enriched_offer_view(ENGINE)
 
 
@@ -108,4 +112,5 @@ def create_enriched_venue_data(ENGINE):
     create_offers_created_per_venue_view(ENGINE)
     create_theoretic_revenue_per_venue(ENGINE)
     create_real_revenue_per_venue(ENGINE)
+    create_humanized_id_data(ENGINE, "venue")
     create_enriched_venue_view(ENGINE)
