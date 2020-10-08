@@ -3,9 +3,15 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
         environment:
           DATABASE_URL: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
       - image: circleci/postgres:11.6-postgis
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
         name: postgres-product
         environment:
           POSTGRES_USER: pass_culture
