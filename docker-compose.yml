@@ -28,9 +28,10 @@ services:
                git clone https://github.com/betagouv/pass-culture-api.git;
                cd pass-culture-api;
                pip install -r requirements.txt;
+               pip install -e .;
                python -m nltk.downloader punkt stopwords;
-               python install_database_extensions.py
-               PYTHONPATH=. alembic upgrade head
+               python -m pcapi.install_database_extensions;
+               alembic upgrade head;
                "
     env_file:
       - env_file
