@@ -58,7 +58,7 @@ def _get_activation_dates_query() -> str:
 
 
 def _get_date_of_first_bookings_query() -> str:
-    return '''
+    return """
      SELECT
         booking."userId" AS user_id
         ,min(booking."dateCreated") AS "Date de première réservation"
@@ -68,11 +68,11 @@ def _get_date_of_first_bookings_query() -> str:
     AND offer.type != 'ThingType.ACTIVATION'
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
     GROUP BY user_id
-    '''
+    """
 
 
 def _get_date_of_second_bookings_query() -> str:
-    return '''
+    return """
      WITH ranked_booking_data AS (
          SELECT
             booking."userId" AS user_id
@@ -89,11 +89,11 @@ def _get_date_of_second_bookings_query() -> str:
         ,date_creation_booking AS "Date de deuxième réservation"
     FROM ranked_booking_data
     WHERE rank_booking = 2
-    '''
+    """
 
 
 def _get_date_of_bookings_on_third_product_type_query() -> str:
-    return '''
+    return """
     WITH dat AS (
     SELECT
         booking.*
@@ -124,11 +124,11 @@ def _get_date_of_bookings_on_third_product_type_query() -> str:
         ,"dateCreated" AS "Date de première réservation dans 3 catégories différentes"
     FROM ranked_data
     WHERE rank_cat = 3
-    '''
+    """
 
 
 def _get_number_of_bookings_query() -> str:
-    return '''
+    return """
     SELECT  
     booking."userId" AS user_id
     ,count(booking.id) AS number_of_bookings
@@ -139,24 +139,23 @@ def _get_number_of_bookings_query() -> str:
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
     GROUP BY user_id
     ORDER BY number_of_bookings ASC
-    '''
+    """
 
 
 def _get_number_of_non_cancelled_bookings_query() -> str:
-    return '''
+    return """
     SELECT  
         booking."userId" AS user_id
         ,count(booking.id) AS number_of_bookings
->>>>>>> (PC-4259) clean enriched_user_data table
     FROM booking
     JOIN stock ON stock.id = booking."stockId"
     JOIN offer ON offer.id = stock."offerId"
     AND offer.type != 'ThingType.ACTIVATION'
-    AND offer."bookingEmail" != 'jeux-concours@passculture.app'
+    AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
     AND NOT booking."isCancelled"
     GROUP BY user_id
     ORDER BY number_of_bookings ASC
-    '''
+    """
 
 
 def _get_users_seniority_query() -> str:
@@ -239,6 +238,7 @@ def _get_theoric_amount_spent_in_digital_goods_query() -> str:
     GROUP BY "user".id)
     """
 
+
 def _get_theoric_amount_spent_in_physical_goods_query() -> str:
     return """
     (WITH eligible_booking AS (
@@ -288,8 +288,9 @@ def _get_theoric_amount_spent_in_outings_query() -> str:
     GROUP BY "user".id)
     """
 
+
 def _get_last_booking_date_query() -> str:
-    return '''
+    return """
      SELECT
         booking."userId" AS user_id
         ,max(booking."dateCreated") AS "Date de dernière réservation"
@@ -299,7 +300,7 @@ def _get_last_booking_date_query() -> str:
     AND offer.type != 'ThingType.ACTIVATION'
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
     GROUP BY user_id
-    '''
+    """
 
 
 def create_experimentation_sessions_view(ENGINE) -> None:
@@ -405,10 +406,11 @@ def create_theoric_amount_spent_in_outings_view(ENGINE) -> None:
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
+
 def create_date_of_last_booking_view(ENGINE) -> None:
-    view_query = f'''
+    view_query = f"""
         CREATE OR REPLACE VIEW last_booking_date AS {_get_last_booking_date_query()} 
-        '''
+        """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
@@ -435,7 +437,7 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
          theoric_amount_spent_in_digital_goods."Dépenses numériques",
          theoric_amount_spent_in_physical_goods."Dépenses physiques",
          theoric_amount_spent_in_outings."Dépenses sorties",
-         user_humanized_id.humanized_id AS "user_humanized_id"
+         user_humanized_id.humanized_id AS "user_humanized_id",
          last_booking_date."Date de dernière réservation"
         FROM "user"
         LEFT JOIN experimentation_sessions ON "user".id = experimentation_sessions."user_id"
