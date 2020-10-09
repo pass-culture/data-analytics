@@ -125,14 +125,27 @@ class ViewQueriesTest:
 
         def test_should_create_enriched_user_data_view_with_columns(self):
             # Given
-            expected_columns = ["Vague d'expérimentation", "Département", "Code postal", "Statut", "Date d'activation",
-                                "Date de première connexion", "Date de première réservation",
-                                "Date de deuxième réservation",
-                                "Date de première réservation dans 3 catégories différentes",
-                                "Nombre de réservations totales", "Nombre de réservations non annulées",
-                                "Ancienneté en jours",
-                                "Montant réél dépensé", "Montant théorique dépensé", "Dépenses numériques",
-                                "Dépenses physiques", "Dépenses sorties","Date de dernière réservation","user_humanized_id",]
+            expected_columns = [
+                "Vague d'expérimentation",
+                "Département",
+                "Code postal",
+                "Statut",
+                "Date d'activation",
+                "Date de première connexion",
+                "Date de première réservation",
+                "Date de deuxième réservation",
+                "Date de première réservation dans 3 catégories différentes",
+                "Nombre de réservations totales",
+                "Nombre de réservations non annulées",
+                "Ancienneté en jours",
+                "Montant réél dépensé",
+                "Montant théorique dépensé",
+                "Dépenses numériques",
+                "Dépenses physiques",
+                "Dépenses sorties",
+                "Date de dernière réservation",
+                "user_humanized_id",
+            ]
 
             # When
             create_enriched_user_data(ENGINE)
