@@ -131,12 +131,10 @@ class ViewQueriesTest:
                 "Code postal",
                 "Statut",
                 "Date d'activation",
-                "Date de remplissage du typeform",
                 "Date de première connexion",
                 "Date de première réservation",
                 "Date de deuxième réservation",
                 "Date de première réservation dans 3 catégories différentes",
-                "Date de dernière recommandation",
                 "Nombre de réservations totales",
                 "Nombre de réservations non annulées",
                 "Ancienneté en jours",
@@ -145,6 +143,7 @@ class ViewQueriesTest:
                 "Dépenses numériques",
                 "Dépenses physiques",
                 "Dépenses sorties",
+                "Date de dernière réservation",
                 "user_humanized_id",
             ]
 

@@ -3,9 +3,15 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
         environment:
           DATABASE_URL: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
       - image: circleci/postgres:11.6-postgis
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
         name: postgres-product
         environment:
           POSTGRES_USER: pass_culture
@@ -21,9 +27,10 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt;
+            pip install -e .
             python -m nltk.downloader punkt stopwords;
-            python install_database_extensions.py;
-            PYTHONPATH=. alembic upgrade head;
+            python -m pcapi.install_database_extensions
+            alembic upgrade head
       - run:
           name: Running tests
           command: |

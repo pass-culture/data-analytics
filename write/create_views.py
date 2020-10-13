@@ -1,3 +1,4 @@
+from write.create_humanized_id import create_humanized_id_data
 from write.offerer_view.create_departement_code import (
     create_offerer_departement_code_data,
 )
@@ -9,11 +10,9 @@ from write.create_intermediate_views_for_stock import (
 from write.create_intermediate_views_for_user import (
     create_experimentation_sessions_view,
     create_activation_dates_view,
-    create_first_connection_dates_view,
     create_date_of_first_bookings_view,
     create_date_of_second_bookings_view,
     create_date_of_bookings_on_third_product_view,
-    create_last_recommendation_dates_view,
     create_number_of_bookings_view,
     create_number_of_non_cancelled_bookings_view,
     create_users_seniority_view,
@@ -22,6 +21,7 @@ from write.create_intermediate_views_for_user import (
     create_theoric_amount_spent_in_digital_goods_view,
     create_theoric_amount_spent_in_physical_goods_view,
     create_theoric_amount_spent_in_outings_view,
+    create_date_of_last_booking_view,
     create_materialized_enriched_user_view,
 )
 from write.create_intermediate_views_for_offer import (
@@ -32,7 +32,6 @@ from write.create_intermediate_views_for_offer import (
     create_sum_stock_view,
     create_enriched_offer_view,
 )
-from write.create_humanized_id import create_humanized_id_data
 from write.offerer_view.create_intermediate_views_for_offerer import (
     create_first_stock_creation_dates_view,
     create_first_booking_creation_dates_view,
@@ -70,11 +69,9 @@ def create_enriched_offerer_data(ENGINE):
 def create_enriched_user_data(ENGINE):
     create_experimentation_sessions_view(ENGINE)
     create_activation_dates_view(ENGINE)
-    create_first_connection_dates_view(ENGINE)
     create_date_of_first_bookings_view(ENGINE)
     create_date_of_second_bookings_view(ENGINE)
     create_date_of_bookings_on_third_product_view(ENGINE)
-    create_last_recommendation_dates_view(ENGINE)
     create_number_of_bookings_view(ENGINE)
     create_number_of_non_cancelled_bookings_view(ENGINE)
     create_users_seniority_view(ENGINE)
@@ -84,6 +81,7 @@ def create_enriched_user_data(ENGINE):
     create_theoric_amount_spent_in_physical_goods_view(ENGINE)
     create_theoric_amount_spent_in_outings_view(ENGINE)
     create_humanized_id_data(ENGINE, '"user"')
+    create_date_of_last_booking_view(ENGINE)
     create_materialized_enriched_user_view(ENGINE)
 
 
