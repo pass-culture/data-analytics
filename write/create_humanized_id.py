@@ -17,6 +17,8 @@ def create_table_humanized_id(
             else "{}_humanized_id".format(table_name),
             con=connection,
             if_exists="replace",
+            method="multi",
+            chunksize=500,
             dtype={
                 "id": sqlalchemy.types.BIGINT(),
                 "humanized_id": sqlalchemy.types.VARCHAR(length=250),
