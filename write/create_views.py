@@ -50,7 +50,7 @@ from write.create_intermediate_views_for_venue import (
     create_offers_created_per_venue_view,
     create_theoretic_revenue_per_venue,
     create_real_revenue_per_venue,
-    create_enriched_venue_view,
+    create_materialized_enriched_venue_view,
 )
 
 
@@ -111,4 +111,4 @@ def create_enriched_venue_data(ENGINE):
     create_theoretic_revenue_per_venue(ENGINE)
     create_real_revenue_per_venue(ENGINE)
     create_humanized_id_data(ENGINE, "venue")
-    create_enriched_venue_view(ENGINE)
+    create_materialized_enriched_venue_view(ENGINE)
