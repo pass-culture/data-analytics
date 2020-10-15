@@ -199,9 +199,9 @@ def create_real_revenue_per_venue(ENGINE) -> None:
         connection.execute(view_query)
 
 
-def create_enriched_venue_view(ENGINE) -> None:
+def create_materialized_enriched_venue_view(ENGINE) -> None:
     query = f"""
-        CREATE OR REPLACE VIEW enriched_venue_data AS (
+        CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_venue_data AS (
         SELECT
             venue.id AS venue_id
             ,COALESCE(venue."publicName",venue."name") AS "Nom du lieu"
@@ -250,7 +250,7 @@ def create_enriched_venue_view(ENGINE) -> None:
         ON venue.id = theoretic_revenue_per_venue.venue_id
         LEFT JOIN real_revenue_per_venue
         ON venue.id = real_revenue_per_venue.venue_id
-        LEFT JOIN venue_humanized_id 
+        LEFT JOIN venue_humanized_id
         ON venue_humanized_id.id = venue.id
         )
         """

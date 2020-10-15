@@ -5,7 +5,7 @@ from db import ENGINE
 
 def _get_experimentation_sessions_query() -> str:
     return """
-    (WITH experimentation_session AS 
+    (WITH experimentation_session AS
     (
         SELECT
         DISTINCT ON (user_id)
@@ -16,7 +16,7 @@ def _get_experimentation_sessions_query() -> str:
         JOIN offer
          ON offer.id = stock."offerId"
          AND offer.type = 'ThingType.ACTIVATION'
-        ORDER BY user_id, is_used DESC 
+        ORDER BY user_id, is_used DESC
     )
 
     SELECT
@@ -109,16 +109,16 @@ def _get_date_of_bookings_on_third_product_type_query() -> str:
     WHERE offer."type" NOT IN ('ThingType.ACTIVATION','EventType.ACTIVATION')
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
     ),
-    
+
     ranked_data AS (
-    
+
     SELECT
         *
         ,rank() over (partition by "userId" order by "dateCreated") AS rank_cat
     FROM dat
     WHERE rank_booking_in_cat = 1
     )
-    
+
     SELECT
         "userId" AS user_id
         ,"dateCreated" AS "Date de première réservation dans 3 catégories différentes"
@@ -129,7 +129,7 @@ def _get_date_of_bookings_on_third_product_type_query() -> str:
 
 def _get_number_of_bookings_query() -> str:
     return """
-    SELECT  
+    SELECT
     booking."userId" AS user_id
     ,count(booking.id) AS number_of_bookings
     FROM booking
@@ -144,7 +144,7 @@ def _get_number_of_bookings_query() -> str:
 
 def _get_number_of_non_cancelled_bookings_query() -> str:
     return """
-    SELECT  
+    SELECT
         booking."userId" AS user_id
         ,count(booking.id) AS number_of_bookings
     FROM booking
@@ -160,7 +160,7 @@ def _get_number_of_non_cancelled_bookings_query() -> str:
 
 def _get_users_seniority_query() -> str:
     return f"""
-    (WITH validated_activation_booking AS 
+    (WITH validated_activation_booking AS
     ( SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
      FROM booking
      JOIN stock
@@ -168,7 +168,7 @@ def _get_users_seniority_query() -> str:
      JOIN offer
       ON stock."offerId" = offer.id
       AND offer.type = 'ThingType.ACTIVATION'
-     WHERE booking."isUsed" 
+     WHERE booking."isUsed"
     ),
 
     activation_date AS
@@ -183,7 +183,7 @@ def _get_users_seniority_query() -> str:
      ON validated_activation_booking."userId" = "user".id
     WHERE "user"."canBookFreeOffers")
 
-    SELECT 
+    SELECT
      DATE_PART('day', '{datetime.now()}' - activation_date."Date d'activation") AS "Ancienneté en jours",
      "user".id as user_id
     FROM "user"
@@ -194,8 +194,8 @@ def _get_users_seniority_query() -> str:
 
 def _get_actual_amount_spent_query() -> str:
     return """
-    (SELECT 
-     "user".id AS user_id, 
+    (SELECT
+     "user".id AS user_id,
      COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isUsed" IS TRUE AND booking."isCancelled" IS FALSE
@@ -206,8 +206,8 @@ def _get_actual_amount_spent_query() -> str:
 
 def _get_theoric_amount_spent_query() -> str:
     return """
-    (SELECT 
-     "user".id AS user_id, 
+    (SELECT
+     "user".id AS user_id,
      COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
@@ -223,14 +223,14 @@ def _get_theoric_amount_spent_in_digital_goods_query() -> str:
      FROM booking
      LEFT JOIN stock ON booking."stockId" = stock.id
      LEFT JOIN offer ON stock."offerId" = offer.id
-     WHERE offer.type IN ('ThingType.AUDIOVISUEL', 'ThingType.JEUX_VIDEO', 'ThingType.JEUX_VIDEO_ABO', 
+     WHERE offer.type IN ('ThingType.AUDIOVISUEL', 'ThingType.JEUX_VIDEO', 'ThingType.JEUX_VIDEO_ABO',
      'ThingType.LIVRE_AUDIO', 'ThingType.LIVRE_EDITION', 'ThingType.MUSIQUE', 'ThingType.PRESSE_ABO')
      AND offer.url IS NOT NULL
      AND booking."isCancelled" IS FALSE
      )
 
-    SELECT 
-    "user".id AS user_id, 
+    SELECT
+    "user".id AS user_id,
     COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses numériques"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
@@ -296,7 +296,7 @@ def _get_last_booking_date_query() -> str:
         ,max(booking."dateCreated") AS "Date de dernière réservation"
     FROM booking
     JOIN stock ON stock.id = booking."stockId"
-    JOIN offer ON offer.id = stock."offerId" 
+    JOIN offer ON offer.id = stock."offerId"
     AND offer.type != 'ThingType.ACTIVATION'
     AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
     GROUP BY user_id
@@ -313,7 +313,7 @@ def create_experimentation_sessions_view(ENGINE) -> None:
 
 def create_activation_dates_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW activation_dates AS {_get_activation_dates_query()} 
+        CREATE OR REPLACE VIEW activation_dates AS {_get_activation_dates_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -321,7 +321,7 @@ def create_activation_dates_view(ENGINE) -> None:
 
 def create_date_of_first_bookings_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW date_of_first_bookings AS {_get_date_of_first_bookings_query()} 
+        CREATE OR REPLACE VIEW date_of_first_bookings AS {_get_date_of_first_bookings_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -329,7 +329,7 @@ def create_date_of_first_bookings_view(ENGINE) -> None:
 
 def create_date_of_second_bookings_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW date_of_second_bookings AS {_get_date_of_second_bookings_query()} 
+        CREATE OR REPLACE VIEW date_of_second_bookings AS {_get_date_of_second_bookings_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -337,7 +337,7 @@ def create_date_of_second_bookings_view(ENGINE) -> None:
 
 def create_date_of_bookings_on_third_product_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW date_of_bookings_on_third_product AS {_get_date_of_bookings_on_third_product_type_query()} 
+        CREATE OR REPLACE VIEW date_of_bookings_on_third_product AS {_get_date_of_bookings_on_third_product_type_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -345,7 +345,7 @@ def create_date_of_bookings_on_third_product_view(ENGINE) -> None:
 
 def create_number_of_bookings_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW number_of_bookings AS {_get_number_of_bookings_query()} 
+        CREATE OR REPLACE VIEW number_of_bookings AS {_get_number_of_bookings_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -353,7 +353,7 @@ def create_number_of_bookings_view(ENGINE) -> None:
 
 def create_number_of_non_cancelled_bookings_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW number_of_non_cancelled_bookings AS {_get_number_of_non_cancelled_bookings_query()} 
+        CREATE OR REPLACE VIEW number_of_non_cancelled_bookings AS {_get_number_of_non_cancelled_bookings_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -361,7 +361,7 @@ def create_number_of_non_cancelled_bookings_view(ENGINE) -> None:
 
 def create_users_seniority_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW users_seniority AS {_get_users_seniority_query()} 
+        CREATE OR REPLACE VIEW users_seniority AS {_get_users_seniority_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -369,7 +369,7 @@ def create_users_seniority_view(ENGINE) -> None:
 
 def create_actual_amount_spent_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW actual_amount_spent AS {_get_actual_amount_spent_query()} 
+        CREATE OR REPLACE VIEW actual_amount_spent AS {_get_actual_amount_spent_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -377,7 +377,7 @@ def create_actual_amount_spent_view(ENGINE) -> None:
 
 def create_theoric_amount_spent_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW theoric_amount_spent AS {_get_theoric_amount_spent_query()} 
+        CREATE OR REPLACE VIEW theoric_amount_spent AS {_get_theoric_amount_spent_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -385,7 +385,7 @@ def create_theoric_amount_spent_view(ENGINE) -> None:
 
 def create_theoric_amount_spent_in_digital_goods_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW theoric_amount_spent_in_digital_goods AS {_get_theoric_amount_spent_in_digital_goods_query()} 
+        CREATE OR REPLACE VIEW theoric_amount_spent_in_digital_goods AS {_get_theoric_amount_spent_in_digital_goods_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -393,7 +393,7 @@ def create_theoric_amount_spent_in_digital_goods_view(ENGINE) -> None:
 
 def create_theoric_amount_spent_in_physical_goods_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW theoric_amount_spent_in_physical_goods AS {_get_theoric_amount_spent_in_physical_goods_query()} 
+        CREATE OR REPLACE VIEW theoric_amount_spent_in_physical_goods AS {_get_theoric_amount_spent_in_physical_goods_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -401,7 +401,7 @@ def create_theoric_amount_spent_in_physical_goods_view(ENGINE) -> None:
 
 def create_theoric_amount_spent_in_outings_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW theoric_amount_spent_in_outings AS {_get_theoric_amount_spent_in_outings_query()} 
+        CREATE OR REPLACE VIEW theoric_amount_spent_in_outings AS {_get_theoric_amount_spent_in_outings_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -409,7 +409,7 @@ def create_theoric_amount_spent_in_outings_view(ENGINE) -> None:
 
 def create_date_of_last_booking_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW last_booking_date AS {_get_last_booking_date_query()} 
+        CREATE OR REPLACE VIEW last_booking_date AS {_get_last_booking_date_query()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
