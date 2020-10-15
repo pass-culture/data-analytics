@@ -39,6 +39,7 @@ from write.offerer_view.create_intermediate_views_for_offerer import (
     create_number_of_bookings_not_cancelled_view,
     create_number_of_venues_view,
     create_number_of_venues_without_offer_view,
+    create_current_year_revenue_view,
     create_materialized_enriched_offerer_view,
 )
 from write.create_intermediate_views_for_venue import (
@@ -63,6 +64,7 @@ def create_enriched_offerer_data(ENGINE):
     create_number_of_venues_view(ENGINE)
     create_number_of_venues_without_offer_view(ENGINE)
     create_humanized_id_data(ENGINE, "offerer")
+    create_current_year_revenue_view(ENGINE)
     create_materialized_enriched_offerer_view(ENGINE)
 
 
