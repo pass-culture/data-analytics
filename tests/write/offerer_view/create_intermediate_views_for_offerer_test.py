@@ -19,7 +19,7 @@ from write.offerer_view.create_intermediate_views_for_offerer import (
     _get_number_of_offers_query,
     _get_number_of_bookings_not_cancelled_query,
     _get_number_of_venues_per_offerer_query,
-    _get_number_of_venues_with_offer_per_offerer_query,
+    _get_number_of_venues_with_offer_per_offerer_query,git
 )
 
 
@@ -279,3 +279,4 @@ class OffererQueriesTest:
                     query, connection, index_col="offerer_id"
                 )
             assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 0
+
