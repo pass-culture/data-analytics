@@ -75,9 +75,10 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
      related_venues."Nombre de lieux",
      related_venues_with_offer."Nombre de lieux avec offres",
      offerer_humanized_id.humanized_id AS "offerer_humanized_id",
-     CASE WHEN CASE WHEN "validationToken" IS NULL THEN NULL ELSE CONCAT('https://backend.passculture.beta.gouv.fr/validate/offerer/',"validationToken") END AS "Lien de validation de la structure",
+     CASE WHEN "validationToken" IS NOT NULL THEN CONCAT('https://backend.passculture.beta.gouv.fr/validate/offerer/',"validationToken") ELSE NULL END AS "Lien de validation de la structure",
      current_year_revenue."Chiffre d'affaire réel année civile en cours"
     FROM offerer
+    LEFT JOIN user_offerer
     LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
     LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
     LEFT JOIN related_offers ON related_offers.offerer_id = offerer.id
@@ -86,7 +87,7 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
     LEFT JOIN related_venues ON related_venues.offerer_id = offerer.id
     LEFT JOIN related_venues_with_offer ON related_venues_with_offer.offerer_id = offerer.id
     LEFT JOIN offerer_humanized_id ON offerer_humanized_id.id = offerer.id
-    LEFT JOIN current_year_revenue.offerer_id = offerer.id
+    LEFT JOIN current_year_revenue ON current_year_revenue.offerer_id = offerer.id
     )
     ;
     """
@@ -191,6 +192,7 @@ def _get_current_year_revenue() -> str:
     JOIN stock ON booking."stockId" = stock.id
     JOIN offer ON stock."offerId" = offer.id
     JOIN venue ON offer."venueId" = venue.id
-    AND date_part('year',booking."dateUsed") = date_part('year',current_date)
+    AND date_part('year',booking."dateCreated") = date_part('year',current_date)
+    AND booking."isUsed"
     GROUP BY venue."managingOffererId"
     """
