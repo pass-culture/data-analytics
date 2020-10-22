@@ -75,10 +75,9 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
      related_venues."Nombre de lieux",
      related_venues_with_offer."Nombre de lieux avec offres",
      offerer_humanized_id.humanized_id AS "offerer_humanized_id",
-     CASE WHEN "validationToken" IS NOT NULL THEN CONCAT('https://backend.passculture.beta.gouv.fr/validate/offerer/',"validationToken") ELSE NULL END AS "Lien de validation de la structure",
+     CASE WHEN offerer."validationToken" IS NOT NULL THEN CONCAT('https://backend.passculture.beta.gouv.fr/validate/offerer/',offerer."validationToken") ELSE NULL END AS "Lien de validation de la structure",
      current_year_revenue."Chiffre d'affaire réel année civile en cours"
     FROM offerer
-    LEFT JOIN user_offerer
     LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
     LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
     LEFT JOIN related_offers ON related_offers.offerer_id = offerer.id
@@ -187,7 +186,7 @@ def _get_current_year_revenue() -> str:
     return """
     SELECT
     venue."managingOffererId" AS offerer_id
-    ,sum(coalesce(booking.quantity,0)*coalesce(booking.amount,0)) AS "Chiffre d'affaire réel année civile en cours"
+    ,sum(coalesce(booking.quantity,0)*coalesce(booking.amount,0)) AS "Chiffre d'affaire réel année civile en cours" 
     FROM booking
     JOIN stock ON booking."stockId" = stock.id
     JOIN offer ON stock."offerId" = offer.id
