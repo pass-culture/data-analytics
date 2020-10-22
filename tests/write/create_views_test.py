@@ -178,6 +178,8 @@ class ViewQueriesTest:
                 "Nombre de lieux",
                 "Nombre de lieux avec offres",
                 "offerer_humanized_id",
+                "Lien de validation de la structure",
+                "Chiffre d'affaire réel année civile en cours",
             ]
 
             with ENGINE.connect() as connection:

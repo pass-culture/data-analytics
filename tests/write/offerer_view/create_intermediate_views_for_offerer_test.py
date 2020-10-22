@@ -11,6 +11,7 @@ from tests.data_creators import (
     create_stock,
     create_user,
     create_booking,
+    create_deposit,
 )
 from utils.database_cleaners import clean_database, clean_views
 from write.offerer_view.create_intermediate_views_for_offerer import (
@@ -282,4 +283,67 @@ class OffererQueriesTest:
             assert number_of_venue_with_offer.loc[1, "Nombre de lieux avec offres"] == 0
 
 
+    class GetCurrentYearRevenueTest:
+        def test_should_return_current_year_revenue(self):
 
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type="ThingType.MUSEES_PATRIMOINE_ABO")
+            create_venue(id=15, offerer_id=10)
+            create_offer(
+                id=30,
+                venue_id=15,
+                product_type="ThingType.MUSEES_PATRIMOINE_ABO",
+                product_id=1,
+            )
+            create_stock(
+                id=20,
+                offer_id=30)
+            create_booking(
+                id=1,
+                user_id=1,
+                amount=10,
+                quantity=1,
+                stock_id=20,
+                is_used=True,
+            )
+            create_booking(
+                id=2,
+                user_id=1,
+                amount=10,
+                quantity=1,
+                stock_id=20,
+                token="ABC321",
+                is_used=True,
+                date_created='2020-03-16'
+            )
+            create_booking(
+                id=3,
+                user_id=1,
+                amount=10,
+                quantity=3,
+                stock_id=20,
+                token="FAM321",
+                is_cancelled=True,
+            )
+
+            expected_current_year_revenue = pandas.Series(
+                index=pandas.Index(data=[10], name="offerer_id"),
+                data=[10.0],
+                name="Chiffre d'affaire réel année civile en cours",
+            )
+
+            # When
+            query = _get_current_year_revenue()
+
+            # Then
+            with ENGINE.connect() as connection:
+                current_year_revenue = pandas.read_sql(
+                    query, connection, index_col="offerer_id"
+                )
+            pandas.testing.assert_series_equal(
+                current_year_revenue["Chiffre d'affaire réel année civile en cours"],
+                expected_current_year_revenue,
+            )
