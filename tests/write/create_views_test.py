@@ -217,6 +217,8 @@ class ViewQueriesTest:
                 "Nombre de fois où l'offre a été mise en favoris",
                 "Stock",
                 "offer_humanized_id",
+                "Lien portail pro",
+                "Lien WEBAPP",
             ]
             with ENGINE.connect() as connection:
                 offers_details = pandas.read_sql_table(
@@ -294,6 +296,8 @@ class ViewQueriesTest:
                     "Nombre de fois où l'offre a été mise en favoris": [2.0, 1.0],
                     "Stock": [10.0, 12.0],
                     "offer_humanized_id": ["AM", "AQ"],
+                    "Lien portail pro": ["https://pro.passculture.beta.gouv.fr/offres/AM","https://pro.passculture.beta.gouv.fr/offres/AQ"],
+                    "Lien WEBAPP" : ["https://app.passculture.beta.gouv.fr/offre/details/AM","https://app.passculture.beta.gouv.fr/offre/details/AQ"]
                 },
             )
 

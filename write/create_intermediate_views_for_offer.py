@@ -132,6 +132,8 @@ def create_enriched_offer_view(ENGINE) -> None:
             ,coalesce(count_favorites_view."Nombre de fois où l'offre a été mise en favoris",0.0) AS "Nombre de fois où l'offre a été mise en favoris"
             ,coalesce(sum_stock_view."Stock",0.0) AS  "Stock"
             ,offer_humanized_id.humanized_id AS "offer_humanized_id"
+            ,CONCAT('https://pro.passculture.beta.gouv.fr/offres/',offer_humanized_id.humanized_id) AS "Lien portail pro"
+            ,CONCAT('https://app.passculture.beta.gouv.fr/offre/details/',offer_humanized_id.humanized_id) AS "Lien WEBAPP"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
