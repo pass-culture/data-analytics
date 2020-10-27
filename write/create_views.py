@@ -30,7 +30,7 @@ from write.create_intermediate_views_for_offer import (
     create_booking_information_view,
     create_count_favorites_view,
     create_sum_stock_view,
-    create_enriched_offer_view,
+    create_materialized_enriched_offer_view,
 )
 from write.offerer_view.create_intermediate_views_for_offerer import (
     create_first_stock_creation_dates_view,
@@ -100,7 +100,7 @@ def create_enriched_offer_data(ENGINE):
     create_count_favorites_view(ENGINE)
     create_sum_stock_view(ENGINE)
     create_humanized_id_data(ENGINE, "offer")
-    create_enriched_offer_view(ENGINE)
+    create_materialized_enriched_offer_view(ENGINE)
 
 
 def create_enriched_venue_data(ENGINE):

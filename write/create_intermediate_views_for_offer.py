@@ -109,9 +109,9 @@ def create_sum_stock_view(ENGINE) -> None:
         connection.execute(view_query)
 
 
-def create_enriched_offer_view(ENGINE) -> None:
+def create_materialized_enriched_offer_view(ENGINE) -> None:
     query = f"""
-        CREATE OR REPLACE VIEW enriched_offer_data AS (
+        CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offer_data AS (
         SELECT
             offerer.id AS "Identifiant de la structure"
             ,offerer."name" AS "Nom de la structure"
