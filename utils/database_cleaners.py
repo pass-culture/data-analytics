@@ -68,8 +68,12 @@ def clean_views():
         connection.execute(
             "DROP VIEW IF EXISTS theoric_amount_spent_in_physical_goods CASCADE;"
         )
-        connection.execute("DROP VIEW IF EXISTS enriched_offer_data CASCADE;")
-        connection.execute("DROP MATERIALIZED VIEW IF EXISTS enriched_venue_data CASCADE;")
+        connection.execute(
+            "DROP MATERIALIZED VIEW IF EXISTS enriched_offer_data CASCADE;"
+        )
+        connection.execute(
+            "DROP MATERIALIZED VIEW IF EXISTS enriched_venue_data CASCADE;"
+        )
         connection.execute("DROP VIEW IF EXISTS enriched_venue_data CASCADE;")
         connection.execute("DROP VIEW IF EXISTS is_physical_view CASCADE;")
         connection.execute("DROP VIEW IF EXISTS is_outing_view CASCADE;")

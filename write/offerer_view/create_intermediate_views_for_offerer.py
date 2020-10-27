@@ -51,6 +51,7 @@ def create_number_of_venues_without_offer_view(ENGINE) -> None:
     with ENGINE.connect() as connection:
         connection.execute(query)
 
+
 def create_current_year_revenue_view(ENGINE) -> None:
     query = f"""
         CREATE OR REPLACE VIEW current_year_revenue AS
