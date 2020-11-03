@@ -423,7 +423,11 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
          experimentation_sessions."Vague d'expérimentation",
          "user"."departementCode" AS "Département",
          "user"."postalCode" AS "Code postal",
-         "user".activity AS "Statut",
+          CASE WHEN "user".activity in ('Alternant','Apprenti','Volontaire') THEN 'Apprenti, Alternant, Volontaire en service civique rémunéré'
+                WHEN "user".activity in ('Inactif') THEN 'Inactif (ni en emploi ni au chômage), En incapacité de travailler'
+                    WHEN "user".activity in ('Étudiant') THEN 'Etudiant' 
+                        WHEN "user".activity in ('Chômeur') THEN 'Chômeur, En recherche d''emploi'
+                            ELSE "user".activity END AS "Statut",
          activation_dates."Date d'activation",
          CASE WHEN "user"."hasSeenTutorials" THEN "user"."culturalSurveyFilledDate" ELSE NULL END AS "Date de première connexion",
          date_of_first_bookings."Date de première réservation",
