@@ -30,7 +30,7 @@ from write.create_intermediate_views_for_offer import (
     create_booking_information_view,
     create_count_favorites_view,
     create_sum_stock_view,
-    create_enriched_offer_view,
+    create_materialized_enriched_offer_view,
 )
 from write.offerer_view.create_intermediate_views_for_offerer import (
     create_first_stock_creation_dates_view,
@@ -39,6 +39,7 @@ from write.offerer_view.create_intermediate_views_for_offerer import (
     create_number_of_bookings_not_cancelled_view,
     create_number_of_venues_view,
     create_number_of_venues_without_offer_view,
+    create_current_year_revenue_view,
     create_materialized_enriched_offerer_view,
 )
 from write.create_intermediate_views_for_venue import (
@@ -50,7 +51,7 @@ from write.create_intermediate_views_for_venue import (
     create_offers_created_per_venue_view,
     create_theoretic_revenue_per_venue,
     create_real_revenue_per_venue,
-    create_enriched_venue_view,
+    create_materialized_enriched_venue_view,
 )
 
 
@@ -63,6 +64,7 @@ def create_enriched_offerer_data(ENGINE):
     create_number_of_venues_view(ENGINE)
     create_number_of_venues_without_offer_view(ENGINE)
     create_humanized_id_data(ENGINE, "offerer")
+    create_current_year_revenue_view(ENGINE)
     create_materialized_enriched_offerer_view(ENGINE)
 
 
@@ -98,7 +100,7 @@ def create_enriched_offer_data(ENGINE):
     create_count_favorites_view(ENGINE)
     create_sum_stock_view(ENGINE)
     create_humanized_id_data(ENGINE, "offer")
-    create_enriched_offer_view(ENGINE)
+    create_materialized_enriched_offer_view(ENGINE)
 
 
 def create_enriched_venue_data(ENGINE):
@@ -111,4 +113,4 @@ def create_enriched_venue_data(ENGINE):
     create_theoretic_revenue_per_venue(ENGINE)
     create_real_revenue_per_venue(ENGINE)
     create_humanized_id_data(ENGINE, "venue")
-    create_enriched_venue_view(ENGINE)
+    create_materialized_enriched_venue_view(ENGINE)

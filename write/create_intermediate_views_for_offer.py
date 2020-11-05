@@ -109,9 +109,9 @@ def create_sum_stock_view(ENGINE) -> None:
         connection.execute(view_query)
 
 
-def create_enriched_offer_view(ENGINE) -> None:
+def create_materialized_enriched_offer_view(ENGINE) -> None:
     query = f"""
-        CREATE OR REPLACE VIEW enriched_offer_data AS (
+        CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offer_data AS (
         SELECT
             offerer.id AS "Identifiant de la structure"
             ,offerer."name" AS "Nom de la structure"
@@ -132,6 +132,9 @@ def create_enriched_offer_view(ENGINE) -> None:
             ,coalesce(count_favorites_view."Nombre de fois où l'offre a été mise en favoris",0.0) AS "Nombre de fois où l'offre a été mise en favoris"
             ,coalesce(sum_stock_view."Stock",0.0) AS  "Stock"
             ,offer_humanized_id.humanized_id AS "offer_humanized_id"
+            ,CONCAT('https://pro.passculture.beta.gouv.fr/offres/',offer_humanized_id.humanized_id) AS "Lien portail pro"
+            ,CONCAT('https://app.passculture.beta.gouv.fr/offre/details/',offer_humanized_id.humanized_id) AS "Lien WEBAPP"
+            ,CONCAT('https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=',offer.id) AS "Lien vers FlaskAdmin"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id

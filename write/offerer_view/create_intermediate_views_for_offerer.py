@@ -52,6 +52,15 @@ def create_number_of_venues_without_offer_view(ENGINE) -> None:
         connection.execute(query)
 
 
+def create_current_year_revenue_view(ENGINE) -> None:
+    query = f"""
+        CREATE OR REPLACE VIEW current_year_revenue AS
+        {_get_current_year_revenue()}
+        """
+    with ENGINE.connect() as connection:
+        connection.execute(query)
+
+
 def create_materialized_enriched_offerer_view(ENGINE) -> str:
     query = """
     CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_offerer_data AS
@@ -66,7 +75,9 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
      offerer_departement_code.department_code AS "Département",
      related_venues."Nombre de lieux",
      related_venues_with_offer."Nombre de lieux avec offres",
-     offerer_humanized_id.humanized_id AS "offerer_humanized_id"
+     offerer_humanized_id.humanized_id AS "offerer_humanized_id",
+     CASE WHEN offerer."validationToken" IS NOT NULL THEN CONCAT('https://backend.passculture.beta.gouv.fr/validate/offerer/',offerer."validationToken") ELSE NULL END AS "Lien de validation de la structure",
+     current_year_revenue."Chiffre d'affaire réel année civile en cours"
     FROM offerer
     LEFT JOIN related_stocks ON related_stocks.offerer_id = offerer.id
     LEFT JOIN related_bookings ON related_bookings.offerer_id = offerer.id
@@ -76,6 +87,7 @@ def create_materialized_enriched_offerer_view(ENGINE) -> str:
     LEFT JOIN related_venues ON related_venues.offerer_id = offerer.id
     LEFT JOIN related_venues_with_offer ON related_venues_with_offer.offerer_id = offerer.id
     LEFT JOIN offerer_humanized_id ON offerer_humanized_id.id = offerer.id
+    LEFT JOIN current_year_revenue ON current_year_revenue.offerer_id = offerer.id
     )
     ;
     """
@@ -169,3 +181,18 @@ def _get_number_of_venues_with_offer_per_offerer_query() -> str:
       FROM venues_with_offers
       GROUP BY offerer_id
       """
+
+
+def _get_current_year_revenue() -> str:
+    return """
+    SELECT
+    venue."managingOffererId" AS offerer_id
+    ,sum(coalesce(booking.quantity,0)*coalesce(booking.amount,0)) AS "Chiffre d'affaire réel année civile en cours" 
+    FROM booking
+    JOIN stock ON booking."stockId" = stock.id
+    JOIN offer ON stock."offerId" = offer.id
+    JOIN venue ON offer."venueId" = venue.id
+    AND date_part('year',booking."dateCreated") = date_part('year',current_date)
+    AND booking."isUsed"
+    GROUP BY venue."managingOffererId"
+    """
