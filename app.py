@@ -82,7 +82,8 @@ def health_check_stock_status():
 @app.route("/health/offer")
 def health_check_offer_status():
     does_enriched_offer_data_exist = partial(
-        is_enriched_view_queryable, view_name="enriched_offer_data"
+        is_enriched_materialized_view_queryable,
+        materialized_view_name="enriched_offer_data",
     )
     table_status = get_offer_enriched_data_status(
         is_enriched_offer_present=does_enriched_offer_data_exist,
