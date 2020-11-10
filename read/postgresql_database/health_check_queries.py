@@ -128,7 +128,7 @@ def does_enriched_stock_contain_data(healthcheck_session_maker: sessionmaker) ->
 def does_enriched_offer_contain_data(healthcheck_session_maker: sessionmaker) -> bool:
     is_enriched_user_with_data = False
     health_check_session = healthcheck_session_maker()
-    if is_enriched_view_queryable(healthcheck_session_maker, "enriched_offer_data"):
+    if is_enriched_materialized_view_queryable(healthcheck_session_maker, "enriched_offer_data"):
         try:
             is_enriched_user_with_data = does_view_have_data(
                 health_check_session, "enriched_offer_data"
