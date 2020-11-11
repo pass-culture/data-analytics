@@ -37,9 +37,28 @@ jobs:
           command: |
             pipenv install -e .
             pipenv run pytest
+  trigger:
+    docker:
+      - image: circleci/python:3.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - run:
+          name: Kick off data-maintenance pipeline for deployment
+          command: |
+            curl --location --request POST 'https://circleci.com/api/v2/project/github/pass-culture/data-maintenance/pipeline' \
+            --header 'Content-Type: application/json' \
+            -u "${API_TOKEN}:"
 
 workflows:
   version: 2
   commit:
     jobs:
       - build
+      - trigger:
+          filters:
+            branches:
+              only:
+                - master
