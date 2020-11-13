@@ -26,6 +26,7 @@ from write.create_views import (
     create_enriched_offerer_data,
     create_enriched_offer_data,
     create_enriched_venue_data,
+    create_enriched_booking_data
 )
 
 
@@ -352,3 +353,46 @@ class ViewQueriesTest:
                     "enriched_venue_data", connection, index_col="venue_id"
                 )
             assert sorted(expected_columns) == sorted(venue_details.columns)
+
+    class CreateEnrichedBookingViewTest:
+        def teardown_method(self):
+            clean_database()
+            clean_views()
+
+        def test_should_create_enriched_booking_data_view_with_columns(self):
+            # Given
+            expected_columns = [
+                "Date de réservation",
+                "quantity",
+                "amount",
+                "isCancelled",
+                "isUsed",
+                "Date d'annulation",
+                "Date de début de l'événement",
+                "Type d'offre",
+                "Nom de l'offre",
+                "Nom du lieu",
+                "Label du lieu",
+                "Type de lieu",
+                "Département du lieu",
+                "Nom de la structure",
+                "Département de l'utilisateur",
+                "Date de création de l'utilisateur",
+                "Montant de la réservation",
+                "Remboursé",
+                "Réservation de bien physique",
+                "Réservation de bien numérique",
+                "Réservation de sortie",
+                "Classement de la réservation",
+                "Classement de la réservation dans la même catégorie"
+            ]
+
+            # When
+            create_enriched_booking_data(ENGINE)
+
+            # Then
+            with ENGINE.connect() as connection:
+                booking_details = pandas.read_sql_table(
+                    "enriched_booking_data", connection, index_col="id"
+                )
+            assert sorted(expected_columns) == sorted(booking_details.columns)
