@@ -53,6 +53,13 @@ from write.create_intermediate_views_for_venue import (
     create_real_revenue_per_venue,
     create_materialized_enriched_venue_view,
 )
+from write.create_intermediate_views_for_booking import (
+    create_booking_amount_view,
+    create_booking_payment_status_view,
+    create_booking_ranking_in_category_view,
+    create_booking_ranking_view,
+    create_materialized_enriched_booking_view,
+)
 
 
 def create_enriched_offerer_data(ENGINE):
@@ -114,3 +121,10 @@ def create_enriched_venue_data(ENGINE):
     create_real_revenue_per_venue(ENGINE)
     create_humanized_id_data(ENGINE, "venue")
     create_materialized_enriched_venue_view(ENGINE)
+
+def create_enriched_booking_data(ENGINE):
+    create_booking_ranking_view(ENGINE)
+    create_booking_ranking_in_category_view(ENGINE)
+    create_booking_payment_status_view(ENGINE)
+    create_booking_amount_view(ENGINE)
+    create_materialized_enriched_booking_view(ENGINE)
