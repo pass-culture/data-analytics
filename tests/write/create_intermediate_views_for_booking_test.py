@@ -19,7 +19,7 @@ from write.create_intermediate_views_for_booking import (
     _get_booking_amount,
     _get_booking_payment_status,
     _get_booking_ranking,
-    _get_booking_ranking_in_category
+    _get_booking_ranking_in_category,
 )
 
 
@@ -139,6 +139,7 @@ class BookingQueriesTest:
                 pandas.testing.assert_series_equal(
                     booking_payment["Remboursé"], expected_booking_payment_status
                 )
+
 
         class GetBookingRankingsTest:
             def test_should_return_booking_ranking(app):
