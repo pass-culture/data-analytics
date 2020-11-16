@@ -134,6 +134,7 @@ def create_materialized_enriched_offer_view(ENGINE) -> None:
             ,offer_humanized_id.humanized_id AS "offer_humanized_id"
             ,CONCAT('https://pro.passculture.beta.gouv.fr/offres/',offer_humanized_id.humanized_id) AS "Lien portail pro"
             ,CONCAT('https://app.passculture.beta.gouv.fr/offre/details/',offer_humanized_id.humanized_id) AS "Lien WEBAPP"
+            ,CONCAT('https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=',offer.id) AS "Lien vers FlaskAdmin"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
