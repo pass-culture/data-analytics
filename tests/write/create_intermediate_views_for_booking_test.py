@@ -19,11 +19,7 @@ from write.create_intermediate_views_for_booking import (
     _get_booking_amount,
     _get_booking_payment_status,
     _get_booking_ranking,
-<<<<<<< HEAD
-    _get_booking_ranking_in_category
-=======
     _get_booking_ranking_in_category,
->>>>>>> c31f44e086fd8f91e6fa2820ba970cdad74819c3
 )
 
 
