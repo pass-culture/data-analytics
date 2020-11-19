@@ -72,7 +72,7 @@ class DoesViewExistTest:
 
     def test_should_return_false_if_view_does_not_exist(self, app):
         with app.app_context():
-            result = does_view_exist(db.session, "enriched_stock_data")
+            result = does_materialize_view_exist(db.session, "enriched_stock_data")
 
             # Then
             assert result is False
@@ -83,7 +83,7 @@ class DoesViewExistTest:
         with app.app_context():
             create_enriched_stock_data(db.engine)
             # When
-            result = does_view_exist(db.session, "enriched_stock_data")
+            result = does_materialize_view_exist(db.session, "enriched_stock_data")
 
             # Then
             assert result is True
@@ -200,17 +200,19 @@ class IsEnrichedViewQueryableTest:
         assert result is True
         local_session.close.assert_called_once()
 
-    @patch("read.postgresql_database.health_check_queries.does_view_exist")
-    def test_should_look_for_given_view_in_database(self, does_view_exist_mock):
+    @patch("read.postgresql_database.health_check_queries.does_materialize_view_exist")
+    def test_should_look_for_given_view_in_database(
+        self, does_materialize_view_exist_mock
+    ):
         # Given
-        does_view_exist_mock.return_value = True
+        does_materialize_view_exist_mock.return_value = True
         Session, local_session = _get_mocked_session()
 
         # When
-        result = is_enriched_view_queryable(Session, "enriched_stock_data")
+        result = is_enriched_materialized_view_queryable(Session, "enriched_stock_data")
 
         # Then
-        does_view_exist_mock.assert_called_once_with(
+        does_materialize_view_exist_mock.assert_called_once_with(
             local_session, "enriched_stock_data"
         )
 
@@ -540,13 +542,15 @@ class DoesEnrichedStocksSourceContainsDataTest:
         clean_database()
         clean_views()
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_false_when_the_view_is_not_found(
-        self, does_view_have_data_mock, is_enriched_view_queryable_mock
+        self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
     ):
         # Given
-        is_enriched_view_queryable_mock.return_value = False
+        is_enriched_materialized_view_queryable_mock.return_value = False
         Session, local_session = _get_mocked_session()
 
         # When
@@ -554,18 +558,20 @@ class DoesEnrichedStocksSourceContainsDataTest:
 
         # Then
         assert result is False
-        is_enriched_view_queryable_mock.assert_called_once_with(
+        is_enriched_materialized_view_queryable_mock.assert_called_once_with(
             Session, "enriched_stock_data"
         )
         does_view_have_data_mock.assert_not_called()
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_false_if_view_is_empty(
-        self, does_view_have_data_mock, is_enriched_view_queryable_mock
+        self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
     ):
         # Given
-        is_enriched_view_queryable_mock.return_value = True
+        is_enriched_materialized_view_queryable_mock.return_value = True
         does_view_have_data_mock.return_value = False
         Session, local_session = _get_mocked_session()
 
@@ -575,20 +581,22 @@ class DoesEnrichedStocksSourceContainsDataTest:
         # Then
         assert result is False
         local_session.close.assert_called_once()
-        is_enriched_view_queryable_mock.assert_called_once_with(
+        is_enriched_materialized_view_queryable_mock.assert_called_once_with(
             Session, "enriched_stock_data"
         )
         does_view_have_data_mock.assert_called_once_with(
             local_session, "enriched_stock_data"
         )
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_true_if_view_has_data(
-        self, does_view_have_data_mock, is_enriched_view_queryable_mock
+        self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
     ):
         # Given
-        is_enriched_view_queryable_mock.return_value = True
+        is_enriched_materialized_view_queryable_mock.return_value = True
         does_view_have_data_mock.return_value = True
         Session, local_session = _get_mocked_session()
 
@@ -598,20 +606,22 @@ class DoesEnrichedStocksSourceContainsDataTest:
         # Then
         assert result is True
         local_session.close.assert_called_once()
-        is_enriched_view_queryable_mock.assert_called_once_with(
+        is_enriched_materialized_view_queryable_mock.assert_called_once_with(
             Session, "enriched_stock_data"
         )
         does_view_have_data_mock.assert_called_once_with(
             local_session, "enriched_stock_data"
         )
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_false_when_there_is_an_sql_alchemy_error_on_query(
-        self, does_view_have_data_mock, is_enriched_view_queryable_mock
+        self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
     ):
         # Given
-        is_enriched_view_queryable_mock.return_value = True
+        is_enriched_materialized_view_queryable_mock.return_value = True
         does_view_have_data_mock.side_effect = SQLAlchemyError
         create_enriched_offerer_data(ENGINE)
         Session, local_session = _get_mocked_session()
@@ -623,13 +633,15 @@ class DoesEnrichedStocksSourceContainsDataTest:
         assert result is False
         local_session.close.assert_called_once()
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_raise_exception_when_it_does_not_come_from_sql_alchemy(
-        self, does_view_have_data_mock, is_enriched_view_queryable_mock
+        self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
     ):
         # Given
-        is_enriched_view_queryable_mock.return_value = True
+        is_enriched_materialized_view_queryable_mock.return_value = True
         does_view_have_data_mock.side_effect = Exception
         Session, local_session = _get_mocked_session()
 
@@ -647,7 +659,9 @@ class DoesEnrichedOfferSourceContainsDataTest:
         clean_database()
         clean_views()
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_false_when_the_view_is_not_found(
         self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
@@ -666,7 +680,9 @@ class DoesEnrichedOfferSourceContainsDataTest:
         )
         does_view_have_data_mock.assert_not_called()
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_false_if_view_is_empty(
         self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
@@ -689,7 +705,9 @@ class DoesEnrichedOfferSourceContainsDataTest:
             local_session, "enriched_offer_data"
         )
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_true_if_view_has_data(
         self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
@@ -712,7 +730,9 @@ class DoesEnrichedOfferSourceContainsDataTest:
             local_session, "enriched_offer_data"
         )
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_return_false_when_there_is_an_sql_alchemy_error_on_query(
         self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock
@@ -730,7 +750,9 @@ class DoesEnrichedOfferSourceContainsDataTest:
         assert result is False
         local_session.close.assert_called_once()
 
-    @patch("read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable")
+    @patch(
+        "read.postgresql_database.health_check_queries.is_enriched_materialized_view_queryable"
+    )
     @patch("read.postgresql_database.health_check_queries.does_view_have_data")
     def test_should_raise_exception_when_it_does_not_come_from_sql_alchemy(
         self, does_view_have_data_mock, is_enriched_materialized_view_queryable_mock

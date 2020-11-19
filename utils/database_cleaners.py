@@ -29,7 +29,9 @@ def drop_offerer_cultural_activity_table():
 
 def clean_views():
     with ENGINE.connect() as connection:
-        connection.execute("DROP VIEW IF EXISTS enriched_stock_data CASCADE;")
+        connection.execute(
+            "DROP MATERIALIZED VIEW IF EXISTS enriched_stock_data CASCADE;"
+        )
         connection.execute("DROP VIEW IF EXISTS stock_booking_information CASCADE;")
         connection.execute("DROP VIEW IF EXISTS available_stock_information CASCADE;")
         connection.execute(
@@ -74,7 +76,6 @@ def clean_views():
         connection.execute(
             "DROP MATERIALIZED VIEW IF EXISTS enriched_venue_data CASCADE;"
         )
-        connection.execute("DROP VIEW IF EXISTS enriched_venue_data CASCADE;")
         connection.execute("DROP VIEW IF EXISTS is_physical_view CASCADE;")
         connection.execute("DROP VIEW IF EXISTS is_outing_view CASCADE;")
         connection.execute(

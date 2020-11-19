@@ -93,9 +93,9 @@ def _get_available_stock_query() -> str:
     """
 
 
-def create_enriched_stock_view(ENGINE) -> None:
+def create_materialized_enriched_stock_view(ENGINE) -> None:
     query = f"""
-        CREATE OR REPLACE VIEW enriched_stock_data AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_stock_data AS
         (SELECT
          stock.id AS stock_id,
          stock."offerId" AS "{STOCK_COLUMNS["offer_id"]}",

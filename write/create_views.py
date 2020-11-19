@@ -5,7 +5,7 @@ from write.offerer_view.create_departement_code import (
 from write.create_intermediate_views_for_stock import (
     create_stocks_booking_view,
     create_available_stocks_view,
-    create_enriched_stock_view,
+    create_materialized_enriched_stock_view,
 )
 from write.create_intermediate_views_for_user import (
     create_experimentation_sessions_view,
@@ -97,7 +97,7 @@ def create_enriched_user_data(ENGINE):
 def create_enriched_stock_data(ENGINE):
     create_stocks_booking_view(ENGINE)
     create_available_stocks_view(ENGINE)
-    create_enriched_stock_view(ENGINE)
+    create_materialized_enriched_stock_view(ENGINE)
 
 
 def create_enriched_offer_data(ENGINE):
