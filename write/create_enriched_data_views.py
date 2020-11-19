@@ -1,5 +1,5 @@
+import argparse
 from sqlalchemy import create_engine
-
 from utils.logger import logger
 
 from write.create_views import (
@@ -27,3 +27,11 @@ def create_enriched_data_views(db_url):
     logger.info("[ENRICHED DATA] Created enriched venue data")
 
     logger.info("[ENRICHED DATA] End enriched data creation")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Create enriched views for analytics")
+    parser.add_argument("db_url", help="The database url")
+    args = parser.parse_args()
+
+    create_enriched_data_views(args.db_url)

@@ -48,7 +48,7 @@ reset-metabase: ## stop metabase delete metabase volume and mount it again
 
 .PHONY: create-enriched-views
 create-enriched-views: ## connect to docker postgres database local
-	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && python -m write.create_enriched_data_views -u postgresql://pass_culture:passq@datasource-postgres-blue:5432/pass_culture"
+	docker exec -it analytics-datasource-application bash -c  "cd /opt/data-analytics && python -m write.create_enriched_data_views postgresql://pass_culture:passq@datasource-postgres-blue:5432/pass_culture"
 
 .PHONY: clean-database-and-view
 clean-database-and-view: ## clean local database and view
