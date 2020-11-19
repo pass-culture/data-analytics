@@ -87,3 +87,8 @@ def clean_views():
 def drop_offerer_humanized_id_table():
     with ENGINE.connect() as connection:
         connection.execute("DROP TABLE IF EXISTS offerer_humanized_id CASCADE;")
+
+
+def drop_regions_departments_table():
+    with ENGINE.connect() as connection:
+        connection.execute("DROP TABLE IF EXISTS regions_departments;")
