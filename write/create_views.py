@@ -1,3 +1,6 @@
+from write.create_table_regions_departments import (
+    create_table_regions_departments_data,
+)
 from write.create_humanized_id import create_humanized_id_data
 from write.offerer_view.create_departement_code import (
     create_offerer_departement_code_data,
@@ -62,6 +65,10 @@ from write.create_intermediate_views_for_booking import (
 )
 
 
+def create_table_regions_departments(ENGINE):
+    create_table_regions_departments_data(ENGINE)
+
+
 def create_enriched_offerer_data(ENGINE):
     create_first_stock_creation_dates_view(ENGINE)
     create_first_booking_creation_dates_view(ENGINE)
@@ -121,6 +128,7 @@ def create_enriched_venue_data(ENGINE):
     create_real_revenue_per_venue(ENGINE)
     create_humanized_id_data(ENGINE, "venue")
     create_materialized_enriched_venue_view(ENGINE)
+
 
 def create_enriched_booking_data(ENGINE):
     create_booking_ranking_view(ENGINE)
