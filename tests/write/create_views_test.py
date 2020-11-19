@@ -19,7 +19,7 @@ from utils.database_cleaners import clean_database, clean_views
 from write.create_intermediate_views_for_stock import (
     create_stocks_booking_view,
     create_available_stocks_view,
-    create_enriched_stock_view,
+    create_materialized_enriched_stock_view,
 )
 from write.create_views import (
     create_enriched_user_data,
@@ -110,7 +110,7 @@ class ViewQueriesTest:
             )
 
             # When
-            create_enriched_stock_view(ENGINE)
+            create_materialized_enriched_stock_view(ENGINE)
 
             # Then
             with ENGINE.connect() as connection:

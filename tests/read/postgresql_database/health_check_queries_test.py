@@ -72,7 +72,7 @@ class DoesViewExistTest:
 
     def test_should_return_false_if_view_does_not_exist(self, app):
         with app.app_context():
-            result = does_view_exist(db.session, "enriched_stock_data")
+            result = does_materialize_view_exist(db.session, "enriched_stock_data")
 
             # Then
             assert result is False
@@ -83,7 +83,7 @@ class DoesViewExistTest:
         with app.app_context():
             create_enriched_stock_data(db.engine)
             # When
-            result = does_view_exist(db.session, "enriched_stock_data")
+            result = does_materialize_view_exist(db.session, "enriched_stock_data")
 
             # Then
             assert result is True
