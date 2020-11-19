@@ -22,11 +22,6 @@ def clean_database():
         )
 
 
-def drop_offerer_cultural_activity_table():
-    with ENGINE.connect() as connection:
-        connection.execute("DROP TABLE IF EXISTS offerer_cultural_activity;")
-
-
 def clean_views():
     with ENGINE.connect() as connection:
         connection.execute(
@@ -82,6 +77,11 @@ def clean_views():
             "DROP VIEW IF EXISTS offer_booking_information_view CASCADE;"
         )
         connection.execute("DROP VIEW IF EXISTS count_favorites_view CASCADE;")
+
+
+def drop_offerer_cultural_activity_table():
+    with ENGINE.connect() as connection:
+        connection.execute("DROP TABLE IF EXISTS offerer_cultural_activity;")
 
 
 def drop_offerer_humanized_id_table():
