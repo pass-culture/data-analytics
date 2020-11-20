@@ -1,7 +1,9 @@
 import pandas as pd
 import sqlalchemy
+import os
 
-REGIONS_DEPARTMENTS_FILE = "write/data/departements-regions.csv"
+write_path = os.path.dirname(os.path.realpath(__file__))
+REGIONS_DEPARTMENTS_FILE = write_path + "/data/departements-regions.csv"
 
 
 def create_table_regions_departments(
