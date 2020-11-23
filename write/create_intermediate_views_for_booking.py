@@ -1,4 +1,4 @@
-def _get_booking_amount() -> str:
+def get_booking_amount() -> str:
     return """
     SELECT
         booking.id AS booking_id
@@ -7,7 +7,7 @@ def _get_booking_amount() -> str:
     """
 
 
-def _get_booking_payment_status() -> str:
+def get_booking_payment_status() -> str:
     return """
     SELECT
         booking.id AS booking_id
@@ -21,7 +21,8 @@ def _get_booking_payment_status() -> str:
     AND payment_status.status = 'SENT'
     """
 
-def _get_booking_ranking() -> str:
+
+def get_booking_ranking() -> str:
     return """
     SELECT
         booking.id AS booking_id
@@ -29,7 +30,8 @@ def _get_booking_ranking() -> str:
     FROM booking
     """
 
-def _get_booking_ranking_in_category() -> str:
+
+def get_booking_ranking_in_category() -> str:
     return """
     SELECT
         booking.id AS booking_id
@@ -43,7 +45,7 @@ def _get_booking_ranking_in_category() -> str:
 
 def create_booking_amount_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW booking_amount_view AS {_get_booking_amount()}
+        CREATE OR REPLACE VIEW booking_amount_view AS {get_booking_amount()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -51,7 +53,7 @@ def create_booking_amount_view(ENGINE) -> None:
 
 def create_booking_payment_status_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW booking_payment_status_view  AS {_get_booking_payment_status()}
+        CREATE OR REPLACE VIEW booking_payment_status_view  AS {get_booking_payment_status()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
@@ -59,17 +61,19 @@ def create_booking_payment_status_view(ENGINE) -> None:
 
 def create_booking_ranking_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW booking_ranking_view AS { _get_booking_ranking()}
+        CREATE OR REPLACE VIEW booking_ranking_view AS { get_booking_ranking()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
 
+
 def create_booking_ranking_in_category_view(ENGINE) -> None:
     view_query = f"""
-        CREATE OR REPLACE VIEW booking_ranking_in_category_view  AS { _get_booking_ranking_in_category()}
+        CREATE OR REPLACE VIEW booking_ranking_in_category_view  AS { get_booking_ranking_in_category()}
         """
     with ENGINE.connect() as connection:
         connection.execute(view_query)
+
 
 def create_materialized_enriched_booking_view(ENGINE) -> None:
     query = f"""

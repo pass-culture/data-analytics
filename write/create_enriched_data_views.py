@@ -9,6 +9,7 @@ from write.create_views import (
     create_enriched_stock_data,
     create_enriched_offer_data,
     create_enriched_venue_data,
+    create_enriched_booking_data,
 )
 
 
@@ -28,6 +29,8 @@ def create_enriched_data_views(db_url):
     logger.info("[ENRICHED DATA] Created enriched offer data")
     create_enriched_venue_data(engine)
     logger.info("[ENRICHED DATA] Created enriched venue data")
+    create_enriched_booking_data(engine)
+    logger.info("[ENRICHED DATA] Created enriched booking data")
 
     logger.info("[ENRICHED DATA] End enriched data creation")
 

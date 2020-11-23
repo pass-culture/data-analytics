@@ -16,10 +16,10 @@ from tests.data_creators import (
 )
 from utils.database_cleaners import clean_database, clean_views
 from write.create_intermediate_views_for_booking import (
-    _get_booking_amount,
-    _get_booking_payment_status,
-    _get_booking_ranking,
-    _get_booking_ranking_in_category,
+    get_booking_amount,
+    get_booking_payment_status,
+    get_booking_ranking,
+    get_booking_ranking_in_category,
 )
 
 
@@ -71,7 +71,7 @@ class BookingQueriesTest:
             )
 
             # When
-            query = _get_booking_amount()
+            query = get_booking_amount()
 
             # Then
             with ENGINE.connect() as connection:
@@ -129,7 +129,7 @@ class BookingQueriesTest:
                 )
 
                 # When
-                query = _get_booking_payment_status()
+                query = get_booking_payment_status()
 
                 # Then
                 with ENGINE.connect() as connection:
@@ -140,12 +140,11 @@ class BookingQueriesTest:
                     booking_payment["Remboursé"], expected_booking_payment_status
                 )
 
-
         class GetBookingRankingsTest:
             def test_should_return_booking_ranking(app):
                 # Given
                 create_user(id=1)
-                create_user(id=2, email='test@passculture.app')
+                create_user(id=2, email="test@passculture.app")
                 create_deposit(id=1, user_id=1)
                 create_deposit(id=2, user_id=2)
                 create_offerer(id=1)
@@ -160,12 +159,7 @@ class BookingQueriesTest:
                     venue_id=1, product_id=2, id=2, product_type="ThingType.MUSIQUE"
                 )
                 create_stock(offer_id=2, id=2)
-                create_booking(
-                    id=1,
-                    user_id=1,
-                    quantity=1,
-                    stock_id=2,
-                    is_used=True)
+                create_booking(id=1, user_id=1, quantity=1, stock_id=2, is_used=True)
                 create_booking(
                     id=2,
                     user_id=1,
@@ -174,7 +168,7 @@ class BookingQueriesTest:
                     stock_id=2,
                     token="ABC321",
                     is_used=True,
-                    date_created='2020-05-11',
+                    date_created="2020-05-11",
                 )
                 create_booking(
                     id=3,
@@ -184,7 +178,7 @@ class BookingQueriesTest:
                     stock_id=2,
                     token="FAM321",
                     is_cancelled=True,
-                    date_created='2020-06-21',
+                    date_created="2020-06-21",
                 )
                 create_booking(
                     id=4,
@@ -194,20 +188,20 @@ class BookingQueriesTest:
                     stock_id=2,
                     token="OLD321",
                     is_used=True,
-                    date_created='2020-06-21',
+                    date_created="2020-06-21",
                 )
                 create_payment(id=1, booking_id=2, amount=10)
                 create_payment_status(id=1, payment_id=1, status="SENT")
                 create_payment(id=2, booking_id=3, amount=15)
                 create_payment_status(id=2, payment_id=2, status="PENDING")
                 expected_booking_ranking = pandas.Series(
-                    data=[1,2,3,1],
+                    data=[1, 2, 3, 1],
                     name="Classement de la réservation",
-                    index=Int64Index([1,2,3,4], name="booking_id"),
+                    index=Int64Index([1, 2, 3, 4], name="booking_id"),
                 )
 
                 # When
-                query = _get_booking_ranking()
+                query = get_booking_ranking()
 
                 # Then
                 with ENGINE.connect() as connection:
@@ -215,13 +209,14 @@ class BookingQueriesTest:
                         query, connection, index_col="booking_id"
                     )
                 pandas.testing.assert_series_equal(
-                    booking_ranking["Classement de la réservation"], expected_booking_ranking
+                    booking_ranking["Classement de la réservation"],
+                    expected_booking_ranking,
                 )
 
             def test_should_return_booking_ranking(app):
                 # Given
                 create_user(id=1)
-                create_user(id=2, email='test@passculture.app')
+                create_user(id=2, email="test@passculture.app")
                 create_deposit(id=1, user_id=1)
                 create_deposit(id=2, user_id=2)
                 create_offerer(id=1)
@@ -241,12 +236,7 @@ class BookingQueriesTest:
                     venue_id=1, product_id=3, id=3, product_type="ThingType.AUDIOVISUEL"
                 )
                 create_stock(offer_id=3, id=3)
-                create_booking(
-                    id=1,
-                    user_id=1,
-                    quantity=1,
-                    stock_id=2,
-                    is_used=True)
+                create_booking(id=1, user_id=1, quantity=1, stock_id=2, is_used=True)
                 create_booking(
                     id=2,
                     user_id=1,
@@ -255,7 +245,7 @@ class BookingQueriesTest:
                     stock_id=3,
                     token="ABC321",
                     is_used=True,
-                    date_created='2020-05-11',
+                    date_created="2020-05-11",
                 )
                 create_booking(
                     id=3,
@@ -265,7 +255,7 @@ class BookingQueriesTest:
                     stock_id=2,
                     token="FAM321",
                     is_cancelled=True,
-                    date_created='2020-06-21',
+                    date_created="2020-06-21",
                 )
                 create_booking(
                     id=4,
@@ -275,7 +265,7 @@ class BookingQueriesTest:
                     stock_id=3,
                     token="OLD321",
                     is_used=True,
-                    date_created='2020-06-21',
+                    date_created="2020-06-21",
                 )
                 create_booking(
                     id=5,
@@ -285,20 +275,20 @@ class BookingQueriesTest:
                     stock_id=2,
                     token="YOO321",
                     is_used=True,
-                    date_created='2020-10-25',
+                    date_created="2020-10-25",
                 )
                 create_payment(id=1, booking_id=2, amount=10)
                 create_payment_status(id=1, payment_id=1, status="SENT")
                 create_payment(id=2, booking_id=3, amount=15)
                 create_payment_status(id=2, payment_id=2, status="PENDING")
                 expected_booking_ranking = pandas.Series(
-                    data=[1,1,2,1,1],
+                    data=[1, 1, 2, 1, 1],
                     name="Classement de la réservation dans la même catégorie",
-                    index=Int64Index([1,2,3,4,5], name="booking_id"),
+                    index=Int64Index([1, 2, 3, 4, 5], name="booking_id"),
                 )
 
                 # When
-                query = _get_booking_ranking_in_category()
+                query = get_booking_ranking_in_category()
 
                 # Then
                 with ENGINE.connect() as connection:
@@ -306,5 +296,8 @@ class BookingQueriesTest:
                         query, connection, index_col="booking_id"
                     )
                 pandas.testing.assert_series_equal(
-                    booking_ranking["Classement de la réservation dans la même catégorie"], expected_booking_ranking
+                    booking_ranking[
+                        "Classement de la réservation dans la même catégorie"
+                    ],
+                    expected_booking_ranking,
                 )
