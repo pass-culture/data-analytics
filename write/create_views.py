@@ -61,6 +61,7 @@ from write.create_intermediate_views_for_booking import (
     create_booking_payment_status_view,
     create_booking_ranking_in_category_view,
     create_booking_ranking_view,
+    create_materialized_booking_intermediary_view,
     create_materialized_enriched_booking_view,
 )
 
@@ -135,4 +136,5 @@ def create_enriched_booking_data(ENGINE):
     create_booking_ranking_in_category_view(ENGINE)
     create_booking_payment_status_view(ENGINE)
     create_booking_amount_view(ENGINE)
+    create_materialized_booking_intermediary_view(ENGINE)
     create_materialized_enriched_booking_view(ENGINE)
