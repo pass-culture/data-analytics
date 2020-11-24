@@ -78,6 +78,18 @@ def clean_views():
         )
         connection.execute("DROP VIEW IF EXISTS count_favorites_view CASCADE;")
 
+        # Drop enriched_booking_data and intermediary views:
+        connection.execute(
+            """
+        DROP MATERIALIZED VIEW IF EXISTS enriched_booking_data CASCADE;
+        DROP MATERIALIZED VIEW IF EXISTS booking_intermediary_view CASCADE;
+        DROP VIEW IF EXISTS booking_amount_view CASCADE;
+        DROP VIEW IF EXISTS booking_payment_status_view CASCADE;
+        DROP VIEW IF EXISTS booking_ranking_view CASCADE;
+        DROP VIEW IF EXISTS booking_ranking_in_category_view CASCADE;
+        """
+        )
+
 
 def drop_offerer_cultural_activity_table():
     with ENGINE.connect() as connection:
