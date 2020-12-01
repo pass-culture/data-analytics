@@ -59,6 +59,17 @@ def _get_count_favorites_query() -> str:
     """
 
 
+def _get_count_first_booking_query() -> str:
+    return """
+    SELECT offer_id, count(*) as "Nombre de premières réservations" FROM (
+        SELECT stock."offerId" as offer_id, 
+        rank() OVER (PARTITION BY booking."userId" ORDER BY booking."dateCreated", booking.id) AS "Classement de la réservation"
+        FROM booking left join stock on stock.id = booking."stockId" 
+    ) c WHERE c."Classement de la réservation" = 1
+    GROUP BY offer_id ORDER BY "Nombre de premières réservations" DESC;
+    """
+
+
 def _get_offer_info_with_quantity() -> str:
     return """
         SELECT
@@ -101,6 +112,14 @@ def create_count_favorites_view(ENGINE) -> None:
         connection.execute(view_query)
 
 
+def create_count_first_booking_query(ENGINE) -> None:
+    first_booking_query = f"""
+        CREATE OR REPLACE VIEW count_first_booking_view AS {_get_count_first_booking_query()}
+    """
+    with ENGINE.connect() as connection:
+        connection.execute(first_booking_query)
+
+
 def create_sum_stock_view(ENGINE) -> None:
     view_query = f"""
         CREATE OR REPLACE VIEW sum_stock_view AS {_get_offer_info_with_quantity()}
@@ -135,6 +154,7 @@ def create_materialized_enriched_offer_view(ENGINE) -> None:
             ,CONCAT('https://pro.passculture.beta.gouv.fr/offres/',offer_humanized_id.humanized_id) AS "Lien portail pro"
             ,CONCAT('https://app.passculture.beta.gouv.fr/offre/details/',offer_humanized_id.humanized_id) AS "Lien WEBAPP"
             ,CONCAT('https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=',offer.id) AS "Lien vers FlaskAdmin"
+            ,count_first_booking_view."Nombre de premières réservations" AS "Nombre de premières réservations"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
@@ -144,6 +164,7 @@ def create_materialized_enriched_offer_view(ENGINE) -> None:
         LEFT JOIN count_favorites_view ON count_favorites_view.offer_id = offer.id
         LEFT JOIN sum_stock_view ON sum_stock_view.offer_id = offer.id
         LEFT JOIN offer_humanized_id ON offer_humanized_id.id = offer.id
+        LEFT JOIN count_first_booking_view ON count_first_booking_view.offer_id = offer.id
         )
         """
     with ENGINE.connect() as connection:
