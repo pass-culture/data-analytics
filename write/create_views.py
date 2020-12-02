@@ -32,6 +32,7 @@ from write.create_intermediate_views_for_offer import (
     create_is_outing_view,
     create_booking_information_view,
     create_count_favorites_view,
+    create_count_first_booking_query,
     create_sum_stock_view,
     create_materialized_enriched_offer_view,
 )
@@ -113,6 +114,7 @@ def create_enriched_offer_data(ENGINE):
     create_is_outing_view(ENGINE)
     create_booking_information_view(ENGINE)
     create_count_favorites_view(ENGINE)
+    create_count_first_booking_query(ENGINE)
     create_sum_stock_view(ENGINE)
     create_humanized_id_data(ENGINE, "offer")
     create_materialized_enriched_offer_view(ENGINE)
@@ -138,3 +140,4 @@ def create_enriched_booking_data(ENGINE):
     create_booking_amount_view(ENGINE)
     create_materialized_booking_intermediary_view(ENGINE)
     create_materialized_enriched_booking_view(ENGINE)
+

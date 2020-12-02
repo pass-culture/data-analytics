@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import numpy as np
 import pandas
 
 from db import ENGINE
@@ -212,6 +213,7 @@ class ViewQueriesTest:
                 "Offre numérique",
                 "Bien physique",
                 "Sortie",
+                "Nombre de premières réservations",
                 "Nombre de réservations",
                 "Nombre de réservations annulées",
                 "Nombre de réservations validées",
@@ -300,7 +302,8 @@ class ViewQueriesTest:
                     "offer_humanized_id": ["AM", "AQ"],
                     "Lien portail pro": ["https://pro.passculture.beta.gouv.fr/offres/AM","https://pro.passculture.beta.gouv.fr/offres/AQ"],
                     "Lien WEBAPP": ["https://app.passculture.beta.gouv.fr/offre/details/AM","https://app.passculture.beta.gouv.fr/offre/details/AQ"],
-                    "Lien vers FlaskAdmin": ["https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=3","https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=4"]
+                    "Lien vers FlaskAdmin": ["https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=3","https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=4"],
+                    "Nombre de premières réservations": [1.0, np.nan]
                 },
             )
 

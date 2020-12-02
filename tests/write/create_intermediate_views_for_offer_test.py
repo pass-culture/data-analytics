@@ -20,6 +20,7 @@ from write.create_intermediate_views_for_offer import (
     _get_offer_booking_information_query,
     _get_count_favorites_query,
     _get_offer_info_with_quantity,
+    _get_count_first_booking_query
 )
 
 
@@ -360,4 +361,64 @@ class OfferQueriesTest:
                 offer_stock = pandas.read_sql(query, connection, index_col="offer_id")
             pandas.testing.assert_series_equal(
                 offer_stock["Stock"], expected_offer_stock
+            )
+
+    class GetCountFirstBookingTest:
+        def teardown_method(self):
+            clean_database()
+            clean_views()
+
+        def test_should_return_how_many_time_first_booking(self):
+            # Given
+            create_user(id=1)
+            create_deposit(amount=500)
+            create_offerer(id=10)
+            create_product(id=1, product_type="ThingType.MUSEES_PATRIMOINE_ABO")
+            create_venue(id=15, offerer_id=10)
+            create_offer(
+                id=30,
+                venue_id=15,
+                product_type="ThingType.MUSEES_PATRIMOINE_ABO",
+                product_id=1,
+            )
+            create_stock(id=20, offer_id=30)
+            create_booking(
+                id=1, user_id=1, amount=10, quantity=1, stock_id=20, is_used=True
+            )
+            create_booking(
+                id=2,
+                user_id=1,
+                amount=10,
+                quantity=1,
+                stock_id=20,
+                token="ABC321",
+                is_used=True,
+            )
+            create_booking(
+                id=3,
+                user_id=1,
+                amount=10,
+                quantity=3,
+                stock_id=20,
+                token="FAM321",
+                is_cancelled=True,
+            )
+
+            expected_first_booking_number = pandas.Series(
+                index=pandas.Index(data=[30], name="offer_id"),
+                data=[1],
+                name="Nombre de premières réservations",
+            )
+
+            # When
+            query = _get_count_first_booking_query()
+
+            # Then
+            with ENGINE.connect() as connection:
+                count_first_booking = pandas.read_sql(
+                    query, connection, index_col="offer_id"
+                )
+            pandas.testing.assert_series_equal(
+                count_first_booking["Nombre de premières réservations"],
+                expected_first_booking_number,
             )
