@@ -418,7 +418,6 @@ class OfferQueriesTest:
                 count_first_booking = pandas.read_sql(
                     query, connection, index_col="offer_id"
                 )
-            print(count_first_booking)
             pandas.testing.assert_series_equal(
                 count_first_booking["Nombre de premières réservations"],
                 expected_first_booking_number,

@@ -154,7 +154,7 @@ def create_materialized_enriched_offer_view(ENGINE) -> None:
             ,CONCAT('https://pro.passculture.beta.gouv.fr/offres/',offer_humanized_id.humanized_id) AS "Lien portail pro"
             ,CONCAT('https://app.passculture.beta.gouv.fr/offre/details/',offer_humanized_id.humanized_id) AS "Lien WEBAPP"
             ,CONCAT('https://backend.passculture.beta.gouv.fr/pc/back-office/offersqlentity/edit/?id=',offer.id) AS "Lien vers FlaskAdmin"
-            ,count_first_booking_view."Nombre de premières réservations" AS "Nombre de premières réservations"
+            ,count_first_booking_view."Nombre de premières réservations"
         FROM offer
         LEFT JOIN venue ON offer."venueId" = venue.id
         LEFT JOIN offerer ON venue."managingOffererId" = offerer.id
