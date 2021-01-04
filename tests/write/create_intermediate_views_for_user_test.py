@@ -144,7 +144,7 @@ class UserQueriesTest:
 
         def test_should_return_an_empty_series_if_user_cannot_book_free_offers(self):
             # Given
-            create_user(can_book_free_offers=False)
+            create_user(is_beneficiary=False)
 
             # When
             query = _get_experimentation_sessions_query()
@@ -353,7 +353,7 @@ class UserQueriesTest:
 
         def test_if_user_cannot_book_free_offer_return_empty_data_frame(self):
             # Given
-            create_user(id=45, can_book_free_offers=False)
+            create_user(id=45, is_beneficiary=False)
 
             # When
             query = _get_actual_amount_spent_query()
@@ -366,7 +366,7 @@ class UserQueriesTest:
     class GetUserTheoricAmountSpent:
         def test_if_user_cannot_book_free_offer_return_empty_data_frame(self):
             # Given
-            create_user(id=45, can_book_free_offers=False)
+            create_user(id=45, is_beneficiary=False)
 
             # When
             query = _get_theoric_amount_spent_query()
@@ -561,9 +561,9 @@ class UserQueriesTest:
                 ),
             )
 
-        def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
+        def test_if_user_is_beneficiary_is_false_return_empty_data_frame(self):
             # Given
-            create_user(id=1, can_book_free_offers=False)
+            create_user(id=1, is_beneficiary=False)
 
             # When
             query = _get_theoric_amount_spent_in_digital_goods_query()
@@ -767,9 +767,9 @@ class UserQueriesTest:
                 ),
             )
 
-        def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
+        def test_if_user_is_beneficiary_is_false_return_empty_data_frame(self):
             # Given
-            create_user(id=1, can_book_free_offers=False)
+            create_user(id=1, is_beneficiary=False)
 
             # When
             query = _get_theoric_amount_spent_in_physical_goods_query()
@@ -977,9 +977,9 @@ class UserQueriesTest:
                 ),
             )
 
-        def test_if_user_can_book_free_offer_is_false_return_empty_data_frame(self):
+        def test_if_user_is_beneficiary_is_false_return_empty_data_frame(self):
             # Given
-            create_user(id=1, can_book_free_offers=False)
+            create_user(id=1, is_beneficiary=False)
 
             # When
             query = _get_theoric_amount_spent_in_outings_query()

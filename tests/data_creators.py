@@ -4,7 +4,7 @@ from db import ENGINE
 def create_user(
     id=1,
     email="test@email.com",
-    can_book_free_offers=True,
+    is_beneficiary=True,
     is_admin=False,
     postal_code="93100",
     departement_code="93",
@@ -24,9 +24,9 @@ def create_user(
     with ENGINE.connect() as connection:
         connection.execute(
             f"""
-        INSERT INTO "user" (id, email, "publicName", "canBookFreeOffers", "isAdmin", password, "postalCode",
+        INSERT INTO "user" (id, email, "publicName", "isBeneficiary", "isAdmin", password, "postalCode",
         "departementCode", "dateCreated", "needsToFillCulturalSurvey", "culturalSurveyFilledDate")
-        VALUES ({id}, '{email}', '{public_name}', {can_book_free_offers}, {is_admin}, '{password}', '{postal_code}',
+        VALUES ({id}, '{email}', '{public_name}', {is_beneficiary}, {is_admin}, '{password}', '{postal_code}',
         '{departement_code}', '{date_created}', {needs_to_fill_cultural_survey}, {cultural_survey_filled_date})
         """
         )

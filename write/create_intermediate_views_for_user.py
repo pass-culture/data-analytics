@@ -27,7 +27,7 @@ def _get_experimentation_sessions_query() -> str:
      "user".id AS user_id
     FROM "user"
     LEFT JOIN experimentation_session ON experimentation_session.user_id = "user".id
-    WHERE "user"."canBookFreeOffers")
+    WHERE "user"."isBeneficiary")
     """
 
 
@@ -53,7 +53,7 @@ def _get_activation_dates_query() -> str:
     FROM "user"
     LEFT JOIN validated_activation_booking
      ON validated_activation_booking."userId" = "user".id
-    WHERE "user"."canBookFreeOffers")
+    WHERE "user"."isBeneficiary")
     """
 
 
@@ -181,7 +181,7 @@ def _get_users_seniority_query() -> str:
     FROM "user"
     LEFT JOIN validated_activation_booking
      ON validated_activation_booking."userId" = "user".id
-    WHERE "user"."canBookFreeOffers")
+    WHERE "user"."isBeneficiary")
 
     SELECT
      DATE_PART('day', '{datetime.now()}' - activation_date."Date d'activation") AS "Ancienneté en jours",
@@ -199,7 +199,7 @@ def _get_actual_amount_spent_query() -> str:
      COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant réél dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isUsed" IS TRUE AND booking."isCancelled" IS FALSE
-    WHERE "user"."canBookFreeOffers"
+    WHERE "user"."isBeneficiary"
     GROUP BY "user".id)
     """
 
@@ -211,7 +211,7 @@ def _get_theoric_amount_spent_query() -> str:
      COALESCE(SUM(booking.amount * booking.quantity), 0) AS "Montant théorique dépensé"
     FROM "user"
     LEFT JOIN booking ON "user".id = booking."userId" AND booking."isCancelled" IS FALSE
-    WHERE "user"."canBookFreeOffers"
+    WHERE "user"."isBeneficiary"
     GROUP BY "user".id)
     """
 
@@ -234,7 +234,7 @@ def _get_theoric_amount_spent_in_digital_goods_query() -> str:
     COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses numériques"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
-    WHERE "user"."canBookFreeOffers" IS TRUE
+    WHERE "user"."isBeneficiary" IS TRUE
     GROUP BY "user".id)
     """
 
@@ -254,7 +254,7 @@ def _get_theoric_amount_spent_in_physical_goods_query() -> str:
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses physiques"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
-    WHERE "user"."canBookFreeOffers" IS TRUE
+    WHERE "user"."isBeneficiary" IS TRUE
     GROUP BY "user".id)
     """
 
@@ -284,7 +284,7 @@ def _get_theoric_amount_spent_in_outings_query() -> str:
     SELECT "user".id AS user_id, COALESCE(SUM(eligible_booking.amount * eligible_booking.quantity),0.) AS "Dépenses sorties"
     FROM "user"
     LEFT JOIN eligible_booking ON "user".id = eligible_booking."userId"
-    WHERE "user"."canBookFreeOffers" IS TRUE
+    WHERE "user"."isBeneficiary" IS TRUE
     GROUP BY "user".id)
     """
 
@@ -459,7 +459,7 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
         LEFT JOIN theoric_amount_spent_in_outings ON "user".id = theoric_amount_spent_in_outings.user_id
         LEFT JOIN last_booking_date ON last_booking_date.user_id = "user".id
         LEFT JOIN user_humanized_id ON user_humanized_id.id = "user".id
-        WHERE "user"."canBookFreeOffers");
+        WHERE "user"."isBeneficiary");
         """
     with ENGINE.connect() as connection:
         connection.execute(query)
