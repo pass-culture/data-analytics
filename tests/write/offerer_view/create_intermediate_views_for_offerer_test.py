@@ -317,7 +317,7 @@ class OffererQueriesTest:
                 stock_id=20,
                 token="ABC321",
                 is_used=True,
-                date_created='2021-01-05'
+                date_created=f'{datetime.now().year}-01-05'
             )
             create_booking(
                 id=3,
