@@ -8,7 +8,7 @@ jobs:
           password: $DOCKERHUB_PASSWORD
         environment:
           DATABASE_URL: postgresql://pass_culture:passq@postgres-product:5432/pass_culture
-      - image: circleci/postgres:11.6-postgis
+      - image: circleci/postgres:12.3-postgis
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Initialize environment
           command: |
-            git clone --single-branch --branch $CIRCLE_BRANCH https://github.com/betagouv/pass-culture-api.git || git clone https://github.com/betagouv/pass-culture-api.git;
+            git clone --single-branch --branch $CIRCLE_BRANCH https://github.com/pass-culture/pass-culture-api.git || git clone https://github.com/pass-culture/pass-culture-api.git;
             cd pass-culture-api;
             python3 -m venv venv
             . venv/bin/activate
