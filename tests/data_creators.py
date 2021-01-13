@@ -253,13 +253,13 @@ def create_payment_status(payment_id, id=1, date="2019-11-29", status="PENDING")
 
 
 def create_deposit(
-    id=1, amount=500, user_id=1, source="string", date_created="2019-11-29"
+    id=1, amount=500, user_id=1, source="string", date_created="2019-11-29", version=1
 ):
     with ENGINE.connect() as connection:
         connection.execute(
             f"""
-                    INSERT INTO deposit (id, amount, "userId", source, "dateCreated")
-                    VALUES ({id}, {amount}, {user_id}, '{source}', '{date_created}')
+                    INSERT INTO deposit (id, amount, "userId", source, "dateCreated", version)
+                    VALUES ({id}, {amount}, {user_id}, '{source}', '{date_created}', '{version}')
                     """
         )
 

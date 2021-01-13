@@ -7,7 +7,6 @@ def clean_database():
             """
         DELETE FROM "deposit";
         DELETE FROM "favorite";
-        DELETE FROM "recommendation";
         DELETE FROM payment_status;
         DELETE FROM payment;
         DELETE FROM "booking";

@@ -25,7 +25,7 @@ services:
       - .:/opt/enriched_data
     command: >
       bash -c "cd /opt;
-               git clone https://github.com/betagouv/pass-culture-api.git;
+               git clone https://github.com/pass-culture/pass-culture-api;
                cd pass-culture-api;
                pip install -r requirements.txt;
                pip install -e .;
@@ -39,7 +39,7 @@ services:
       - datasource-postgres-blue
 
   datasource-postgres-blue:
-    image: circleci/postgres:11.6-postgis
+    image: circleci/postgres:12.3-postgis
     container_name: analytics-datasource-blue-postgres
     env_file:
       - env_file

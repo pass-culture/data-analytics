@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   datasource-postgres-green:
-    image: circleci/postgres:11.6-postgis
+    image: circleci/postgres:12.3-postgis
     container_name: analytics-datasource-green-postgres
     environment:
       - POSTGRES_USER=pass_culture
