@@ -33,28 +33,27 @@ def _get_experimentation_sessions_query() -> str:
 
 def _get_activation_dates_query() -> str:
     return """
-    (WITH validated_activation_booking AS (
-     SELECT booking."dateUsed" AS date_used, booking."userId", booking."isUsed" AS is_used
-     FROM booking
-     JOIN stock
-      ON stock.id = booking."stockId"
-     JOIN offer
-      ON stock."offerId" = offer.id
-      AND offer.type = 'ThingType.ACTIVATION'
-     WHERE booking."isUsed"
+    WITH dat AS (
+        SELECT
+            booking."userId" AS user_id
+            ,offer."type"
+            ,"dateUsed"
+            ,"isUsed"
+            ,RANK() OVER (PARTITION BY booking."userId" ORDER BY booking."dateCreated" ASC) AS rank_
+        FROM booking
+    JOIN stock ON booking."stockId" = stock.id
+    JOIN offer ON stock."offerId" = offer.id
     )
 
     SELECT
-     CASE
-      WHEN validated_activation_booking.is_used THEN validated_activation_booking.date_used
-      ELSE "user"."dateCreated"
-     END AS "Date d'activation",
-     "user".id as user_id
+        "user".id AS user_id
+        ,CASE WHEN "type" = 'ThingType.ACTIVATION' AND "isUsed" THEN "dateUsed" ELSE "user"."dateCreated" END AS "Date d'activation"
     FROM "user"
-    LEFT JOIN validated_activation_booking
-     ON validated_activation_booking."userId" = "user".id
-    WHERE "user"."isBeneficiary")
-    """
+    LEFT JOIN dat ON "user".id = dat.user_id
+    WHERE rank_ = 1
+    AND "user"."isBeneficiary"
+
+"""
 
 
 def _get_date_of_first_bookings_query() -> str:
@@ -303,6 +302,86 @@ def _get_last_booking_date_query() -> str:
     """
 
 
+def _get_first_paid_booking_date_query() -> str:
+    return """
+     SELECT
+        booking."userId" AS user_id
+        ,min(booking."dateCreated") AS "Date de première réservation"
+    FROM booking
+    JOIN stock ON stock.id = booking."stockId"
+    JOIN offer ON offer.id = stock."offerId"
+    AND offer.type != 'ThingType.ACTIVATION'
+    AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
+    AND COALESCE(booking.amount,0) > 0
+    GROUP BY user_id
+    """
+
+def _get_first_booking_type_query() -> str:
+    return """
+    WITH dat AS (
+    SELECT
+        booking.id
+        ,booking."userId" AS user_id
+        ,offer."type" AS offer_type
+        ,rank() over (partition by booking."userId" order by booking."dateCreated") AS rank_booking
+    FROM booking
+    JOIN stock
+    ON booking."stockId" = stock.id
+    JOIN offer
+    ON offer.id = stock."offerId"
+    AND offer."type" NOT IN ('ThingType.ACTIVATION','EventType.ACTIVATION')
+    AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
+    )
+    
+    SELECT
+        user_id
+        ,offer_type AS first_booking_type
+    FROM dat
+    WHERE rank_booking = 1
+    """
+
+
+def _get_first_paid_booking_type_query() -> str:
+    return """
+    WITH dat_2 AS (
+    SELECT
+        booking.id
+        ,booking."userId" AS user_id
+        ,offer."type" AS offer_type
+        ,rank() over (partition by booking."userId" order by booking."dateCreated") AS rank_booking
+    FROM booking
+    JOIN stock
+    ON booking."stockId" = stock.id
+    JOIN offer
+    ON offer.id = stock."offerId"
+    AND offer."type" NOT IN ('ThingType.ACTIVATION','EventType.ACTIVATION')
+    AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
+    AND booking.amount > 0
+    )
+
+    SELECT
+        user_id
+        ,offer_type AS first_paid_booking_type
+    FROM dat_2
+    WHERE rank_booking = 1
+    """
+
+def _get_count_distinct_types_query() -> str:
+    return """
+    SELECT
+       booking."userId" AS user_id
+       ,COUNT(DISTINCT offer."type") AS cnt_distinct_types
+    FROM booking
+    JOIN stock
+    ON booking."stockId" = stock.id
+    JOIN offer
+    ON offer.id = stock."offerId"
+    AND offer."type" NOT IN ('ThingType.ACTIVATION','EventType.ACTIVATION')
+    AND (offer."bookingEmail" != 'jeux-concours@passculture.app' OR offer."bookingEmail" IS NULL)
+    GROUP BY user_id
+    """
+
+
 def create_experimentation_sessions_view(ENGINE) -> None:
     view_query = f"""
         CREATE OR REPLACE VIEW experimentation_sessions AS {_get_experimentation_sessions_query()}
@@ -415,6 +494,38 @@ def create_date_of_last_booking_view(ENGINE) -> None:
         connection.execute(view_query)
 
 
+def create_date_first_paid_booking_view(ENGINE) -> None:
+    view_query = f"""
+        CREATE OR REPLACE VIEW first_paid_booking_date AS {_get_first_paid_booking_date_query()}
+        """
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
+
+
+def create_first_booking_type_view(ENGINE) -> None:
+    view_query = f"""
+        CREATE OR REPLACE VIEW first_booking_type AS {_get_first_booking_type_query()}
+        """
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
+
+
+def create_first_paid_booking_type_view(ENGINE) -> None:
+    view_query = f"""
+        CREATE OR REPLACE VIEW first_paid_booking_type AS {_get_first_paid_booking_type_query()}
+        """
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
+
+
+def create_count_distinct_types_view(ENGINE) -> None:
+    view_query = f"""
+        CREATE OR REPLACE VIEW count_distinct_types AS {_get_count_distinct_types_query()}
+        """
+    with ENGINE.connect() as connection:
+        connection.execute(view_query)
+
+
 def create_materialized_enriched_user_view(ENGINE) -> None:
     query = """
         CREATE MATERIALIZED VIEW IF NOT EXISTS enriched_user_data AS
@@ -442,7 +553,14 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
          theoric_amount_spent_in_physical_goods."Dépenses physiques",
          theoric_amount_spent_in_outings."Dépenses sorties",
          user_humanized_id.humanized_id AS "user_humanized_id",
-         last_booking_date."Date de dernière réservation"
+         last_booking_date."Date de dernière réservation",
+         regions_departments.region_name AS "Région de l'utilisateur",
+         first_paid_booking_date."Date de première réservation" AS "Date de première réservation payante",
+         DATE_PART('day', date_of_first_bookings."Date de première réservation" - activation_dates."Date d'activation") AS "Jours entre l'activation et la première réservation",
+         DATE_PART('day', first_paid_booking_date."Date de première réservation" - activation_dates."Date d'activation") AS "Jours entre l'activation et la première réservation payante",
+         first_booking_type.first_booking_type AS "Catégorie de la première réservation",
+         first_paid_booking_type.first_paid_booking_type AS "Catégorie de la première réservation payante",
+         count_distinct_types.cnt_distinct_types AS "Nombre de catégories réservées"
         FROM "user"
         LEFT JOIN experimentation_sessions ON "user".id = experimentation_sessions."user_id"
         LEFT JOIN activation_dates ON "user".id  = activation_dates.user_id
@@ -459,6 +577,11 @@ def create_materialized_enriched_user_view(ENGINE) -> None:
         LEFT JOIN theoric_amount_spent_in_outings ON "user".id = theoric_amount_spent_in_outings.user_id
         LEFT JOIN last_booking_date ON last_booking_date.user_id = "user".id
         LEFT JOIN user_humanized_id ON user_humanized_id.id = "user".id
+        LEFT JOIN regions_departments ON "user"."departementCode" = regions_departments.num_dep
+        LEFT JOIN first_paid_booking_date ON "user".id = first_paid_booking_date.user_id
+        LEFT JOIN first_booking_type ON "user".id = first_booking_type.user_id
+        LEFT JOIN first_paid_booking_type ON "user".id = first_paid_booking_type.user_id
+        LEFT JOIN count_distinct_types ON "user".id = count_distinct_types.user_id
         WHERE "user"."isBeneficiary");
         """
     with ENGINE.connect() as connection:

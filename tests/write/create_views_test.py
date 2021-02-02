@@ -147,6 +147,13 @@ class ViewQueriesTest:
                 "Dépenses sorties",
                 "Date de dernière réservation",
                 "user_humanized_id",
+                "Région de l'utilisateur",
+                "Date de première réservation payante",
+                "Jours entre l'activation et la première réservation",
+                "Jours entre l'activation et la première réservation payante",
+                "Catégorie de la première réservation",
+                "Catégorie de la première réservation payante",
+                "Nombre de catégories réservées",
             ]
 
             # When

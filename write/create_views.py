@@ -25,6 +25,10 @@ from write.create_intermediate_views_for_user import (
     create_theoric_amount_spent_in_physical_goods_view,
     create_theoric_amount_spent_in_outings_view,
     create_date_of_last_booking_view,
+    create_date_first_paid_booking_view,
+    create_first_booking_type_view,
+    create_first_paid_booking_type_view,
+    create_count_distinct_types_view,
     create_materialized_enriched_user_view,
 )
 from write.create_intermediate_views_for_offer import (
@@ -99,7 +103,12 @@ def create_enriched_user_data(ENGINE):
     create_theoric_amount_spent_in_physical_goods_view(ENGINE)
     create_theoric_amount_spent_in_outings_view(ENGINE)
     create_humanized_id_data(ENGINE, '"user"')
+    create_table_regions_departments_data(ENGINE)
     create_date_of_last_booking_view(ENGINE)
+    create_date_first_paid_booking_view(ENGINE)
+    create_first_booking_type_view(ENGINE)
+    create_first_paid_booking_type_view(ENGINE)
+    create_count_distinct_types_view(ENGINE)
     create_materialized_enriched_user_view(ENGINE)
 
 
