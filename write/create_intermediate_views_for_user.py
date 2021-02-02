@@ -33,7 +33,7 @@ def _get_experimentation_sessions_query() -> str:
 
 def _get_activation_dates_query() -> str:
     return """
-    WITH dat AS (
+    WITH ranked_bookings AS (
         SELECT
             booking."userId" AS user_id
             ,offer."type"
@@ -49,7 +49,7 @@ def _get_activation_dates_query() -> str:
         "user".id AS user_id
         ,CASE WHEN "type" = 'ThingType.ACTIVATION' AND "isUsed" THEN "dateUsed" ELSE "user"."dateCreated" END AS "Date d'activation"
     FROM "user"
-    LEFT JOIN dat ON "user".id = dat.user_id
+    LEFT JOIN ranked_bookings ON "user".id = ranked_bookings.user_id
     WHERE rank_ = 1
     AND "user"."isBeneficiary"
 
@@ -318,7 +318,7 @@ def _get_first_paid_booking_date_query() -> str:
 
 def _get_first_booking_type_query() -> str:
     return """
-    WITH dat AS (
+    WITH bookings_ranked AS (
     SELECT
         booking.id
         ,booking."userId" AS user_id
@@ -336,14 +336,14 @@ def _get_first_booking_type_query() -> str:
     SELECT
         user_id
         ,offer_type AS first_booking_type
-    FROM dat
+    FROM bookings_ranked
     WHERE rank_booking = 1
     """
 
 
 def _get_first_paid_booking_type_query() -> str:
     return """
-    WITH dat_2 AS (
+    WITH paid_bookings_ranked AS (
     SELECT
         booking.id
         ,booking."userId" AS user_id
@@ -362,7 +362,7 @@ def _get_first_paid_booking_type_query() -> str:
     SELECT
         user_id
         ,offer_type AS first_paid_booking_type
-    FROM dat_2
+    FROM paid_bookings_ranked
     WHERE rank_booking = 1
     """
 
