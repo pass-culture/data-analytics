@@ -47,11 +47,11 @@ def _get_activation_dates_query() -> str:
 
     SELECT
         "user".id AS user_id
-        ,CASE WHEN "type" = 'ThingType.ACTIVATION' AND "isUsed" THEN "dateUsed" ELSE "user"."dateCreated" END AS "Date d'activation"
+        ,CASE WHEN "type" = 'ThingType.ACTIVATION' AND "dateUsed" IS NOT NULL THEN "dateUsed" ELSE "user"."dateCreated" END AS "Date d'activation"
     FROM "user"
     LEFT JOIN ranked_bookings ON "user".id = ranked_bookings.user_id
-    WHERE rank_ = 1
-    AND "user"."isBeneficiary"
+    AND rank_ = 1
+    WHERE "user"."isBeneficiary"
 
 """
 
