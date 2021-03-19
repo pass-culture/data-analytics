@@ -67,6 +67,7 @@ def create_venue(
     departement_code="93",
     is_virtual=False,
     fields_updated="{}",
+    date_created="2019-11-20",
 ):
     if not siret:
         siret = "NULL"
@@ -91,8 +92,8 @@ def create_venue(
     with ENGINE.connect() as connection:
         connection.execute(
             f"""
-        INSERT INTO venue (id, "thumbCount", "name", "siret", "postalCode", city, "departementCode", "managingOffererId", "isVirtual", "fieldsUpdated")
-        VALUES ({id}, {thumb_count}, '{name}', {siret}, {postal_code}, {city}, {departement_code}, {offerer_id}, {is_virtual}, '{fields_updated}')
+        INSERT INTO venue (id, "thumbCount", "name", "siret", "postalCode", city, "departementCode", "managingOffererId", "isVirtual", "fieldsUpdated", "dateCreated")
+        VALUES ({id}, {thumb_count}, '{name}', {siret}, {postal_code}, {city}, {departement_code}, {offerer_id}, {is_virtual}, '{fields_updated}', '{date_created}')
         """
         )
 
